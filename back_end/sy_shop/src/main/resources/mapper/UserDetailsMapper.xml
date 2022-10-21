@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jy2b.zxxfd.mapper.UserDetailsMapper">
+    <!--List<String> queryAuthPermsByUserId(Long userId);-->
+    <select id="queryAuthPermsByUserId" parameterType="long" resultType="string">
+        select perms from tb_auth where id in (
+            select auth_id from tb_role_auth where role_id in (
+                select role_id from tb_user_role where user_id = #{userId}
+            ) and `status` = 1
+        ) and `status` = 1
+    </select>
+</mapper>

@@ -1,0 +1,43 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/sy_shop?characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true
+    username: root
+    password: 123456
+  application:
+    name: syShop
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher # 解决SpringBoot与Swagger版本冲突
+  redis:
+    host: 192.168.110.100
+    port: 6379
+    password: 123456
+    lettuce:
+      pool:
+        max-wait: 100 # 连接等待时间
+        max-active: 8 # 最大连接数
+        min-idle: 0 # 最小空闲连接数
+        max-idle: 8 # 最大空闲连接数
+  jackson:
+    default-property-inclusion: non_null # JSON处理时忽略非空字段
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  servlet:
+    multipart:
+      max-file-size: 10MB # 单文件最大上传大小
+      max-request-size: 100MB # 多文件最大上传大小
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 开启日志，输出SQL语句
+  type-aliases-package: com.jy2b.zxxfd.entity # 指定实体类别名路径
+  mapper-locations: classpath:/mapper/*.xml
+server:
+  port: 8081 # 指定端口号
+  servlet:
+    context-path: "/api" # 指定根路径
+logging:
+  level:
+    com.hmdp: debug
+
+
