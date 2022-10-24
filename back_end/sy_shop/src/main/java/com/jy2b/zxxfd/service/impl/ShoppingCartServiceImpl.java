@@ -35,24 +35,24 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
         // 判断该商品属性是否存在
         GoodsItem item = itemMapper.selectById(gid);
         if (item == null) {
-            return ResultVo.fail("商品属性不存在！");
+            return ResultVo.fail("商品属性不存在");
         }
         // 获取数量
         Integer quantity = cartDTO.getQuantity();
         // 判断数量是否为空
         if (quantity == null || quantity <= 0) {
-            return ResultVo.fail("数量不能小于零！");
+            return ResultVo.fail("数量不能小于零");
         }
         // 判断数量是否大于商品属性库存
         if (quantity > item.getStock()) {
-            return ResultVo.fail("商品库存不足！");
+            return ResultVo.fail("商品库存不足");
         }
 
         // 判断是否重复
         ShoppingCart cart = query().eq("uid", userId).eq("gid", gid).one();
         if (cart != null) {
             update().set("quantity", quantity).eq("id", cart.getId()).update();
-            return ResultVo.ok("新增购物车成功！");
+            return ResultVo.ok("新增购物车成功");
         }
 
         ShoppingCart shoppingCart = new ShoppingCart();
@@ -61,7 +61,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
         shoppingCart.setQuantity(quantity);
 
         boolean result = save(shoppingCart);
-        return result ? ResultVo.ok("新增购物车成功！") : ResultVo.fail("新增购物车失败！");
+        return result ? ResultVo.ok("新增购物车成功") : ResultVo.fail("新增购物车失败");
     }
 
     @Override
@@ -69,7 +69,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
         // 查询购物车
         ShoppingCart shoppingCart = getById(id);
         if (shoppingCart == null) {
-            return ResultVo.fail("购物车不存在！");
+            return ResultVo.fail("购物车不存在");
         }
 
         // 获取登录用户id
@@ -77,13 +77,13 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
 
         // 判断用户id是否一致
         if (!userId.equals(shoppingCart.getUid())) {
-            return ResultVo.fail("购物车不存在！");
+            return ResultVo.fail("购物车不存在");
         }
 
         // 删除购物车
         boolean result = removeById(id);
 
-        return result ? ResultVo.ok("删除购物车成功！") : ResultVo.fail("删除购物车失败！");
+        return result ? ResultVo.ok("删除购物车成功") : ResultVo.fail("删除购物车失败");
     }
 
     @Override
@@ -93,14 +93,14 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
 
         // 判断购物车是否存在
         if (shoppingCart == null) {
-            return ResultVo.fail("购物车不存在！");
+            return ResultVo.fail("购物车不存在");
         }
 
         // 获取登录用户id
         Long userId = UserHolder.getUser().getId();
         // 判断用户id是否一致
         if (!userId.equals(shoppingCart.getUid())) {
-            return ResultVo.fail("购物车不存在！");
+            return ResultVo.fail("购物车不存在");
         }
 
         // 获取修改信息 商品属性id
@@ -109,17 +109,17 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
         // 判断商品属性是否存在
         GoodsItem item = itemMapper.selectById(gid);
         if (item == null) {
-            return ResultVo.fail("商品属性已下架或不存在！");
+            return ResultVo.fail("商品属性已下架或不存在");
         }
         // 获取修改信息 商品数量
         Integer quantity = cartDTO.getQuantity();
         // 判断数量是否不为空
         if (quantity == null || quantity <= 0) {
-            return ResultVo.fail("数量不能等于零！");
+            return ResultVo.fail("数量不能等于零");
         }
         // 判断数量是否大于商品属性库存
         if (quantity > item.getStock()) {
-            return ResultVo.fail("商品库存不足！");
+            return ResultVo.fail("商品库存不足");
         }
 
         ShoppingCart updateCart = new ShoppingCart();
@@ -131,7 +131,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
         // 修改购物车
         boolean result = updateById(updateCart);
 
-        return result ? ResultVo.ok("修改购物车成功！") : ResultVo.fail("修改购物车失败！");
+        return result ? ResultVo.ok("修改购物车成功") : ResultVo.fail("修改购物车失败");
     }
 
     @Override

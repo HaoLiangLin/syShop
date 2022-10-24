@@ -34,24 +34,23 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
         // 判断商品是否存在
         String gid = itemFromDTO.getGid();
         if (gid == null) {
-            return ResultVo.fail("请指定添加属性的商品！");
+            return ResultVo.fail("请指定添加属性的商品");
         }
         Goods goods = goodsMapper.selectById(gid);
         if (goods == null) {
-            return ResultVo.fail("商品不存在！");
+            return ResultVo.fail("商品不存在");
         }
 
         // 获取属性颜色
         String color = itemFromDTO.getColor();
         // 判断属性颜色是否不为空
         if (StrUtil.isBlank(color)) {
-            return ResultVo.fail("添加商品属性失败，颜色不能为空！");
+            return ResultVo.fail("添加商品属性失败，颜色不能为空");
         }
 
         // 判断属性图片是否不为空
         if (StrUtil.isBlank(itemFromDTO.getIcon())) {
-            // TODO return ResultVo.fail("添加商品属性失败，图片不能为空！");
-            itemFromDTO.setIcon("测试图片");
+            return ResultVo.fail("添加商品属性失败，图片不能为空！");
         }
 
         QueryWrapper<GoodsItem> queryWrapper = new QueryWrapper<>();
@@ -78,12 +77,12 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
         // 查询是否有重复项
         int colorCount = count(queryWrapper);
         if (colorCount > 0) {
-            return ResultVo.fail("商品属性已存在！");
+            return ResultVo.fail("商品属性已存在");
         }
 
         // 判断属性价格是否不为空，且大于零
         if (itemFromDTO.getPrice() == null || itemFromDTO.getPrice() <= 0) {
-            return ResultVo.fail("添加商品属性价格不能为空或小于等于零！");
+            return ResultVo.fail("添加商品属性价格不能为空或小于等于零");
         }
         // 判断属性折扣是否不为空，且大于零
         if (itemFromDTO.getDiscount() == null || itemFromDTO.getDiscount() <= 0) {
@@ -91,12 +90,12 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
         }
         // 判断属性库存是否不为空，且大于零
         if (itemFromDTO.getStock() == null || itemFromDTO.getStock() <= 0) {
-            return ResultVo.fail("添加商品属性库存不能为空或小于等于零！");
+            return ResultVo.fail("添加商品属性库存不能为空或小于等于零");
         }
         // 添加商品属性
         GoodsItem goodsItem = BeanUtil.copyProperties(itemFromDTO, GoodsItem.class);
         boolean result = save(goodsItem);
-        return result ? ResultVo.ok("添加商品属性成功！") : ResultVo.fail("添加商品属性失败！");
+        return result ? ResultVo.ok("添加商品属性成功") : ResultVo.fail("添加商品属性失败");
     }
 
     @Override
@@ -106,26 +105,26 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
         // 判断商品属性是否存在
         GoodsItem item = getById(id);
         if (item == null) {
-            return ResultVo.fail("商品属性不存在！");
+            return ResultVo.fail("商品属性不存在");
         }
         // 获取商品属性归属商品id
         Long gid = goodsItem.getGid();
         // 判断商品是否存在
         Goods goods = goodsMapper.selectById(gid);
         if (goods == null) {
-            return ResultVo.fail("商品不存在！");
+            return ResultVo.fail("商品不存在");
         }
         // 判断属性颜色是否不为空
         if (StrUtil.isBlank(goodsItem.getColor())) {
-            return ResultVo.fail("修改商品属性失败，颜色不能为空！！");
+            return ResultVo.fail("修改商品属性失败，颜色不能为空");
         }
         // 判断属性图片是否不为空
         if (StrUtil.isBlank(goodsItem.getIcon())) {
-            return ResultVo.fail("修改商品属性图片不能为空！");
+            return ResultVo.fail("修改商品属性图片不能为空");
         }
         // 判断属性价格是否不为空，且大于零
         if (goodsItem.getPrice() == null || goodsItem.getPrice() <= 0) {
-            return ResultVo.fail("修改商品属性价格不能为空或小于等于零！");
+            return ResultVo.fail("修改商品属性价格不能为空或小于等于零");
         }
         // 判断属性折扣是否不为空，且大于零
         if (goodsItem.getDiscount() == null || goodsItem.getDiscount() <= 0) {
@@ -133,23 +132,23 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
         }
         // 判断属性库存是否不为空，且大于零
         if (goodsItem.getStock() == null || goodsItem.getStock() <= 0) {
-            return ResultVo.fail("修改商品属性库存不能为空或小于等于零！");
+            return ResultVo.fail("修改商品属性库存不能为空或小于等于零");
         }
         // 判断属性状态是否不为空
         if (goodsItem.getStatus() != null) {
             if (goodsItem.getStatus() < 0 || goodsItem.getStatus() > 1) {
-                return ResultVo.fail("修改商品属性状态不存在！");
+                return ResultVo.fail("修改商品属性状态不存在");
             }
         }
         // 修改商品属性
         boolean result = updateById(goodsItem);
-        return result ? ResultVo.ok("修改商品属性成功！") : ResultVo.fail("修改商品属性失败！");
+        return result ? ResultVo.ok("修改商品属性成功") : ResultVo.fail("修改商品属性失败");
     }
 
     @Override
     public ResultVo queryItemList(Integer page, Integer size, GoodsItemQueryFromDTO itemFromDTO) {
         if (itemFromDTO == null) {
-            return ResultVo.fail("商品不存在！");
+            return ResultVo.fail("商品不存在");
         }
         // 获取商品id
         Long gid = itemFromDTO.getGid();
@@ -157,7 +156,7 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
         Goods goods = goodsMapper.selectById(gid);
         // 判断商品是否存在
         if (goods == null) {
-            return ResultVo.fail("商品不存在！");
+            return ResultVo.fail("商品不存在");
         }
         // 分页
         Page<GoodsItem> goodsItemPage = new Page<>(page, size);
@@ -235,14 +234,14 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
         Goods goods = goodsMapper.selectById(gid);
         // 判断商品是否为空
         if (goods == null) {
-            return ResultVo.fail("商品不存在！");
+            return ResultVo.fail("商品不存在");
         }
 
         // 根据商品id查询商品属性
         List<GoodsItem> goodsItems = query().eq("gid", gid).eq("status", 1).list();
 
         if (goodsItems.isEmpty()) {
-            return ResultVo.ok("该商品暂无商品属性！");
+            return ResultVo.ok("该商品暂无商品属性");
         }
 
         // 获取第一个商品属性为默认选中
@@ -272,7 +271,7 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
     public ResultVo queryItemByColor(Long gid, String color) {
         // 判断颜色是否为空
         if (StrUtil.isBlank(color)) {
-            return ResultVo.fail("属性颜色不能为空！");
+            return ResultVo.fail("属性颜色不能为空");
         }
 
         GoodsItemDTO itemDTO = setItemDTO(gid, color);

@@ -1,9 +1,9 @@
 package com.jy2b.zxxfd.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.jy2b.zxxfd.domain.GoodsComment;
+import com.jy2b.zxxfd.domain.EvaluationComment;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface GoodsCommentMapper extends BaseMapper<GoodsComment> {
+public interface EvaluationCommentMapper extends BaseMapper<EvaluationComment> {
 }

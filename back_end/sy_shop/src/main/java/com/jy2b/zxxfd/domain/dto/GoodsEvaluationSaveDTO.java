@@ -3,7 +3,7 @@ package com.jy2b.zxxfd.domain.dto;
 import lombok.Data;
 
 @Data
-public class GoodsCommentSaveDTO {
+public class GoodsEvaluationSaveDTO {
     private Long orderItemId; // 订单属性id
 
     private Integer stars; // 评价星级

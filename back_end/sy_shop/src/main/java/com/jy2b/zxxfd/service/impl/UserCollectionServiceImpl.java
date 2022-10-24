@@ -32,18 +32,18 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
         Goods goods = goodsMapper.selectById(gid);
         // 判断商品是否存在
         if (goods == null) {
-            return ResultVo.fail("商品不存在！");
+            return ResultVo.fail("商品不存在");
         }
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
         // 查询收藏
         UserCollection collection = query().eq("uid", userId).eq("gid", gid).one();
         if (collection != null) {
-            return ResultVo.fail("商品已收藏！");
+            return ResultVo.fail("商品已收藏");
         }
         // 新增收藏
         boolean result = save(new UserCollection(userId, gid));
-        return result ? ResultVo.ok("收藏成功！") : ResultVo.fail("收藏失败！");
+        return result ? ResultVo.ok("收藏成功") : ResultVo.fail("收藏失败");
     }
 
     @Override
@@ -52,19 +52,19 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
         Long userId = UserHolder.getUser().getId();
         // 判断用户id是否与收藏用户id一致
         if (!userId.equals(userCollection.getUid())) {
-            return ResultVo.fail("收藏不存在！");
+            return ResultVo.fail("收藏不存在");
         }
 
         UserCollection collection = query().eq("uid", userCollection.getUid()).eq("gid", userCollection.getGid()).one();
         if (collection == null) {
-            return ResultVo.fail("商品未收藏！");
+            return ResultVo.fail("商品未收藏");
         }
 
         QueryWrapper<UserCollection> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("uid", userCollection.getUid()).eq("gid", userCollection.getGid());
 
         boolean result = remove(queryWrapper);
-        return result ? ResultVo.ok("取消成功！") : ResultVo.fail("取消失败！");
+        return result ? ResultVo.ok("取消收藏成功") : ResultVo.fail("取消收藏失败");
     }
 
     @Override

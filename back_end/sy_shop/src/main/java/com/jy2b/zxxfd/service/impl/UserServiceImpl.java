@@ -72,7 +72,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         // 1. 判断手机号是否被注册
         Integer count = query().eq("phone", phone).count();
         if (count > 0) {
-            return ResultVo.fail("该手机号已注册！");
+            return ResultVo.fail("该手机号已注册");
         }
 
         // 2. 生成验证码
@@ -89,12 +89,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         // 3. 判断手机号是否被注册
         Integer phoneCount = query().eq("phone", phone).count();
         if (phoneCount > 0) {
-            return ResultVo.fail("该手机号已注册！");
+            return ResultVo.fail("该手机号已注册");
         }
         // 4. 判断账号是否存在
         Integer usernameCount = query().eq("username", register.getUsername()).count();
         if (usernameCount > 0) {
-            return ResultVo.fail("该账号已存在!");
+            return ResultVo.fail("该账号已存在");
         }
 
         // 5. 判断是否无效账号
@@ -135,7 +135,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         // 11. 注册账号
         boolean result = userRegister(user);
 
-        return result ? ResultVo.ok("注册成功！") : ResultVo.fail("注册失败！");
+        return result ? ResultVo.ok("注册成功") : ResultVo.fail("注册失败");
     }
 
     @Override
@@ -148,7 +148,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         // 获取登录类型
         Integer loginType = loginFormDTO.getLoginType();
         if (loginType == null) {
-            return ResultVo.fail("非正常登录请求！");
+            return ResultVo.fail("非正常登录请求");
         }
         // 账号密码登录
         if (loginType == 0) {
@@ -158,7 +158,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         if (loginType == 1) {
             return phoneCodeLogin(loginFormDTO.getPhone(), loginFormDTO.getCode());
         }
-        return ResultVo.fail("非正常登录请求！");
+        return ResultVo.fail("非正常登录请求");
     }
 
     @Override
@@ -173,12 +173,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         if (user == null) {
             // 用户不存在
             UserHolder.removeUser();
-            return ResultVo.fail("用户不存在！");
+            return ResultVo.fail("用户不存在");
         }
         // 5. 判断旧密码是否一致
         if (!passwordEncoder.matches(pwdFormDTO.getOldPassword(), user.getPassword())) {
             // 不一致
-            return ResultVo.fail("旧密码错误！");
+            return ResultVo.fail("旧密码错误");
         }
         // 6. 修改密码
         String password = passwordEncoder.encode(pwdFormDTO.getNewPassword());
@@ -190,29 +190,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             stringRedisTemplate.delete(RedisConstants.LOGIN_KEY + user.getId());
         }
 
-        return result ? ResultVo.ok() : ResultVo.fail("修改密码失败！");
+        return result ? ResultVo.ok() : ResultVo.fail("修改密码失败");
     }
 
     @Override
     public ResultVo updateIcon(String icon) {
         if (StrUtil.isBlank(icon)) {
-            return ResultVo.fail("头像不存在！");
+            return ResultVo.fail("头像不存在");
         }
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
         boolean result = update().set("icon", icon).eq("id", userId).update();
-        return result ? ResultVo.ok() : ResultVo.fail("头像修改失败！");
+        return result ? ResultVo.ok() : ResultVo.fail("头像修改失败");
     }
 
     @Override
     public ResultVo updateNickName(String nickname) {
         if (StrUtil.isBlank(nickname)) {
-            return ResultVo.fail("昵称不能为空！");
+            return ResultVo.fail("昵称不能为空");
         }
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
         boolean result = update().set("nickname", nickname).eq("id", userId).update();
-        return result ? ResultVo.ok() : ResultVo.fail("昵称修改失败！");
+        return result ? ResultVo.ok() : ResultVo.fail("昵称修改失败");
     }
 
     @Override
@@ -226,13 +226,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public ResultVo updateUsername(String username) {
         if (StrUtil.isBlank(username)) {
-            return ResultVo.fail("账号不能为空！");
+            return ResultVo.fail("账号不能为空");
         }
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
         User user = getById(userId);
         if (user.getIsUpdate() > 0) {
-            return ResultVo.fail("您的账号已超过修改次数，无法进行修改！");
+            return ResultVo.fail("您的用户名已超过修改次数，无法进行修改");
         }
         boolean result = update().set("username", username).set("isUpdate", 1).eq("id", userId).update();
 
@@ -242,7 +242,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             stringRedisTemplate.delete(RedisConstants.LOGIN_KEY + user.getId());
         }
 
-        return result ? ResultVo.ok("账号修改成功！请重新登录") : ResultVo.fail("账号修改失败！");
+        return result ? ResultVo.ok("用户名修改成功！请重新登录") : ResultVo.fail("账号修改失败！");
     }
 
     @Override
@@ -312,7 +312,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         Long userId = user.getId();
         // 修改密码
         boolean result = update().set("password", pwdFormDTO.getNewPassword()).eq("id", userId).update();
-        return result ? ResultVo.ok("密码修改成功！") : ResultVo.fail("密码修改失败！");
+        return result ? ResultVo.ok("密码修改成功") : ResultVo.fail("密码修改失败");
     }
 
     @Override
@@ -335,7 +335,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         Long id = user.getId();
         // 查询用户是否存在
         if (getById(id) == null) {
-            return ResultVo.fail("用户不存在！");
+            return ResultVo.fail("用户不存在");
         }
         boolean result = update(user, new UpdateWrapper<User>().eq("id", user.getId()));
         return result ? ResultVo.ok("修改成功") : ResultVo.fail("修改失败");
@@ -345,7 +345,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public ResultVo deleteUser(Long id) {
         // 查询用户是否存在
         if (getById(id) == null) {
-            return ResultVo.fail("用户不存在！");
+            return ResultVo.fail("用户不存在");
         }
         // 删除用户
         boolean result = removeById(id);
@@ -377,7 +377,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         // 查询用户是否已经签到
         boolean bit = getSignIn(userId);
         if (bit) {
-            return ResultVo.ok("今日已签到！");
+            return ResultVo.ok("今日已签到");
         }
 
         // 查询用户钱包
@@ -408,7 +408,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         // 查询用户是否已经签到
         boolean result = getSignIn(userId);
-        return result ? ResultVo.ok("今日已签到！") : ResultVo.fail("今日未签到！");
+        return result ? ResultVo.ok("今日已签到") : ResultVo.fail("今日未签到");
     }
 
     @Override
@@ -468,7 +468,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         // 获取日期
         LocalDateTime now = LocalDateTime.now();
         // 设置日期为key后缀
-        String keySuffix = now.format(DateTimeFormatter.ofPattern("yyyyMM"));
+        String keySuffix = now.format(DateTimeFormatter.ofPattern("yyyy:MM"));
         // 拼接key
         String key = RedisConstants.SIGN_IN_KEY + userId + ":" + keySuffix;
 
@@ -558,7 +558,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         LoginUser loginUser = (LoginUser) authenticate.getPrincipal();
 
         if (Objects.isNull(loginUser)) {
-            return ResultVo.fail("账号或密码错误！");
+            return ResultVo.fail("账号或密码错误");
         }
         // 获取用户信息
         User user = loginUser.getUser();
@@ -583,12 +583,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     private ResultVo phoneCodeLogin(String phone, String code) {
         // 校验手机号
         if (RegexUtils.isPhoneInvalid(phone)) {
-            return ResultVo.fail("手机号格式错误！");
+            return ResultVo.fail("手机号格式错误");
         }
 
         // 判断验证码是否为空
         if (StrUtil.isBlank(code)) {
-            return ResultVo.fail("验证码不能为空！");
+            return ResultVo.fail("验证码不能为空");
         }
 
         // 交由将请求信息进行封装成token，并返回
@@ -600,7 +600,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         LoginUser loginUser = (LoginUser) authenticate.getPrincipal();
 
         if (Objects.isNull(loginUser)) {
-            return ResultVo.fail("手机号或验证码错误！");
+            return ResultVo.fail("手机号或验证码错误");
         }
         // 获取用户信息
         User user = loginUser.getUser();
@@ -655,7 +655,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     private ResultVo createCode(String phone, String prefix, Long time, TimeUnit timeUnit) {
         // 1. 校验手机号
         if (RegexUtils.isPhoneInvalid(phone)) {
-            return ResultVo.fail("手机号格式错误！");
+            return ResultVo.fail("手机号格式错误");
         }
         // 2. 生成验证码
         String code = RandomUtil.randomNumbers(6);
@@ -678,12 +678,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     private ResultVo checkCode(String prefix, String phone, String code) {
         // 校验手机号
         if (RegexUtils.isPhoneInvalid(phone)) {
-            return ResultVo.fail("手机号格式错误！");
+            return ResultVo.fail("手机号格式错误");
         }
 
         // 判断验证码是否为空
         if (StrUtil.isBlank(code)) {
-            return ResultVo.fail("验证码不能为空！");
+            return ResultVo.fail("验证码不能为空");
         }
 
         String key = prefix + phone;

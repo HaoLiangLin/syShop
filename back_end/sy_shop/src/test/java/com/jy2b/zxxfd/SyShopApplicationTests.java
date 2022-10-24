@@ -10,6 +10,9 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 
 import javax.annotation.Resource;
 
+import java.io.File;
+import java.util.Objects;
+
 import static com.jy2b.zxxfd.contants.RedisConstants.ORDER_KEY;
 
 @SpringBootTest
@@ -47,5 +50,24 @@ class SyShopApplicationTests {
         for (String s1 : split) {
             System.out.println("s1 = " + s1);
         }
+    }
+
+    @Test
+    void test3() {
+        String s = "bill:1577368407370752002:2022:10:16";
+
+        String[] split = s.split(":");
+        String time = split[2] + split[3] +split[4];
+
+        System.out.println("time = " + time);
+    }
+
+    @Test
+    void test4() {
+        String property = System.getProperty("user.dir");
+        System.out.println("property = " + property);
+
+        String path = Objects.requireNonNull(this.getClass().getResource("")).getPath();
+        System.out.println("path = " + path);
     }
 }

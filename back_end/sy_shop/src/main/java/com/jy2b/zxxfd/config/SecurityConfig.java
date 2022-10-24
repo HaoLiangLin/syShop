@@ -100,6 +100,7 @@ public class SecurityConfig {
                     "/goodsCategory/query/**",
                     "/goods/query/**",
                     "/goodsItem/query/**",
+                    "/evaluation/query/**",
                     "/comments/query/**",
                     "/resources/image/**",
                     "/swagger-resources/**",

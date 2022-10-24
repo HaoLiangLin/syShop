@@ -5,7 +5,9 @@ import lombok.Data;
 import java.util.ArrayList;
 
 @Data
-public class GoodsCommentDTO {
+public class GoodsEvaluationDTO {
+    private Long id;
+
     private String userIcon;
 
     private String nickname;
@@ -21,4 +23,6 @@ public class GoodsCommentDTO {
     private ArrayList<String> images;
 
     private Integer liked;
+
+    private Integer isLiked;
 }

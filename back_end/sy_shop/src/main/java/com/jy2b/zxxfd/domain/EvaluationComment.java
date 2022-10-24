@@ -8,25 +8,16 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-@TableName("tb_goods_comment")
-public class GoodsComment {
+@TableName("tb_evaluation_comment")
+public class EvaluationComment {
     @TableId("id")
     private Long id;
 
     @TableField("uid")
     private Long uid;
 
-    @TableField("order_id")
-    private Long orderId;
-
-    @TableField("gid")
-    private Long gid;
-
-    @TableField("stars")
-    private Integer stars;
-
-    @TableField("images")
-    private String images;
+    @TableField("evaluation_id")
+    private Long evaluationId;
 
     @TableField("content")
     private String content;
@@ -39,4 +30,10 @@ public class GoodsComment {
 
     @TableField("status")
     private Integer status;
+
+    @TableField("fid")
+    private Long fid;
+
+    @TableField("isAuthor")
+    private Integer isAuthor;
 }

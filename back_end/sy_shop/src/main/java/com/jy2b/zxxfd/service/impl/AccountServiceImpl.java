@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 @Service
 public class AccountServiceImpl extends ServiceImpl<AccountMapper, UserAccount> implements IAccountService {
@@ -56,7 +55,7 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, UserAccount> 
         Double recharge = rechargeFromDTO.getRecharge();
         // 判断是否不为空
         if (recharge == null || recharge <= 0) {
-            return ResultVo.fail("充值金额不能为空！");
+            return ResultVo.fail("充值金额不能为空");
         }
 
         // 获取钱包信息
@@ -82,7 +81,7 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, UserAccount> 
         }
 
 
-        return ResultVo.fail("充值失败！");
+        return ResultVo.fail("充值失败");
     }
 
     /**
@@ -95,7 +94,7 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, UserAccount> 
         // 获取套餐信息
         RechargeCombo combo = rechargeComboMapper.selectById(comboId);
         if (combo == null) {
-            return ResultVo.fail("套餐不存在！");
+            return ResultVo.fail("套餐不存在");
         }
 
         // 获取钱包信息
@@ -128,7 +127,7 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, UserAccount> 
             return ResultVo.ok("充值成功！充值金额：" + combo.getPrice());
         }
 
-        return ResultVo.fail("充值失败！");
+        return ResultVo.fail("充值失败");
     }
 
     @Override
@@ -139,11 +138,10 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, UserAccount> 
         // 获取账单
         BillUtils billUtils = new BillUtils(stringRedisTemplate);
         if (dateDTO != null) {
-            HashMap<String, ArrayList<BillDTO>> arrayListHashMap
-                    = billUtils.queryBillByDate(userId, dateDTO.getYear(), dateDTO.getMonth(), dateDTO.getDay());
-            return ResultVo.ok(arrayListHashMap);
+            ArrayList<BillVO> billVOS = billUtils.queryBillByDate(userId, dateDTO.getYear(), dateDTO.getMonth(), dateDTO.getDay());
+            return ResultVo.ok(billVOS);
         }
-        HashMap<String, ArrayList<BillDTO>> arrayListHashMap = billUtils.queryBill(userId);
-        return ResultVo.ok(arrayListHashMap);
+        ArrayList<BillVO> billVOS = billUtils.queryBill(userId);
+        return ResultVo.ok(billVOS);
     }
 }

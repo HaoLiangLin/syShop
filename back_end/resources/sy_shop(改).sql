@@ -171,21 +171,35 @@ CREATE TABLE tb_order_item  (
   FOREIGN KEY (order_id) REFERENCES tb_order (id)
 )comment '订单详情表';
 
-CREATE TABLE tb_goods_comment  (
-  id bigint NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT '评论id',
-	uid bigint not null comment '评论用户id',
+CREATE TABLE tb_goods_evaluation (
+  id bigint NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT '评价id',
+  uid bigint not null comment '评价用户id',
   order_id bigint NOT NULL COMMENT '订单号',
-  gid bigint NOT NULL COMMENT '商品属性id',
+  goods_id bigint NOT NULL COMMENT '商品id',
+  goodsItem_id bigint NOT NULL COMMENT '商品属性id',
   stars int not null default 1 comment '评价等级',
   images varchar(1024) NULL DEFAULT NULL COMMENT '评论图片，多个图片以,隔开，最多三张',
   content longtext NOT NULL COMMENT '评论内容',
   time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '评论时间',
   liked int NOT NULL DEFAULT 0 COMMENT '点赞数量',
   status int NOT NULL DEFAULT 0 COMMENT '评论状态，0：正常，1：违规，2：隐藏/屏蔽',
-	FOREIGN KEY (uid) REFERENCES tb_user (id),
+  FOREIGN KEY (uid) REFERENCES tb_user (id),
   FOREIGN KEY (order_id) REFERENCES tb_order (id),
-  FOREIGN KEY (gid) REFERENCES tb_goods_item (id)
-)comment '商品评论表';
+  FOREIGN KEY (goods_id) REFERENCES tb_goods (id),
+  FOREIGN KEY (goodsItem_id) REFERENCES tb_goods_item (id)
+)comment '商品评价表';
+
+CREATE TABLE tb_evaluation_comment (
+  id bigint NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT '评论id',
+  uid bigint not null comment '评论用户id',
+  evaluation_id bigint NOT NULL COMMENT '评价id',
+  content longtext NOT NULL COMMENT '评论内容',
+  time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '评论时间',
+  liked int NOT NULL DEFAULT 0 COMMENT '点赞数量',
+  status int NOT NULL DEFAULT 0 COMMENT '评论状态，0：正常，1：违规，2：隐藏/屏蔽',
+  fid bigint COMMENT '评论父id',
+  FOREIGN KEY (evaluation_id) REFERENCES tb_goods_evaluation (id)
+)COMMENT '评价评论表';
 
 CREATE TABLE tb_goods_collection  (
   uid bigint NOT NULL COMMENT '用户id',

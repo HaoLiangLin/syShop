@@ -37,20 +37,20 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
     @Override
     public ResultVo queryCategoryChild(Long id) {
         List<GoodsCategory> categories = query().eq("fid", id).list();
-        return ResultVo.ok(categories, "查询商品子分类成功！");
+        return ResultVo.ok(categories, "查询商品子分类成功");
     }
 
     @Override
     public ResultVo saveCategory(GoodsCategory goodsCategory) {
         // 判断分类名称是否存在
         if (StrUtil.isBlank(goodsCategory.getName())) {
-            return ResultVo.fail("分类名称不能为空！");
+            return ResultVo.fail("分类名称不能为空");
         }
 
         // 判断分类是否存在
         Integer count = query().eq("name", goodsCategory.getName()).count();
         if (count > 0) {
-            return ResultVo.fail("该分类已存在！");
+            return ResultVo.fail("该分类已存在");
         }
 
         // 判断是否新增子分类
@@ -58,13 +58,13 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
             // 查询父分类是否存在
             GoodsCategory category = getById(goodsCategory.getFid());
             if (category == null) {
-                return ResultVo.fail("父分类不存在，无法新增子分类！");
+                return ResultVo.fail("父分类不存在，无法新增子分类");
             }
         }
 
         // 新增分类
         boolean result = save(goodsCategory);
-        return result ? ResultVo.ok("新增分类成功！") : ResultVo.fail("新增分类失败！");
+        return result ? ResultVo.ok("新增分类成功") : ResultVo.fail("新增分类失败");
     }
 
     @Override
@@ -74,19 +74,23 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
 
         // 判断商品分类是否存在
         if (goodsCategory == null) {
-            return ResultVo.fail("商品分类不存在！");
+            return ResultVo.fail("商品分类不存在");
         }
 
         // 判断商品分类是否已经被使用
         Integer goodsCount = goodsService.query().eq("cid", id).count();
         if (goodsCount > 0) {
-            return ResultVo.fail("商品分类已经被使用，暂无法删除！");
+            return ResultVo.fail("商品分类已经被使用，暂无法删除");
         }
 
         // 删除分类
         boolean result = delCategory(id);
 
-        return result ? ResultVo.ok("删除商品分类成功！") : ResultVo.fail("删除商品分类失败！");
+        if (!result) {
+            throw new RuntimeException("删除商品分类失败");
+        }
+
+        return ResultVo.ok("删除商品分类成功");
     }
 
     @Override
@@ -99,13 +103,13 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
 
         // 判断商品分类是否存在
         if (category == null) {
-            return ResultVo.fail("商品分类不存在！");
+            return ResultVo.fail("商品分类不存在");
         }
 
         // 判断分类名称是否存在
         Integer count = query().eq("name", goodsCategory.getName()).ne("id", categoryId).count();
         if (count > 0) {
-            return ResultVo.fail("商品分类已存在！");
+            return ResultVo.fail("商品分类已存在");
         }
 
         // 判断是否为子分类
@@ -113,14 +117,14 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
             // 查询父分类是否存在
             GoodsCategory fCategory = getById(goodsCategory.getFid());
             if (fCategory == null) {
-                return ResultVo.fail("父分类不存在，修改商品分类失败！");
+                return ResultVo.fail("父分类不存在，修改商品分类失败");
             }
         }
 
         // 修改商品分类
         boolean result = updateById(goodsCategory);
 
-        return result ? ResultVo.ok("修改商品分类成功！") : ResultVo.fail("修改商品分类失败！");
+        return result ? ResultVo.ok("修改商品分类成功") : ResultVo.fail("修改商品分类失败");
     }
 
     /**

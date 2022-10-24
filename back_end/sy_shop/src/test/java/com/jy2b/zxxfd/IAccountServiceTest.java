@@ -1,6 +1,6 @@
 package com.jy2b.zxxfd;
 
-import com.jy2b.zxxfd.domain.dto.BillDTO;
+import com.jy2b.zxxfd.domain.dto.BillVO;
 import com.jy2b.zxxfd.utils.BillUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,7 +17,7 @@ public class IAccountServiceTest {
     @Test
     void test() {
         BillUtils billUtils = new BillUtils(stringRedisTemplate);
-        HashMap<String, ArrayList<BillDTO>> bill = billUtils.queryBill(1577368407370752002l);
+        ArrayList<BillVO> bill = billUtils.queryBill(1577368407370752002l);
         System.out.println(bill);
     }
 

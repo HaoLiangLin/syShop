@@ -21,8 +21,8 @@ spring:
         max-idle: 8 # 最大空闲连接数
   jackson:
     default-property-inclusion: non_null # JSON处理时忽略非空字段
-    date-format: yyyy-MM-dd HH:mm:ss
-    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss # 日期格式字符串或完全限定的日期格式类名
+    time-zone: GMT+8 # 设置日期格式时使用的时区
   servlet:
     multipart:
       max-file-size: 10MB # 单文件最大上传大小
@@ -35,7 +35,7 @@ mybatis-plus:
 server:
   port: 8081 # 指定端口号
   servlet:
-    context-path: "/api" # 指定根路径
+    context-path: "/api" # 应用程序的上下文路径
 logging:
   level:
     com.hmdp: debug

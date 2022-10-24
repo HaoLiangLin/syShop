@@ -37,7 +37,7 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
     @Override
     public ResultVo uploadImage(MultipartFile[] files) {
         if (files.length > SystemConstants.GOODS_IMAGES_LENGTH) {
-            return ResultVo.fail("上传图片不能超过" + SystemConstants.GOODS_IMAGES_LENGTH + "张！");
+            return ResultVo.fail("上传图片不能超过" + SystemConstants.GOODS_IMAGES_LENGTH + "张");
         }
 
         MultipartFile[] multipartFiles = new MultipartFile[SystemConstants.GOODS_IMAGES_LENGTH];
@@ -50,17 +50,17 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
     public ResultVo saveGoods(GoodsSaveFromDTO goodsSaveFromDTO) {
         // 1. 判断商品名称是否为空
         if (StrUtil.isBlank(goodsSaveFromDTO.getName())) {
-            return ResultVo.fail("商品名称不能为空！");
+            return ResultVo.fail("商品名称不能为空");
         }
 
         // 2. 判断是否选择分类
         if (goodsSaveFromDTO.getCid() == null) {
-            return ResultVo.fail("商品分类不能为空！");
+            return ResultVo.fail("商品分类不能为空");
         }
 
         // 3. 判断发货地址是否为空
         if (StrUtil.isBlank(goodsSaveFromDTO.getProvince()) && StrUtil.isBlank(goodsSaveFromDTO.getCity()) && StrUtil.isBlank(goodsSaveFromDTO.getDistrict()) && StrUtil.isBlank(goodsSaveFromDTO.getAddress())) {
-            return ResultVo.fail("发货地址不能未空！");
+            return ResultVo.fail("发货地址不能未空");
         }
 
         // 4. 判断商品分类是否存在
@@ -68,7 +68,7 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         queryWrapper.eq("id", goodsSaveFromDTO.getCid());
         Integer categoryCount = goodsCategoryMapper.selectCount(queryWrapper);
         if (categoryCount <= 0) {
-            return ResultVo.fail("商品分类不存在！");
+            return ResultVo.fail("商品分类不存在");
         }
 
         // 5. 类型转换
@@ -76,13 +76,13 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
 
         // 6. 新增商品
         boolean result = save(goods);
-        return result ? ResultVo.ok("新增商品成功！") : ResultVo.fail("新增商品失败！");
+        return result ? ResultVo.ok("新增商品成功") : ResultVo.fail("新增商品失败");
     }
 
     @Override
     public ResultVo deleteGoods(Long id) {
         boolean result = removeById(id);
-        return result ? ResultVo.ok("删除商品成功！") : ResultVo.fail("删除商品失败！");
+        return result ? ResultVo.ok("删除商品成功") : ResultVo.fail("删除商品失败");
     }
 
     @Override
@@ -94,14 +94,14 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
 
         // 判断商品是否存在
         if (beforeGoods == null) {
-            return ResultVo.fail("商品不存在！");
+            return ResultVo.fail("商品不存在");
         }
 
         // 判断将要修改的商品分类是否存在
         if (updateFromDTO.getCid() != null) {
             GoodsCategory category = goodsCategoryMapper.selectById(updateFromDTO.getCid());
             if (category == null) {
-                return ResultVo.fail("商品分类不存在！");
+                return ResultVo.fail("商品分类不存在");
             }
         }
 
@@ -129,7 +129,7 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
                 queryWrapper.eq("gid", id).eq("status", 1);
                 Integer itemCount = itemMapper.selectCount(queryWrapper);
                 if (itemCount < 1) {
-                    return ResultVo.fail("商品上架失败，商品属性需满足至少一个已上架！");
+                    return ResultVo.fail("商品上架失败，商品属性需满足至少一个已上架");
                 }
             }
 
@@ -143,13 +143,13 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
 
         // 修改商品
         boolean result = updateById(goods);
-        return result ? ResultVo.ok("修改商品成功！") : ResultVo.fail("修改商品失败！");
+        return result ? ResultVo.ok("修改商品成功") : ResultVo.fail("修改商品失败");
     }
 
     @Override
     public ResultVo findGoodsById(Long id) {
         Goods goods = getById(id);
-        return goods != null ? ResultVo.ok(goods) : ResultVo.fail("商品不存在！");
+        return goods != null ? ResultVo.ok(goods) : ResultVo.fail("商品不存在");
     }
 
     @Override
@@ -200,7 +200,7 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
     @Override
     public ResultVo queryGoodsById(Long id) {
         Goods goods = query().eq("id", id).eq("status", 1).one();
-        return goods != null ? ResultVo.ok(goods) : ResultVo.fail("商品不存在！");
+        return goods != null ? ResultVo.ok(goods) : ResultVo.fail("商品不存在");
     }
 
     @Override

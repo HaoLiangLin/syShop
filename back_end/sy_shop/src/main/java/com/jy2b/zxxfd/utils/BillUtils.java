@@ -2,6 +2,7 @@ package com.jy2b.zxxfd.utils;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.jy2b.zxxfd.domain.dto.BillVO;
 import com.jy2b.zxxfd.domain.dto.BillDTO;
 import com.jy2b.zxxfd.contants.RedisConstants;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -47,7 +48,7 @@ public class BillUtils {
      * @param userId 用户id
      * @return 账单信息
      */
-    public HashMap<String, ArrayList<BillDTO>> queryBill(Long userId) {
+    public ArrayList<BillVO> queryBill(Long userId) {
         // 账单key前缀
         String billKey = RedisConstants.BILL_KEY + userId;
         // 获取用户账单key集合
@@ -69,7 +70,7 @@ public class BillUtils {
      * @param day 日数
      * @return HashMap<String, ArrayList<BillDTO>>
      */
-    public HashMap<String, ArrayList<BillDTO>> queryBillByDate(Long userId, String year, String month, String day) {
+    public ArrayList<BillVO> queryBillByDate(Long userId, String year, String month, String day) {
         // 获取key前缀
         String prefixKey = RedisConstants.BILL_KEY + userId;
 
@@ -82,7 +83,7 @@ public class BillUtils {
         if (StrUtil.isNotBlank(year) && StrUtil.isNotBlank(month)) {
             isKey = prefixKey + ":" + year + ":" + month + ":*";
         }
-        // 判断期号是否不为空
+        // 判断日数是否不为空
         if (StrUtil.isNotBlank(year) && StrUtil.isNotBlank(month) && StrUtil.isNotBlank(day)) {
             isKey = prefixKey + ":" + year + ":" + month + ":" + day;
         }
@@ -100,14 +101,16 @@ public class BillUtils {
 
     /**
      * 获取账单
-      * @param keys 账单key集合
-     * @return HashMap<String, ArrayList<BillDTO>>
+     * @param keys 账单key集合
+     * @return ArrayList<Bill2DTO>
      */
-    private HashMap<String, ArrayList<BillDTO>> foreachBill(Set<String> keys) {
-        // key：日期  value：值
-        HashMap<String, ArrayList<BillDTO>> listHashMap = new HashMap<>();
+    private ArrayList<BillVO> foreachBill(Set<String> keys) {
+        ArrayList<String> dateList = dateSort(keys);
+
+        ArrayList<BillVO> billVOS = new ArrayList<>();
         // 查看每一日的账单
-        for (String key : keys) {
+        for (String key : dateList) {
+            BillVO billVO = new BillVO();
             // 获取每一日的账单列表
             Map<Object, Object> map = stringRedisTemplate.opsForHash().entries(key);
             // 获取map中的key的集合
@@ -128,10 +131,44 @@ public class BillUtils {
 
             String[] split = key.split(":");
             String time = split[2] + "年" + split[3] + "月" + split[4] + "日";
-            listHashMap.put(time, arrayList);
+            billVO.setDate(time);
+            billVO.setBill(arrayList);
+
+            billVOS.add(billVO);
         }
 
-        return listHashMap;
+        return billVOS;
+    }
+
+    /**
+     * 账单日期排序
+     * @param keys 账单key集合
+     * @return ArrayList<String>
+     */
+    private ArrayList<String> dateSort(Set<String> keys) {
+        ArrayList<Integer> dateList = new ArrayList<>();
+        for (String key : keys) {
+            String[] split = key.split(":");
+            String date = split[2] + split[3] +split[4];
+            dateList.add(Integer.valueOf(date));
+        }
+
+        dateList.sort(Comparator.reverseOrder());
+
+        ArrayList<String> timeList = new ArrayList<>();
+        for (Integer item : dateList) {
+            for (String key : keys) {
+                String[] split = key.split(":");
+                String date = split[2] + split[3] + split[4];
+                int integer = Integer.parseInt(date);
+
+                if (integer == item) {
+                    timeList.add(key);
+                }
+            }
+        }
+
+        return timeList;
     }
 
     /**

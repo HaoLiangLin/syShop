@@ -44,7 +44,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private AccountMapper accountMapper;
 
     @Resource
-    private GoodsCommentMapper goodsCommentMapper;
+    private GoodsEvaluationMapper goodsEvaluationMapper;
 
     @Override
     public ResultVo submitOrder(OrderSaveFromDTO orderSaveFromDTO) {
@@ -57,7 +57,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         UserAddress address = addressMapper.selectById(addressId);
         // 判断收货地址是否为空
         if (address == null) {
-            return ResultVo.fail("收货地址不能为空！");
+            return ResultVo.fail("收货地址不能为空");
         }
 
         // 获取收货人姓名
@@ -118,7 +118,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             GoodsItem item = goodsItemMapper.selectById(gid);
 
             if (item == null) {
-                throw new RuntimeException("商品不存在！");
+                throw new RuntimeException("商品不存在");
             }
 
             // 获取商品id
@@ -127,23 +127,23 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             Goods goods = goodsMapper.selectById(goodsId);
 
             if (goods.getStatus() != 1) {
-                return ResultVo.fail("商品：" + goods.getName() + "不存在！");
+                return ResultVo.fail("商品：" + goods.getName() + "不存在");
             }
             // 判断商品属性是否上架
             if (item.getStatus() == 0) {
-                return ResultVo.fail("商品：" + goods.getName() + "已下架！");
+                return ResultVo.fail("商品：" + goods.getName() + "已下架");
             }
             // 获取商品数量
             Integer quantity = orderSaveDTO.getQuantity();
             // 判断数量是否小于大于零
             if (quantity <= 0) {
-                return ResultVo.fail("购买数量不能等于小于零！");
+                return ResultVo.fail("购买数量不能等于小于零");
             }
             // 获取商品属性库存
             Long stock = item.getStock();
             // 判断库存是否充盈
             if (quantity > stock) {
-                return ResultVo.fail("商品库存不足！");
+                return ResultVo.fail("商品库存不足");
             }
 
             // 获取商品单价
@@ -182,12 +182,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         boolean result = update().set("postage", postage).set("price", amount + postage).eq("id", orderId).update();
 
         if (!result) {
-            throw new RuntimeException("提交订单失败！");
+            throw new RuntimeException("提交订单失败");
         }
 
         // TODO 用户提交订单后，若在限定时间中没有进行支付，则删除该订单
 
-        return ResultVo.ok(orderId, "提交订单成功！");
+        return ResultVo.ok(orderId, "提交订单成功");
     }
 
     @Override
@@ -197,20 +197,20 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
         // 判断订单是否存在
         if (order == null) {
-            return ResultVo.fail("订单不存在！");
+            return ResultVo.fail("订单不存在");
         }
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
         if (!order.getUid().equals(userId)) {
-            return ResultVo.fail("订单不存在！");
+            return ResultVo.fail("订单不存在");
         }
         // 判断订单是否已完成
         if (order.getStatus() != 0) {
-            return ResultVo.fail("订单已完成！");
+            return ResultVo.fail("订单已完成");
         }
         // 判断订单是否已发货
         if (order.getLogisticsStatus() > 0) {
-            return ResultVo.fail("订单已发货！");
+            return ResultVo.fail("订单已发货");
         }
         // 判断订单是否已付款
         if (order.getIsPay() != 0) {
@@ -225,7 +225,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             int update = accountMapper.updateById(userAccount);
 
             if (update < 1) {
-                throw new RuntimeException("取消订单失败！");
+                throw new RuntimeException("取消订单失败");
             }
 
             String price = String.valueOf(order.getPrice());
@@ -255,7 +255,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 int updateOrderItem = orderItemMapper.deleteById(orderItem.getId());
 
                 if (updateItem < 1 || updateOrderItem < 1) {
-                    throw new RuntimeException("取消订单失败！");
+                    throw new RuntimeException("取消订单失败");
                 }
             }
         }
@@ -263,9 +263,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // 取消订单
         boolean result = removeById(id);
         if (!result) {
-            throw new RuntimeException("取消订单失败！");
+            throw new RuntimeException("取消订单失败");
         }
-        return ResultVo.ok("取消订单成功！");
+        return ResultVo.ok("取消订单成功");
     }
 
     @Override
@@ -274,11 +274,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         Order order = getById(id);
         // 判断订单是否存在
         if (order == null) {
-            return ResultVo.fail("订单不存在！");
+            return ResultVo.fail("订单不存在");
         }
         // 判断订单是否已支付
         if (order.getIsPay() > 0) {
-            return ResultVo.fail("订单已支付！");
+            return ResultVo.fail("订单已支付");
         }
 
         // 获取订单金额
@@ -293,7 +293,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         Double balance = userAccount.getBalance();
         // 判断用户钱包是否足够
         if (balance < price) {
-            return ResultVo.fail("钱包余额不足！");
+            return ResultVo.fail("钱包余额不足");
         }
 
         // 获取钱包累计消费
@@ -304,7 +304,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         userAccount.setSpending(spending + price);
         int update = accountMapper.updateById(userAccount);
         if (update < 1) {
-            return ResultVo.fail("支付失败！");
+            return ResultVo.fail("支付失败");
         }
 
         // 支付成功
@@ -313,7 +313,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
         boolean result = updateById(order);
         if (!result) {
-            throw new RuntimeException("订单支付失败！");
+            throw new RuntimeException("订单支付失败");
         }
 
         // 生成账单
@@ -321,7 +321,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         BillUtils billUtils = new BillUtils(stringRedisTemplate);
         billUtils.saveBill(userId, "购物消费", amount);
 
-        return ResultVo.ok("支付成功！");
+        return ResultVo.ok("支付成功");
     }
 
     @Override
@@ -331,11 +331,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // 查询订单
         Order order = getById(id);
         if (order == null) {
-            return ResultVo.fail("订单不存在！");
+            return ResultVo.fail("订单不存在");
         }
         // 判断是否下单用户本人
         if (!userId.equals(order.getUid())) {
-            return ResultVo.fail("订单不存在！");
+            return ResultVo.fail("订单不存在");
         }
 
         OrderDTO orderDTO = setQueryDTO(order);
@@ -384,23 +384,23 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // 查询订单
         Order order = getById(id);
         if (order == null) {
-            return ResultVo.fail("订单不存在！");
+            return ResultVo.fail("订单不存在");
         }
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
         // 判断订单是否属于用户
         if (!order.getUid().equals(userId)) {
-            return ResultVo.fail("订单不存在！");
+            return ResultVo.fail("订单不存在");
         }
         // 判断订单是否已完成
         if (order.getStatus() < 1) {
-            return ResultVo.fail("订单未完成！");
+            return ResultVo.fail("订单未完成");
         }
 
         // 删除订单
         boolean result = update().set("isDel", 1).eq("id", id).update();
 
-        return result ? ResultVo.ok("订单删除成功！") : ResultVo.fail("订单删除失败！");
+        return result ? ResultVo.ok("订单删除成功") : ResultVo.fail("订单删除失败");
     }
 
     @Override
@@ -694,9 +694,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
                 if (order.getStatus() == 1) {
                     // 查询是否进行评价
-                    QueryWrapper<GoodsComment> commentQueryWrapper = new QueryWrapper<>();
-                    commentQueryWrapper.eq("order_id", order.getId()).eq("gid", itemId);
-                    Integer integer = goodsCommentMapper.selectCount(commentQueryWrapper);
+                    QueryWrapper<GoodsEvaluation> commentQueryWrapper = new QueryWrapper<>();
+                    commentQueryWrapper.eq("order_id", order.getId()).eq("goodsItem_id", itemId);
+                    Integer integer = goodsEvaluationMapper.selectCount(commentQueryWrapper);
 
                     if (integer < 1) {
                         // 设置未评论

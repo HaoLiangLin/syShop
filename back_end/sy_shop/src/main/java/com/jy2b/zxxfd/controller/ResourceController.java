@@ -17,6 +17,7 @@ public class ResourceController {
     @ApiOperation(value = "获取图片")
     public byte[] getUploadImage(@RequestParam("name") String name) {
         String imagePath = SystemConstants.UPLOAD_IMAGE_PATH + name;
+
         File file = new File(imagePath);
         byte[] bytes = new byte[0];
         try {

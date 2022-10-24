@@ -44,7 +44,7 @@ public class AddressServiceImpl extends ServiceImpl<AddressMapper, UserAddress> 
         address.setUid(userId);
         // 新增收货地址
         boolean result = save(address);
-        return result ? ResultVo.ok("新增收货地址成功！") : ResultVo.fail("新增收货地址失败！");
+        return result ? ResultVo.ok("新增收货地址成功") : ResultVo.fail("新增收货地址失败");
     }
 
     @Override
@@ -56,11 +56,11 @@ public class AddressServiceImpl extends ServiceImpl<AddressMapper, UserAddress> 
         UserAddress userAddress = getById(address.getId());
         // 判断是否存在
         if (userAddress == null) {
-            return ResultVo.fail("收货地址不存在！");
+            return ResultVo.fail("收货地址不存在");
         }
         // 判断是否属于当前用户
         if (!Objects.equals(userAddress.getUid(), userId)) {
-            return ResultVo.fail("收货地址不存在！");
+            return ResultVo.fail("收货地址不存在");
         }
         // 判断是否为默认收货地址
         if (address.getIsDefault() != null && address.getIsDefault() == 1) {
@@ -72,7 +72,7 @@ public class AddressServiceImpl extends ServiceImpl<AddressMapper, UserAddress> 
         updateWrapper.eq("id", address.getId()).eq("uid", userId);
         // 修改收货地址
         boolean result = update(address, updateWrapper);
-        return result ? ResultVo.ok("修改收货地址成功！") : ResultVo.fail("修改收货地址失败！");
+        return result ? ResultVo.ok("修改收货地址成功") : ResultVo.fail("修改收货地址失败");
     }
 
     @Override
@@ -85,17 +85,17 @@ public class AddressServiceImpl extends ServiceImpl<AddressMapper, UserAddress> 
 
         // 判断收货地址是否存在
         if (userAddress == null) {
-            return ResultVo.fail("收货地址不存在！");
+            return ResultVo.fail("收货地址不存在");
         }
 
         // 判断收货地址是否为执行删除用户的
         if (!Objects.equals(userId, userAddress.getUid())) {
-            return ResultVo.fail("收货地址不存在！");
+            return ResultVo.fail("收货地址不存在");
         }
 
         boolean result = removeById(id);
 
-        return result ? ResultVo.ok("删除收货地址成功！") : ResultVo.fail("删除收货地址失败！");
+        return result ? ResultVo.ok("删除收货地址成功") : ResultVo.fail("删除收货地址失败");
     }
 
     @Override
@@ -103,7 +103,7 @@ public class AddressServiceImpl extends ServiceImpl<AddressMapper, UserAddress> 
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
         // 删除成功的id集合
-        Integer success = 0;
+        int success = 0;
         for (Long id : ids) {
             // 获取将要删除的收货地址
             UserAddress userAddress = getById(id);

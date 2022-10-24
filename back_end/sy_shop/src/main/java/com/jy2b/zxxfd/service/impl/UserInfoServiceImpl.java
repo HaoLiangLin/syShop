@@ -48,7 +48,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         UserInfo info = getById(id);
         // 判断用户信息是否存在
         if (info == null) {
-            return ResultVo.fail("用户信息不存在！");
+            return ResultVo.fail("用户信息不存在");
         }
         // 设置用户id
         userInfo.setId(id);
@@ -96,7 +96,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         UserInfo info = getById(userInfo.getId());
         // 判断是否存在
         if (info == null) {
-            return ResultVo.fail("用户信息不存在！");
+            return ResultVo.fail("用户信息不存在");
         }
         // 修改用户信息
         return updateInfo(userInfo, info, true);
@@ -144,6 +144,6 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         // 修改用户信息
         boolean result = update(wrapper);
         // 返回信息
-        return result ? ResultVo.ok() : ResultVo.fail("用户信息修改失败！");
+        return result ? ResultVo.ok("用户信息修改成功") : ResultVo.fail("用户信息修改失败");
     }
 }

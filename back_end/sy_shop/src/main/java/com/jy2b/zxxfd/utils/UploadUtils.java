@@ -21,7 +21,7 @@ public class UploadUtils {
         try {
             // 判断文件是否为空
             if (file.isEmpty()) {
-                return ResultVo.fail("文件未上传！");
+                return ResultVo.fail("文件未上传");
             }
 
             // 获取文件原始名称以及后缀名
@@ -35,13 +35,13 @@ public class UploadUtils {
         } catch (IOException e) {
             e.printStackTrace();
             // 失败，返回错误信息
-            return ResultVo.fail("文件上传失败！");
+            return ResultVo.fail("文件上传失败");
         }
     }
 
     public static ResultVo saveFiles(MultipartFile[] files, String savePath) {
         if (files.length == 0) {
-            return ResultVo.fail("上传文件不能为空！");
+            return ResultVo.fail("上传文件不能为空");
         }
         String fileNames = "";
         try {
@@ -61,11 +61,11 @@ public class UploadUtils {
         } catch (IOException e) {
             e.printStackTrace();
             // 失败，返回错误信息
-            return ResultVo.fail("文件上传失败！");
+            return ResultVo.fail("文件上传失败");
         }
 
         if (StrUtil.isBlank(fileNames)) {
-            return ResultVo.fail("文件上传失败！");
+            return ResultVo.fail("文件上传失败");
         }
 
         fileNames = fileNames.substring(1);

@@ -34,11 +34,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         User user = userMapper.selectOne(userQueryWrapper);
 
         if (user == null) {
-            throw new UsernameNotFoundException("用户不存在,请前往注册！");
+            throw new UsernameNotFoundException("用户不存在,请前往注册");
         }
 
         if (user.getStatus() == 1) {
-            throw new LockedException("账号已停用！");
+            throw new LockedException("账号已停用");
         }
 
         // 2. 查询权限信息
