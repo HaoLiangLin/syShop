@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @RestController
 @RequestMapping("/shoppingCart")
@@ -29,10 +30,28 @@ public class ShoppingCartController {
         return shoppingCartService.delCart(id);
     }
 
+    @DeleteMapping("/deletes")
+    @PreAuthorize("hasAnyAuthority('shoppingcart:delete')")
+    public ResultVo bulkDelCart(@RequestParam List<Long> ids) {
+        return shoppingCartService.bulkDelCart(ids);
+    }
+
+    @DeleteMapping("/empty")
+    @PreAuthorize("hasAnyAuthority('shoppingcart:delete')")
+    public ResultVo emptyCart() {
+        return shoppingCartService.emptyCart();
+    }
+
     @PutMapping("/update")
     @PreAuthorize("hasAnyAuthority('shoppingcart:update')")
     public ResultVo updateCart(@RequestBody ShoppingCartDTO cartDTO) {
         return shoppingCartService.updateCart(cartDTO);
+    }
+
+    @GetMapping("/query/{id}")
+    @PreAuthorize("hasAnyAuthority('shoppingcart:query')")
+    public ResultVo queryCartById(@PathVariable("id") Long id) {
+        return shoppingCartService.queryCartById(id);
     }
 
     @GetMapping("/query")

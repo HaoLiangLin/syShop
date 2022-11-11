@@ -77,7 +77,7 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, UserAccount> 
             // 新增账单
             billUtils.saveBill(userId, type, amount);
 
-            return ResultVo.ok("充值成功！充值金额：" + recharge);
+            return ResultVo.ok(null,"充值成功！充值金额：" + recharge);
         }
 
 
@@ -124,7 +124,7 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, UserAccount> 
             // 新增充值赠送积分账单
             billUtils.saveBill(userId, combo.getName(), points + "积分");
 
-            return ResultVo.ok("充值成功！充值金额：" + combo.getPrice());
+            return ResultVo.ok(null,"充值成功！充值金额：" + combo.getPrice());
         }
 
         return ResultVo.fail("充值失败");

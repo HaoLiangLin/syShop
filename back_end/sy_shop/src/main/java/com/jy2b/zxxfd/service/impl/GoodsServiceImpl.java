@@ -5,10 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jy2b.zxxfd.domain.dto.GoodsQueryFromDTO;
-import com.jy2b.zxxfd.domain.dto.GoodsSaveFromDTO;
-import com.jy2b.zxxfd.domain.dto.GoodsUpdateFromDTO;
-import com.jy2b.zxxfd.domain.dto.ResultVo;
+import com.jy2b.zxxfd.domain.dto.*;
 import com.jy2b.zxxfd.domain.Goods;
 import com.jy2b.zxxfd.domain.GoodsCategory;
 import com.jy2b.zxxfd.domain.GoodsItem;
@@ -16,12 +13,14 @@ import com.jy2b.zxxfd.mapper.GoodsCategoryMapper;
 import com.jy2b.zxxfd.mapper.GoodsItemMapper;
 import com.jy2b.zxxfd.mapper.GoodsMapper;
 import com.jy2b.zxxfd.service.IGoodsService;
+import com.jy2b.zxxfd.utils.TimeUtils;
 import com.jy2b.zxxfd.utils.UploadUtils;
 import com.jy2b.zxxfd.contants.SystemConstants;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.util.*;
 
 @Service
 public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements IGoodsService {
@@ -76,13 +75,21 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
 
         // 6. 新增商品
         boolean result = save(goods);
-        return result ? ResultVo.ok("新增商品成功") : ResultVo.fail("新增商品失败");
+        if (!result) {
+            String images = goods.getImages();
+            UploadUtils.deleteFiles(images);
+        }
+        return result ? ResultVo.ok(null,"新增商品成功") : ResultVo.fail("新增商品失败");
     }
 
     @Override
     public ResultVo deleteGoods(Long id) {
+        Goods goods = getById(id);
+        String images = goods.getImages();
+        UploadUtils.deleteFiles(images);
+
         boolean result = removeById(id);
-        return result ? ResultVo.ok("删除商品成功") : ResultVo.fail("删除商品失败");
+        return result ? ResultVo.ok(null,"删除商品成功") : ResultVo.fail("删除商品失败");
     }
 
     @Override
@@ -105,20 +112,37 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
             }
         }
 
-        if (StrUtil.isBlank(updateFromDTO.getName())) {
-            updateFromDTO.setName(beforeGoods.getName());
+        if (updateFromDTO.getName() != null) {
+            if (StrUtil.isBlank(updateFromDTO.getName())) {
+                return ResultVo.fail("商品名称不能为空");
+            }
         }
-        if (StrUtil.isBlank(updateFromDTO.getProvince())) {
-            updateFromDTO.setProvince(beforeGoods.getProvince());
+        if (updateFromDTO.getProvince() != null) {
+            if (StrUtil.isBlank(updateFromDTO.getProvince())) {
+                return ResultVo.fail("发货省份不能为空");
+            }
         }
-        if (StrUtil.isBlank(updateFromDTO.getCity())) {
-            updateFromDTO.setCity(beforeGoods.getCity());
+        if (updateFromDTO.getCity() != null) {
+            if (StrUtil.isBlank(updateFromDTO.getCity())) {
+                return ResultVo.fail("发货城市不能为空");
+            }
         }
-        if (StrUtil.isBlank(updateFromDTO.getDistrict())) {
-            updateFromDTO.setDistrict(beforeGoods.getDistrict());
+        if (updateFromDTO.getDistrict() != null) {
+            if (StrUtil.isBlank(updateFromDTO.getDistrict())) {
+                return ResultVo.fail("发货区县不能为空");
+            }
         }
-        if (StrUtil.isBlank(updateFromDTO.getAddress())) {
-            updateFromDTO.setAddress(beforeGoods.getAddress());
+        if (updateFromDTO.getAddress() != null) {
+            if (StrUtil.isBlank(updateFromDTO.getAddress())) {
+                return ResultVo.fail("发货详细地址不能为空");
+            }
+        }
+        if (updateFromDTO.getRecommend() == null || updateFromDTO.getRecommend() > 1 || updateFromDTO.getRecommend() < 0) {
+            updateFromDTO.setRecommend(beforeGoods.getRecommend());
+        }
+        if (StrUtil.isNotBlank(updateFromDTO.getImages())) {
+            String images = beforeGoods.getImages();
+            UploadUtils.deleteFiles(images);
         }
 
         // 获取商品状态
@@ -143,7 +167,7 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
 
         // 修改商品
         boolean result = updateById(goods);
-        return result ? ResultVo.ok("修改商品成功") : ResultVo.fail("修改商品失败");
+        return result ? ResultVo.ok(null,"修改商品成功") : ResultVo.fail("修改商品失败");
     }
 
     @Override
@@ -178,6 +202,11 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
             if (StrUtil.isNotBlank(goods.getDistrict())) {
                 queryWrapper.eq("district", goods.getDistrict());
             }
+            // 判断是否推荐
+            if (goods.getRecommend() != null && goods.getRecommend() == 0 && goods.getRecommend() == 1) {
+                queryWrapper.eq("recommend", goods.getRecommend());
+            }
+
             if (goods.getWarrantyTime() != null) {
                 queryWrapper.eq("warranty_time", goods.getWarrantyTime());
             }
@@ -200,7 +229,9 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
     @Override
     public ResultVo queryGoodsById(Long id) {
         Goods goods = query().eq("id", id).eq("status", 1).one();
-        return goods != null ? ResultVo.ok(goods) : ResultVo.fail("商品不存在");
+        GoodsItem goodsItem = itemMapper.selectList(new QueryWrapper<GoodsItem>().eq("gid", id).eq("status", 1)).get(0);
+        GoodsDTO goodsDTO = new GoodsDTO(goods, goodsItem.getPrice(), goodsItem.getDiscount());
+        return goods != null ? ResultVo.ok(goodsDTO) : ResultVo.fail("商品不存在");
     }
 
     @Override
@@ -218,8 +249,33 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
             Long cid = goodsFromDTO.getCid();
             // 判断商品分类是否不为空
             if (cid != null) {
-                queryWrapper.eq("cid", cid);
+                List<Long> cidList = getSunCid(cid);
+                if (!cidList.isEmpty()) {
+                    queryWrapper.in("cid", cidList);
+                } else {
+                    queryWrapper.eq("cid", cid);
+                }
             }
+            // 获取商品推荐
+            Integer recommend = goodsFromDTO.getRecommend();
+            if (recommend != null) {
+                switch (recommend) {
+                    case 0: case 1:queryWrapper.eq("recommend", recommend);break;
+                }
+            }
+            // 是否新品
+            Integer isNew = goodsFromDTO.getIsNew();
+            if (isNew != null && isNew == 1) {
+                // 获取当前时间
+                Date date = new Date();
+                String now = TimeUtils.dateToStringTime(date);
+                // 获取七天前的时间
+                long before7 = date.getTime() - (7 * 24 * 60 * 60 * 1000);
+                String before = TimeUtils.dateToStringTime(new Date(before7));
+
+                queryWrapper.le("shelves_time", now).ge("shelves_time", before);
+            }
+
             // 获取销量排序
             String saleSort = goodsFromDTO.getSaleSort();
             // 判断销量排序是否不为空
@@ -237,6 +293,72 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         }
         queryWrapper.eq("status", 1);
         goodsMapper.selectPage(goodsPage, queryWrapper);
+
+        List<Goods> records = goodsPage.getRecords();
+        if (!records.isEmpty()) {
+            ArrayList<GoodsDTO> goodsDTOS = new ArrayList<>();
+            for (Goods goods : records) {
+                // 获取商品id
+                Long id = goods.getId();
+                GoodsItem goodsItem = itemMapper.selectList(new QueryWrapper<GoodsItem>().eq("gid", id).eq("status", 1)).get(0);
+                GoodsDTO goodsDTO = new GoodsDTO(goods, goodsItem.getPrice(), goodsItem.getDiscount());
+                goodsDTOS.add(goodsDTO);
+            }
+
+            if (goodsFromDTO != null) {
+                // 获取价格排序
+                String priceSort = goodsFromDTO.getPriceSort();
+                // 判断价格排序是否不为空
+                if (StrUtil.isNotBlank(priceSort)) {
+                    switch (priceSort) {
+                        case "Asc":
+                            // 价格升序排序 1 2 3 4 5
+                            goodsDTOS.sort(Comparator.comparing(GoodsDTO::getPrice));
+                            break;
+                        case "Des":
+                            // 价格降序排序 5 4 3 2 1
+                            goodsDTOS.sort(Comparator.comparing(GoodsDTO::getPrice).reversed());
+                    }
+                }
+            }
+
+            Page<GoodsDTO> goodsDTOPage = new Page<>();
+            goodsDTOPage.setRecords(goodsDTOS);
+            goodsDTOPage.setSize(goodsPage.getSize());
+            goodsDTOPage.setCountId(goodsPage.getCountId());
+            goodsDTOPage.setCurrent(goodsPage.getCurrent());
+            goodsDTOPage.setHitCount(goodsPage.isHitCount());
+            goodsDTOPage.setMaxLimit(goodsPage.getMaxLimit());
+            goodsDTOPage.setTotal(goodsPage.getTotal());
+            goodsDTOPage.setSearchCount(goodsPage.isSearchCount());
+            goodsDTOPage.setOrders(goodsPage.getOrders());
+
+            return ResultVo.ok(goodsDTOPage);
+        }
+
         return ResultVo.ok(goodsPage);
+    }
+
+    private List<Long> getSunCid(Long cid) {
+        ArrayList<Long> categoryIds = new ArrayList<>();
+        // 获取父类的子类
+        List<GoodsCategory> categoryList = goodsCategoryMapper.selectList(new QueryWrapper<GoodsCategory>().eq("fid", cid));
+        // 判断是不存在子类
+        if (categoryList.isEmpty()) {
+            categoryIds.add(cid);
+            // 返回空集合
+            return categoryIds;
+        }
+        // 存在子类
+        for (GoodsCategory goodsCategory : categoryList) {
+            // 循环每一个子类，并拿到id
+            categoryIds.add(goodsCategory.getId());
+            // 判断是否存在子类
+            List<Long> sunCidList = getSunCid(goodsCategory.getId());
+            // 将子类id存入
+            categoryIds.addAll(sunCidList);
+        }
+
+        return categoryIds;
     }
 }

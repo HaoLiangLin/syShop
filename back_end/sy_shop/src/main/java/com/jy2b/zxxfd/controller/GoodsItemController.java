@@ -1,5 +1,6 @@
 package com.jy2b.zxxfd.controller;
 
+import com.jy2b.zxxfd.domain.dto.GoodsItemFromDTO;
 import com.jy2b.zxxfd.domain.dto.GoodsItemQueryFromDTO;
 import com.jy2b.zxxfd.domain.dto.ResultVo;
 import com.jy2b.zxxfd.domain.dto.GoodsItemSaveFromDTO;
@@ -37,10 +38,10 @@ public class GoodsItemController {
         return itemService.saveItem(itemFromDTO);
     }
 
-    @PutMapping("/update")
+    @PutMapping("/update/{id}")
     @PreAuthorize("hasAnyAuthority('goods:item:update')")
-    public ResultVo updateItem(@RequestBody GoodsItem goodsItem) {
-        return itemService.updateItem(goodsItem);
+    public ResultVo updateItem(@PathVariable("id") Long id, @RequestBody GoodsItemSaveFromDTO itemSaveFromDTO) {
+        return itemService.updateItem(id, itemSaveFromDTO);
     }
 
     @PostMapping("/list/{page}/{size}")
@@ -57,8 +58,8 @@ public class GoodsItemController {
         return itemService.queryItemByGid(gid);
     }
 
-    @GetMapping("/query/{gid}/{color}")
-    public ResultVo queryItemByColor(@PathVariable("gid") Long gid, @PathVariable("color") String color) {
-        return itemService.queryItemByColor(gid, color);
+    @PostMapping("/query")
+    public ResultVo queryItemByColor(@RequestBody GoodsItemFromDTO itemFromDTO) {
+        return itemService.queryItem(itemFromDTO);
     }
 }

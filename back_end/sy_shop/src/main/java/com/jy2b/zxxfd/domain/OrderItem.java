@@ -3,17 +3,21 @@ package com.jy2b.zxxfd.domain;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 @Data
 @TableName("tb_order_item")
 public class OrderItem {
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     @TableId("id")
     private Long id;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     @TableField("order_id")
     private Long orderId;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     @TableField("gid")
     private Long gid;
 

@@ -1,17 +1,26 @@
 package com.jy2b.zxxfd.service.impl;
 
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jy2b.zxxfd.domain.dto.RechargeComboSaveDTO;
 import com.jy2b.zxxfd.domain.dto.ResultVo;
 import com.jy2b.zxxfd.domain.RechargeCombo;
 import com.jy2b.zxxfd.mapper.RechargeComboMapper;
 import com.jy2b.zxxfd.service.IRechargeComboService;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
+
+import static com.jy2b.zxxfd.contants.RedisConstants.RECHARGE_COMBO_KEY;
 
 @Service
 public class RechargeComboServiceImpl extends ServiceImpl<RechargeComboMapper, RechargeCombo> implements IRechargeComboService {
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
+
     @Override
     public ResultVo saveCombo(RechargeComboSaveDTO comboSaveDTO) {
         // 获取套餐名称
@@ -39,7 +48,10 @@ public class RechargeComboServiceImpl extends ServiceImpl<RechargeComboMapper, R
         rechargeCombo.setPoints(points);
 
         boolean result = save(rechargeCombo);
-        return result ? ResultVo.ok("新增充值套餐成功") : ResultVo.fail("新增充值套餐失败");
+        if (result) {
+            saveComboList();
+        }
+        return result ? ResultVo.ok(null,"新增充值套餐成功") : ResultVo.fail("新增充值套餐失败");
     }
 
     @Override
@@ -51,7 +63,10 @@ public class RechargeComboServiceImpl extends ServiceImpl<RechargeComboMapper, R
             return ResultVo.fail("套餐不存在");
         }
         boolean result = removeById(id);
-        return result ? ResultVo.ok("删除充值套餐成功") : ResultVo.fail("删除充值套餐失败");
+        if (result) {
+            saveComboList();
+        }
+        return result ? ResultVo.ok(null,"删除充值套餐成功") : ResultVo.fail("删除充值套餐失败");
     }
 
     @Override
@@ -72,13 +87,40 @@ public class RechargeComboServiceImpl extends ServiceImpl<RechargeComboMapper, R
         }
         // 修改充值套餐
         boolean result = updateById(rechargeCombo);
-        return result ? ResultVo.ok("修改充值套餐成功") : ResultVo.fail("修改充值套餐失败");
+        if (result) {
+            saveComboList();
+        }
+        return result ? ResultVo.ok(null,"修改充值套餐成功") : ResultVo.fail("修改充值套餐失败");
     }
 
     @Override
     public ResultVo queryCombo() {
+        // 查询Redis
+        String result = stringRedisTemplate.opsForValue().get(RECHARGE_COMBO_KEY);
+        if (StrUtil.isNotBlank(result)) {
+            List<RechargeCombo> rechargeCombos = JSONUtil.toList(result, RechargeCombo.class);
+            if (!rechargeCombos.isEmpty()) {
+                return ResultVo.ok(rechargeCombos);
+            }
+        }
+
         List<RechargeCombo> comboList = list();
+        if (!comboList.isEmpty()) {
+            saveComboList();
+        }
         return ResultVo.ok(comboList);
+    }
+
+    /**
+     * 保存充值套餐到Redis
+     */
+    private void saveComboList() {
+        List<RechargeCombo> comboList = list();
+        if (comboList.isEmpty()) {
+            return;
+        }
+        String jsonStr = JSONUtil.toJsonStr(comboList);
+        stringRedisTemplate.opsForValue().set(RECHARGE_COMBO_KEY, jsonStr);
     }
 
 }

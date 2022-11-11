@@ -17,21 +17,27 @@ public class UserCollectionController {
     @Resource
     private IUserCollectionService collectionService;
 
-    @PostMapping("/save")
+    @PostMapping("/save/{gid}")
     @PreAuthorize("hasAnyAuthority('collection:save')")
-    public ResultVo saveCollection(@RequestParam("gid") Long gid) {
+    public ResultVo saveCollection(@PathVariable("gid") Long gid) {
         return collectionService.saveCollection(gid);
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/{gid}")
     @PreAuthorize("hasAnyAuthority('collection:delete')")
-    public ResultVo delCollection(@RequestBody UserCollection userCollection) {
-        return collectionService.delCollection(userCollection);
+    public ResultVo delCollection(@PathVariable("gid") Long gid) {
+        return collectionService.delCollection(gid);
     }
 
     @GetMapping("/query")
     @PreAuthorize("hasAnyAuthority('collection:query')")
     public ResultVo queryCollection() {
         return collectionService.queryCollection();
+    }
+
+    @GetMapping("/query/{gid}")
+    @PreAuthorize("hasAnyAuthority('collection:query')")
+    public ResultVo queryCollectionByGid(@PathVariable("gid") Long gid) {
+        return collectionService.queryCollectionByGid(gid);
     }
 }

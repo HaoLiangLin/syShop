@@ -18,6 +18,10 @@ public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         ResultVo resultVo = ResultVo.fail(authException.getMessage());
 
+        if (authException.getMessage().equals("Full authentication is required to access this resource")) {
+            resultVo.setMessage("登录认证未通过，请重新登录");
+        }
+
         WebUtils.renderString(response, JSONUtil.toJsonStr(resultVo));
 
         authException.printStackTrace();

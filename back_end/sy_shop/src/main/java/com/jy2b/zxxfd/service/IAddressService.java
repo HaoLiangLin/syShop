@@ -16,6 +16,12 @@ public interface IAddressService extends IService<UserAddress> {
     ResultVo queryAddress();
 
     /**
+     * 查询默认收货地址
+     * @return ResultVo
+     */
+    ResultVo queryDefaultAddress();
+
+    /**
      * 根据id查询收货地址
      * @param id 收货地址id
      * @return ResultVo

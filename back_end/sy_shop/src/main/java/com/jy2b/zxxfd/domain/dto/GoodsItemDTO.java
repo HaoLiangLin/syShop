@@ -12,9 +12,9 @@ public class GoodsItemDTO {
 
     private List<HashMap<String,String>> colorAndIcon; // 颜色与图片
 
-    private List<String> combo; // 套餐
+    private List<HashMap<String, String>> combo; // 套餐
 
-    private List<String> size; // 尺寸
+    private List<HashMap<String, String>> size; // 尺寸
 
-    private List<String> edition; // 版本
+    private List<HashMap<String, String>> edition; // 版本
 }

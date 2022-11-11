@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.util.Date;
@@ -12,11 +13,13 @@ import java.util.Date;
 @TableName("tb_goods")
 public class Goods {
     @TableId("id")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long id;
 
     @TableField("name")
     private String name;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     @TableField("cid")
     private Long cid;
 
@@ -38,6 +41,10 @@ public class Goods {
     @TableField("postage")
     private Double postage;
 
+    @TableField("recommend")
+    private Integer recommend;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     @TableField("monthSale")
     private Long monthSale;
 

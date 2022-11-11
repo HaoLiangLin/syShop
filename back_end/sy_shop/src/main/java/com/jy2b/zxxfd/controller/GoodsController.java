@@ -63,9 +63,9 @@ public class GoodsController {
         return goodsService.findGoodsList(page, size, goods);
     }
 
-    @GetMapping("/query")
+    @GetMapping("/query/{id}")
     @ApiOperation(value = "查询商品")
-    public ResultVo queryGoodsById(@RequestParam("id") Long id) {
+    public ResultVo queryGoodsById(@PathVariable("id") Long id) {
         return goodsService.queryGoodsById(id);
     }
 

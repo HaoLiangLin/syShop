@@ -43,28 +43,32 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
         }
         // 新增收藏
         boolean result = save(new UserCollection(userId, gid));
-        return result ? ResultVo.ok("收藏成功") : ResultVo.fail("收藏失败");
+        return result ? ResultVo.ok(null,"收藏成功") : ResultVo.fail("收藏失败");
     }
 
     @Override
-    public ResultVo delCollection(UserCollection userCollection) {
+    public ResultVo delCollection(Long gid) {
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
+
+        // 查询收藏
+        Integer count = query().eq("uid", userId).eq("gid", gid).count();
+
         // 判断用户id是否与收藏用户id一致
-        if (!userId.equals(userCollection.getUid())) {
+        if (count < 1) {
             return ResultVo.fail("收藏不存在");
         }
 
-        UserCollection collection = query().eq("uid", userCollection.getUid()).eq("gid", userCollection.getGid()).one();
+        UserCollection collection = query().eq("uid", userId).eq("gid", gid).one();
         if (collection == null) {
             return ResultVo.fail("商品未收藏");
         }
 
         QueryWrapper<UserCollection> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("uid", userCollection.getUid()).eq("gid", userCollection.getGid());
+        queryWrapper.eq("uid", userId).eq("gid", gid);
 
         boolean result = remove(queryWrapper);
-        return result ? ResultVo.ok("取消收藏成功") : ResultVo.fail("取消收藏失败");
+        return result ? ResultVo.ok(null,"取消收藏成功") : ResultVo.fail("取消收藏失败");
     }
 
     @Override
@@ -104,5 +108,21 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
         }
 
         return ResultVo.ok(dtoArrayList);
+    }
+
+    @Override
+    public ResultVo queryCollectionByGid(Long gid) {
+        // 获取用户id
+        Long userId = UserHolder.getUser().getId();
+        // 获取商品信息
+        Goods goods = goodsMapper.selectById(gid);
+        // 判断商品是否不存在
+        if (goods == null) {
+            return ResultVo.fail("商品不存在");
+        }
+        // 查询收藏
+        Integer count = query().eq("uid", userId).eq("gid", gid).count();
+
+        return count > 0 ? ResultVo.ok(count, "商品已收藏") : ResultVo.fail("商品未收藏");
     }
 }

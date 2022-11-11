@@ -1,6 +1,5 @@
 package com.jy2b.zxxfd.controller;
 
-import com.jy2b.zxxfd.domain.dto.AddressFromDTO;
 import com.jy2b.zxxfd.domain.dto.ResultVo;
 import com.jy2b.zxxfd.domain.UserAddress;
 import com.jy2b.zxxfd.service.IAddressService;
@@ -10,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @RestController
 @RequestMapping("/address")
@@ -24,6 +24,13 @@ public class AddressController {
     @PreAuthorize("hasAnyAuthority('address:query')")
     public ResultVo queryAddress() {
         return addressService.queryAddress();
+    }
+
+    @GetMapping("/default")
+    @ApiOperation(value = "查询默认收货地址")
+    @PreAuthorize("hasAnyAuthority('address:query')")
+    public ResultVo queryDefaultAddress() {
+        return addressService.queryDefaultAddress();
     }
 
     @GetMapping("/query/{id}")
@@ -57,7 +64,7 @@ public class AddressController {
     @DeleteMapping("/deletes")
     @ApiOperation(value = "根据ids批量删除收货地址")
     @PreAuthorize("hasAnyAuthority('address:delete')")
-    public ResultVo bulkDeleteAddress(@RequestBody AddressFromDTO addressFromDTO) {
-        return addressService.bulkDeleteAddress(addressFromDTO.getIds());
+    public ResultVo bulkDeleteAddress(@RequestParam List<Long> ids) {
+        return addressService.bulkDeleteAddress(ids);
     }
 }

@@ -33,7 +33,7 @@ public class AccountController {
         return accountService.recharge(rechargeFromDTO);
     }
 
-    @GetMapping("/bill")
+    @PostMapping("/bill")
     @PreAuthorize("hasAnyAuthority('account:query')")
     public ResultVo queryBill(@RequestBody(required = false) BillDateDTO dateDTO) {
         return accountService.queryBill(dateDTO);

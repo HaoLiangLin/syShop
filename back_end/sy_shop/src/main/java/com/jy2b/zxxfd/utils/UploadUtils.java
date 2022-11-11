@@ -75,15 +75,25 @@ public class UploadUtils {
     /**
      * 删除文件
      * @param fileName 图片名称
-     * @return ResultVo
      */
-    public static ResultVo deleteFile(String fileName) {
+    public static void deleteFile(String fileName) {
         File file = new File(SystemConstants.UPLOAD_IMAGE_PATH, fileName);
         if (file.isDirectory()) {
-            return ResultVo.fail("错误的文件名称!");
+            return;
         }
         FileUtil.del(file);
-        return ResultVo.ok();
+    }
+
+    public static void deleteFiles(String images) {
+        if (StrUtil.isBlank(images)) {
+            return;
+        }
+        String[] split = images.split(",");
+        for (String s : split) {
+            if (StrUtil.isNotBlank(s)) {
+                deleteFile(s);
+            }
+        }
     }
 
     private static String createNewFileName(String originalFilename, String savePath) {

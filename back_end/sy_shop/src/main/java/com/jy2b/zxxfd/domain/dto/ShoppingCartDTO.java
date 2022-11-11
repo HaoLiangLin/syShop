@@ -1,14 +1,20 @@
 package com.jy2b.zxxfd.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 @Data
 public class ShoppingCartDTO {
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long id; // 购物车id
 
     private String name; // 商品名称
 
-    private Long gid; // 商品属性id
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private Long goodsId; // 商品id
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private Long goodsItemId; // 商品属性id
 
     private String icon; // 图片
 
@@ -21,6 +27,9 @@ public class ShoppingCartDTO {
     private String edition; // 版本
 
     private Integer quantity; // 数量
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private Long stock; // 库存
 
     private Double unitPrice; // 单价
 

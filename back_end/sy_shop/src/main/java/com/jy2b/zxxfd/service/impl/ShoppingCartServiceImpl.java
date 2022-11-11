@@ -1,5 +1,6 @@
 package com.jy2b.zxxfd.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jy2b.zxxfd.domain.dto.ResultVo;
 import com.jy2b.zxxfd.domain.dto.ShoppingCartSaveDTO;
@@ -52,7 +53,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
         ShoppingCart cart = query().eq("uid", userId).eq("gid", gid).one();
         if (cart != null) {
             update().set("quantity", quantity).eq("id", cart.getId()).update();
-            return ResultVo.ok("新增购物车成功");
+            return ResultVo.ok(null, "新增购物车成功");
         }
 
         ShoppingCart shoppingCart = new ShoppingCart();
@@ -61,7 +62,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
         shoppingCart.setQuantity(quantity);
 
         boolean result = save(shoppingCart);
-        return result ? ResultVo.ok("新增购物车成功") : ResultVo.fail("新增购物车失败");
+        return result ? ResultVo.ok(null,"新增购物车成功") : ResultVo.fail("新增购物车失败");
     }
 
     @Override
@@ -83,7 +84,37 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
         // 删除购物车
         boolean result = removeById(id);
 
-        return result ? ResultVo.ok("删除购物车成功") : ResultVo.fail("删除购物车失败");
+        return result ? ResultVo.ok(null,"删除购物车成功") : ResultVo.fail("删除购物车失败");
+    }
+
+    @Override
+    public ResultVo bulkDelCart(List<Long> ids) {
+        // 获取登录用户id
+        Long userId = UserHolder.getUser().getId();
+
+        int success = 0;
+        if (!ids.isEmpty()) {
+            for (Long id : ids) {
+                boolean result = remove(new QueryWrapper<ShoppingCart>().eq("id", id).eq("uid", userId));
+                if (result) {
+                    success++;
+                }
+            }
+        }
+        return ResultVo.ok(null,"批量删除购物车：" + success);
+    }
+
+    @Override
+    public ResultVo emptyCart() {
+        // 获取用户id
+        Long userId = UserHolder.getUser().getId();
+        // 查询购物车
+        Integer count = query().eq("uid", userId).count();
+        if (count < 1) {
+            return ResultVo.ok();
+        }
+        boolean result = remove(new QueryWrapper<ShoppingCart>().eq("uid", userId));
+        return result ? ResultVo.ok(null,"购物车已清空") : ResultVo.fail("清空购物车失败");
     }
 
     @Override
@@ -104,7 +135,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
         }
 
         // 获取修改信息 商品属性id
-        Long gid = cartDTO.getGid();
+        Long gid = cartDTO.getGoodsItemId();
 
         // 判断商品属性是否存在
         GoodsItem item = itemMapper.selectById(gid);
@@ -131,7 +162,26 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
         // 修改购物车
         boolean result = updateById(updateCart);
 
-        return result ? ResultVo.ok("修改购物车成功") : ResultVo.fail("修改购物车失败");
+        return result ? ResultVo.ok(null,"修改购物车成功") : ResultVo.fail("修改购物车失败");
+    }
+
+    @Override
+    public ResultVo queryCartById(Long id) {
+        // 获取登录用户id
+        Long userId = UserHolder.getUser().getId();
+        // 根据id查询购物车
+        ShoppingCart shoppingCart = getById(id);
+        // 判断购物车是否为空
+        if (shoppingCart == null) {
+            return ResultVo.fail("购物车不存在");
+        }
+        // 判断是否用户购物车
+        if (!shoppingCart.getUid().equals(userId)) {
+            return ResultVo.fail("购物车不存在");
+        }
+        ShoppingCartDTO shoppingCartDTO = setShoppingCartDTO(shoppingCart);
+
+        return ResultVo.ok(shoppingCartDTO);
     }
 
     @Override
@@ -148,39 +198,50 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
 
         ArrayList<ShoppingCartDTO> dtoArrayList = new ArrayList<>();
         for (ShoppingCart shoppingCart : shoppingCartList) {
-            ShoppingCartDTO cartDTO = new ShoppingCartDTO();
-            // 设置购物车id
-            cartDTO.setId(shoppingCart.getId());
-
-            // 获取商品属性
-            GoodsItem item = itemMapper.selectById(shoppingCart.getGid());
-            // 获取商品名称
-            Goods goods = goodsMapper.selectById(item.getGid());
-            // 设置商品名称
-            cartDTO.setName(goods.getName());
-
-            // 设置商品图片
-            cartDTO.setIcon(item.getIcon());
-            // 设置商品属性
-            cartDTO.setColor(item.getColor());
-            cartDTO.setSize(item.getSize());
-            cartDTO.setCombo(item.getCombo());
-            cartDTO.setEdition(item.getEdition());
-
-            // 设置商品单价
-            cartDTO.setUnitPrice(item.getPrice());
-            // 设置商品运费
-            cartDTO.setPostage(goods.getPostage());
-            // 设置购物车数量
-            cartDTO.setQuantity(shoppingCart.getQuantity());
-
-            // 设置总价格
-            Double price = (item.getPrice() * shoppingCart.getQuantity()) + goods.getPostage();
-            cartDTO.setPrice(price);
+            ShoppingCartDTO cartDTO = setShoppingCartDTO(shoppingCart);
 
             dtoArrayList.add(cartDTO);
         }
 
         return ResultVo.ok(dtoArrayList);
+    }
+
+    private ShoppingCartDTO setShoppingCartDTO(ShoppingCart shoppingCart) {
+        ShoppingCartDTO cartDTO = new ShoppingCartDTO();
+        // 设置购物车id
+        cartDTO.setId(shoppingCart.getId());
+
+        // 获取商品属性
+        GoodsItem item = itemMapper.selectById(shoppingCart.getGid());
+        // 获取商品名称
+        Goods goods = goodsMapper.selectById(item.getGid());
+        // 设置商品名称
+        cartDTO.setName(goods.getName());
+
+        // 设置商品id
+        cartDTO.setGoodsId(item.getGid());
+        // 设置商品图片
+        cartDTO.setIcon(item.getIcon());
+        // 设置商品属性id
+        cartDTO.setGoodsItemId(item.getId());
+        // 设置商品属性
+        cartDTO.setColor(item.getColor());
+        cartDTO.setSize(item.getSize());
+        cartDTO.setCombo(item.getCombo());
+        cartDTO.setEdition(item.getEdition());
+        cartDTO.setStock(item.getStock());
+
+        // 设置商品单价
+        cartDTO.setUnitPrice(item.getPrice());
+        // 设置商品运费
+        cartDTO.setPostage(goods.getPostage());
+        // 设置购物车数量
+        cartDTO.setQuantity(shoppingCart.getQuantity());
+
+        // 设置总价格
+        Double price = (item.getPrice() * shoppingCart.getQuantity()) + goods.getPostage();
+        cartDTO.setPrice(price);
+
+        return cartDTO;
     }
 }

@@ -16,10 +16,7 @@ import com.jy2b.zxxfd.mapper.UserRoleMapper;
 import com.jy2b.zxxfd.service.IAccountService;
 import com.jy2b.zxxfd.service.IUserInfoService;
 import com.jy2b.zxxfd.service.IUserService;
-import com.jy2b.zxxfd.utils.BillUtils;
-import com.jy2b.zxxfd.utils.JwtUtils;
-import com.jy2b.zxxfd.utils.RegexUtils;
-import com.jy2b.zxxfd.utils.UserHolder;
+import com.jy2b.zxxfd.utils.*;
 import com.jy2b.zxxfd.contants.RedisConstants;
 import com.jy2b.zxxfd.contants.SystemConstants;
 import com.jy2b.zxxfd.domain.dto.*;
@@ -42,6 +39,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+
+import static com.jy2b.zxxfd.contants.RedisConstants.UPDATE_PHONE_CODE_KEY;
+import static com.jy2b.zxxfd.contants.RedisConstants.UPDATE_PHONE_CODE_TTL;
 
 @Slf4j
 @Service
@@ -135,7 +135,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         // 11. 注册账号
         boolean result = userRegister(user);
 
-        return result ? ResultVo.ok("注册成功") : ResultVo.fail("注册失败");
+        return result ? ResultVo.ok(null,"注册成功") : ResultVo.fail("注册失败");
     }
 
     @Override
@@ -190,29 +190,30 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             stringRedisTemplate.delete(RedisConstants.LOGIN_KEY + user.getId());
         }
 
-        return result ? ResultVo.ok() : ResultVo.fail("修改密码失败");
+        return result ? ResultVo.ok(null,"修改密码成功") : ResultVo.fail("修改密码失败");
     }
 
     @Override
-    public ResultVo updateIcon(String icon) {
+    public ResultVo updateIcon(String jwt, String icon) {
         if (StrUtil.isBlank(icon)) {
             return ResultVo.fail("头像不存在");
         }
         // 获取用户id
-        Long userId = UserHolder.getUser().getId();
+        UserDTO user = UserHolder.getUser();
+        Long userId = user.getId();
         boolean result = update().set("icon", icon).eq("id", userId).update();
-        return result ? ResultVo.ok() : ResultVo.fail("头像修改失败");
-    }
-
-    @Override
-    public ResultVo updateNickName(String nickname) {
-        if (StrUtil.isBlank(nickname)) {
-            return ResultVo.fail("昵称不能为空");
+        if (result) {
+            // 获取用户旧头像
+            String oldIcon = user.getIcon();
+            if (StrUtil.isNotBlank(oldIcon)) {
+                UploadUtils.deleteFile(oldIcon);
+            }
+            stringRedisTemplate.opsForHash().put(RedisConstants.LOGIN_USER_KEY + jwt, "icon", icon);
+            UserHolder.getUser().setIcon(icon);
+        } else {
+            UploadUtils.deleteFile(icon);
         }
-        // 获取用户id
-        Long userId = UserHolder.getUser().getId();
-        boolean result = update().set("nickname", nickname).eq("id", userId).update();
-        return result ? ResultVo.ok() : ResultVo.fail("昵称修改失败");
+        return result ? ResultVo.ok(null,"头像修改成功") : ResultVo.fail("头像修改失败");
     }
 
     @Override
@@ -242,7 +243,68 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             stringRedisTemplate.delete(RedisConstants.LOGIN_KEY + user.getId());
         }
 
-        return result ? ResultVo.ok("用户名修改成功！请重新登录") : ResultVo.fail("账号修改失败！");
+        return result ? ResultVo.ok("用户名修改成功！请重新登录") : ResultVo.fail("账号修改失败");
+    }
+
+    @Override
+    public ResultVo updateNickName(String jwt, String nickname) {
+        if (StrUtil.isBlank(nickname)) {
+            return ResultVo.fail("昵称不能为空");
+        }
+        // 获取用户id
+        Long userId = UserHolder.getUser().getId();
+        boolean result = update().set("nickname", nickname).eq("id", userId).update();
+        if (result) {
+            stringRedisTemplate.opsForHash().put(RedisConstants.LOGIN_USER_KEY + jwt, "nickname", nickname);
+            UserHolder.getUser().setNickname(nickname);
+        }
+        return result ? ResultVo.ok(null,"昵称修改成功") : ResultVo.fail("昵称修改失败");
+    }
+
+    @Override
+    public ResultVo codePhone(String phone) {
+        // 验证手机号
+        if (RegexUtils.isPhoneInvalid(phone)) {
+            return ResultVo.fail("手机号格式错误");
+        }
+        // 获取用户手机号
+        String userPhone = UserHolder.getUser().getPhone();
+        if (phone.equals(userPhone)) {
+            return ResultVo.fail("该手机号与当前绑定的手机号相同");
+        }
+        // 查询手机号是否注册
+        Integer count = query().eq("phone", phone).count();
+        if (count > 0) {
+            return ResultVo.fail("手机号已注册");
+        }
+        // 发送验证码
+        return createCode(phone, UPDATE_PHONE_CODE_KEY, UPDATE_PHONE_CODE_TTL, TimeUnit.MINUTES);
+    }
+
+    @Override
+    public ResultVo updatePhone(String jwt, String phone, String code) {
+        // 验证手机号
+        if (RegexUtils.isPhoneInvalid(phone)) {
+            return ResultVo.fail("手机号格式错误");
+        }
+        // 判断验证码是否为空
+        if (StrUtil.isBlank(code)) {
+            return ResultVo.fail("验证码不能为空");
+        }
+        // 验证验证码
+        ResultVo resultVo = checkCode(UPDATE_PHONE_CODE_KEY, phone, code);
+        if (!resultVo.getSuccess()) {
+            return resultVo;
+        }
+        // 获取用户id
+        Long userId = UserHolder.getUser().getId();
+        // 修改手机号
+        boolean result = update().set("phone", phone).eq("id", userId).update();
+        if (result) {
+            stringRedisTemplate.opsForHash().put(RedisConstants.LOGIN_USER_KEY + jwt, "phone", phone);
+            UserHolder.getUser().setPhone(phone);
+        }
+        return result ? ResultVo.ok(null,"手机号修改成功") : ResultVo.fail("手机号修改失败");
     }
 
     @Override
@@ -293,7 +355,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         String phone = pwdFormDTO.getPhone();
 
         // 从redis中查询手机号，判断是否通过验证
-        String checkResult = stringRedisTemplate.opsForValue().get(RedisConstants.FORGOT_PASSWORD_PHONE_KEY);
+        String checkResult = stringRedisTemplate.opsForValue().get(RedisConstants.FORGOT_PASSWORD_PHONE_KEY + phone);
 
         // 判断验证结果是否成功
         if (StrUtil.isBlank(checkResult)) {
@@ -308,11 +370,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             return ResultVo.fail("手机号不存在");
         }
 
+        // 获取新密码
+        String password = pwdFormDTO.getNewPassword();
+        if (StrUtil.isBlank(password)) {
+            return ResultVo.fail("密码不能为空");
+        }
+
+        String encode = passwordEncoder.encode(password);
+
         // 获取用户id
         Long userId = user.getId();
         // 修改密码
-        boolean result = update().set("password", pwdFormDTO.getNewPassword()).eq("id", userId).update();
-        return result ? ResultVo.ok("密码修改成功") : ResultVo.fail("密码修改失败");
+        boolean result = update().set("password", encode).eq("id", userId).update();
+        stringRedisTemplate.delete(RedisConstants.FORGOT_PASSWORD_PHONE_KEY + phone);
+        return result ? ResultVo.ok(null,"密码修改成功") : ResultVo.fail("密码修改失败");
     }
 
     @Override
@@ -338,7 +409,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             return ResultVo.fail("用户不存在");
         }
         boolean result = update(user, new UpdateWrapper<User>().eq("id", user.getId()));
-        return result ? ResultVo.ok("修改成功") : ResultVo.fail("修改失败");
+        return result ? ResultVo.ok(null,"修改成功") : ResultVo.fail("修改失败");
     }
 
     @Override
@@ -349,7 +420,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         }
         // 删除用户
         boolean result = removeById(id);
-        return result ? ResultVo.ok("删除成功") : ResultVo.fail("删除失败");
+        return result ? ResultVo.ok(null,"删除成功") : ResultVo.fail("删除失败");
     }
 
     @Override
@@ -367,7 +438,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 success++;
             }
         }
-        return ResultVo.ok("批量删除用户：" + success);
+        return ResultVo.ok(null,"批量删除用户：" + success);
     }
 
     @Override
@@ -377,7 +448,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         // 查询用户是否已经签到
         boolean bit = getSignIn(userId);
         if (bit) {
-            return ResultVo.ok("今日已签到");
+            return ResultVo.ok(null,"今日已签到");
         }
 
         // 查询用户钱包
@@ -398,7 +469,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         // 用户签到
         setSignIn(userId);
 
-        return ResultVo.ok("签到成功");
+        return ResultVo.ok(null,"签到成功");
     }
 
     @Override
@@ -408,7 +479,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         // 查询用户是否已经签到
         boolean result = getSignIn(userId);
-        return result ? ResultVo.ok("今日已签到") : ResultVo.fail("今日未签到");
+        return result ? ResultVo.ok(null,"今日已签到") : ResultVo.fail("今日未签到");
     }
 
     @Override
@@ -571,7 +642,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 .set(RedisConstants.LOGIN_KEY + user.getId(), JSONUtil.toJsonStr(loginUser), RedisConstants.LOGIN_KEY_TTL, TimeUnit.MINUTES);
 
         // 返回token
-        return ResultVo.ok(token);
+        return ResultVo.ok(token, "登录成功");
     }
 
     /**
@@ -613,7 +684,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 .set(RedisConstants.LOGIN_KEY + user.getId(), JSONUtil.toJsonStr(loginUser), RedisConstants.LOGIN_KEY_TTL, TimeUnit.MINUTES);
 
         // 返回token
-        return ResultVo.ok(token);
+        return ResultVo.ok(token, "登录成功");
     }
 
     /**
@@ -665,7 +736,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         stringRedisTemplate.opsForValue().set(key, code, time, timeUnit);
         // 5. 发送验证码
         System.out.println("发送验证码成功！验证码：" + code);
-        return ResultVo.ok();
+        return ResultVo.ok(code);
     }
 
     /**
@@ -694,7 +765,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             // 错误，返回错误信息
             return ResultVo.fail("验证码错误");
         }
-        return ResultVo.ok();
+        return ResultVo.ok(null,"验证通过");
     }
 
 

@@ -1,6 +1,7 @@
 package com.jy2b.zxxfd.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jy2b.zxxfd.domain.dto.GoodsItemFromDTO;
 import com.jy2b.zxxfd.domain.dto.GoodsItemQueryFromDTO;
 import com.jy2b.zxxfd.domain.dto.ResultVo;
 import com.jy2b.zxxfd.domain.dto.GoodsItemSaveFromDTO;
@@ -18,10 +19,10 @@ public interface IGoodsItemService extends IService<GoodsItem> {
 
     /**
      * 修改商品属性
-     * @param goodsItem 商品属性信息
+     * @param itemFromDTO 商品属性信息
      * @return ResultVo
      */
-    ResultVo updateItem(GoodsItem goodsItem);
+    ResultVo updateItem(Long id, GoodsItemSaveFromDTO itemFromDTO);
 
     /**
      * 查询商品属性
@@ -40,10 +41,9 @@ public interface IGoodsItemService extends IService<GoodsItem> {
     ResultVo queryItemByGid(Long gid);
 
     /**
-     * 根据商品属性颜色获取商品属性
-     * @param gid 商品id
-     * @param color 属性颜色
+     * 根据商品属性条件获取商品属性
+     * @param itemFromDTO 条件信息
      * @return ResultVo
      */
-    ResultVo queryItemByColor(Long gid, String color);
+    ResultVo queryItem(GoodsItemFromDTO itemFromDTO);
 }

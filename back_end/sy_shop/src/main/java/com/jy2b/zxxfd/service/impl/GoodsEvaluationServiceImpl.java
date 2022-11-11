@@ -176,7 +176,10 @@ public class GoodsEvaluationServiceImpl extends ServiceImpl<GoodsEvaluationMappe
 
         // 新增评论
         boolean result = save(goodsEvaluation);
-        return result ? ResultVo.ok("评价成功") : ResultVo.fail("评价失败");
+        if (!result) {
+            UploadUtils.deleteFiles(images);
+        }
+        return result ? ResultVo.ok(null,"评价成功") : ResultVo.fail("评价失败");
     }
 
     @Override
@@ -224,20 +227,11 @@ public class GoodsEvaluationServiceImpl extends ServiceImpl<GoodsEvaluationMappe
             // 删除点赞记录
             stringRedisTemplate.delete(EVALUATION_LIKED_KEY + id);
 
-            // 评价图片不为空
-            if (StrUtil.isNotBlank(images)) {
-                String[] split = images.split(",");
-                if (split.length == 0) {
-                    ResultVo.ok("删除评价成功");
-                }
-                for (String s : split) {
-                    // 删除评价图片
-                    UploadUtils.deleteFile(s);
-                }
-            }
+            // 删除评价图片
+            UploadUtils.deleteFiles(images);
         }
 
-        return result ? ResultVo.ok("删除评价成功") : ResultVo.fail("删除评价失败");
+        return result ? ResultVo.ok(null,"删除评价成功") : ResultVo.fail("删除评价失败");
     }
 
     @Override
@@ -335,7 +329,7 @@ public class GoodsEvaluationServiceImpl extends ServiceImpl<GoodsEvaluationMappe
             stringRedisTemplate.opsForZSet().add(EVALUATION_LIKED_KEY + id, userId.toString(), Double.parseDouble(String.valueOf(time)));
         }
 
-        return result ? ResultVo.ok("点赞成功") : ResultVo.fail("点赞失败");
+        return result ? ResultVo.ok(null,"点赞成功") : ResultVo.fail("点赞失败");
     }
 
     private GoodsEvaluationDTO setEvaluationDTO(GoodsEvaluation comment) {

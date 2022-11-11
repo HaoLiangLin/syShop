@@ -1,9 +1,11 @@
 package com.jy2b.zxxfd.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 @Data
 public class GoodsItemQueryFromDTO {
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long gid; // 商品id
 
     private String color; // 颜色

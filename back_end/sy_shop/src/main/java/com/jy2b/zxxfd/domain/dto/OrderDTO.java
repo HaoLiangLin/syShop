@@ -1,11 +1,13 @@
 package com.jy2b.zxxfd.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.util.ArrayList;
 
 @Data
 public class OrderDTO {
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long orderId; // 订单号
     private String name; // 收件人
     private String phone; // 联系电话

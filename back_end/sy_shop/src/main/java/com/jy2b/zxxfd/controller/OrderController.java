@@ -25,10 +25,22 @@ public class OrderController {
         return orderService.submitOrder(orderSaveFromDTO);
     }
 
+    @PutMapping("/update/{id}")
+    @PreAuthorize("hasAnyAuthority('order:submit')")
+    public ResultVo userUpdateOrder(@PathVariable("id") Long id, @RequestBody OrderSaveFromDTO orderSaveFromDTO) {
+        return orderService.userUpdateOrder(id, orderSaveFromDTO);
+    }
+
     @DeleteMapping("/cancel/{id}")
     @PreAuthorize("hasAnyAuthority('order:cancel')")
     public ResultVo cancelOrder(@PathVariable("id") Long id) {
         return orderService.cancelOrder(id);
+    }
+
+    @PutMapping("/complete/{id}")
+    @PreAuthorize("hasAnyAuthority('order:submit')")
+    public ResultVo completeOrder(@PathVariable("id") Long id) {
+        return orderService.completeOrder(id);
     }
 
     @DeleteMapping("/delete/{id}")
@@ -49,10 +61,22 @@ public class OrderController {
         return orderService.queryOrderById(id);
     }
 
+    @GetMapping("/query/all")
+    @PreAuthorize("hasAnyAuthority('order:query')")
+    public ResultVo queryOrderAll() {
+        return orderService.queryOrderAll();
+    }
+
     @GetMapping("/query/unpaid")
     @PreAuthorize("hasAnyAuthority('order:query')")
     public ResultVo queryUnpaidOrder() {
         return orderService.queryUnpaidOrder();
+    }
+
+    @GetMapping("/query/beShipped")
+    @PreAuthorize("hasAnyAuthority('order:query')")
+    public ResultVo queryBeShippedOrder() {
+        return orderService.queryBeShippedOrder();
     }
 
     @GetMapping("/query/undelivered")

@@ -16,14 +16,21 @@ public interface IUserCollectionService extends IService<UserCollection> {
 
     /**
      * 删除收藏
-     * @param userCollection 收藏信息
+     * @param gid 商品id
      * @return ResultVo
      */
-    ResultVo delCollection(UserCollection userCollection);
+    ResultVo delCollection(Long gid);
 
     /**
      * 查询收藏
      * @return ResultVo
      */
     ResultVo queryCollection();
+
+    /**
+     * 根据商品id查询商品是否收藏
+     * @param gid 商品id
+     * @return ResultVo
+     */
+    ResultVo queryCollectionByGid(Long gid);
 }

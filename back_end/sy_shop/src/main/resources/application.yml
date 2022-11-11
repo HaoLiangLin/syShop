@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: dev
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/sy_shop?characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true
@@ -10,7 +12,6 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher # 解决SpringBoot与Swagger版本冲突
   redis:
-    host: 192.168.110.100
     port: 6379
     password: 123456
     lettuce:
@@ -22,7 +23,7 @@ spring:
   jackson:
     default-property-inclusion: non_null # JSON处理时忽略非空字段
     date-format: yyyy-MM-dd HH:mm:ss # 日期格式字符串或完全限定的日期格式类名
-    time-zone: GMT+8 # 设置日期格式时使用的时区
+    time-zone: 'GMT+8' # 设置日期格式时使用的时区
   servlet:
     multipart:
       max-file-size: 10MB # 单文件最大上传大小
@@ -40,4 +41,18 @@ logging:
   level:
     com.hmdp: debug
 
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  redis:
+    host: 192.168.110.100
 
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  redis:
+    host: 127.0.0.1

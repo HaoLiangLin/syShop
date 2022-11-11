@@ -1,6 +1,7 @@
 package com.jy2b.zxxfd.service.impl;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jy2b.zxxfd.domain.dto.ResultVo;
@@ -8,10 +9,14 @@ import com.jy2b.zxxfd.domain.GoodsCategory;
 import com.jy2b.zxxfd.mapper.GoodsCategoryMapper;
 import com.jy2b.zxxfd.service.IGoodsCategoryService;
 import com.jy2b.zxxfd.service.IGoodsService;
+import com.jy2b.zxxfd.utils.UploadUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+
+import static com.jy2b.zxxfd.contants.RedisConstants.GOODS_CATEGORY_FIRST;
 
 @Service
 public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, GoodsCategory> implements IGoodsCategoryService {
@@ -20,6 +25,9 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
 
     @Resource
     private IGoodsService goodsService;
+
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
 
     @Override
     public ResultVo queryCategoryList(Integer page, Integer size) {
@@ -30,7 +38,21 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
 
     @Override
     public ResultVo queryCategoryByOne() {
+        String result = stringRedisTemplate.opsForValue().get(GOODS_CATEGORY_FIRST);
+        if (StrUtil.isNotBlank(result)) {
+            List<GoodsCategory> goodsCategories = JSONUtil.toList(result, GoodsCategory.class);
+            if (!goodsCategories.isEmpty()) {
+                return ResultVo.ok(goodsCategories);
+            }
+        }
+
         List<GoodsCategory> list = query().isNull("fid").list();
+        if (!list.isEmpty()) {
+            // 保存redis
+            String jsonStr = JSONUtil.toJsonStr(list);
+            stringRedisTemplate.opsForValue().set(GOODS_CATEGORY_FIRST, jsonStr);
+        }
+
         return ResultVo.ok(list);
     }
 
@@ -62,9 +84,16 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
             }
         }
 
+        goodsCategory.setId(null);
+
         // 新增分类
         boolean result = save(goodsCategory);
-        return result ? ResultVo.ok("新增分类成功") : ResultVo.fail("新增分类失败");
+
+        // 判断是否新增一级分类
+        if (goodsCategory.getFid() == null) {
+            saveFirstCategory();
+        }
+        return result ? ResultVo.ok(null,"新增分类成功") : ResultVo.fail("新增分类失败");
     }
 
     @Override
@@ -83,6 +112,9 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
             return ResultVo.fail("商品分类已经被使用，暂无法删除");
         }
 
+        // 获取分类图标
+        String icon = goodsCategory.getIcon();
+
         // 删除分类
         boolean result = delCategory(id);
 
@@ -90,7 +122,15 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
             throw new RuntimeException("删除商品分类失败");
         }
 
-        return ResultVo.ok("删除商品分类成功");
+        if (goodsCategory.getFid() == null) {
+            saveFirstCategory();
+        }
+
+        if (StrUtil.isNotBlank(icon)) {
+            UploadUtils.deleteFile(icon);
+        }
+
+        return ResultVo.ok(null,"删除商品分类成功");
     }
 
     @Override
@@ -105,6 +145,9 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
         if (category == null) {
             return ResultVo.fail("商品分类不存在");
         }
+
+        // 获取分类图标
+        String icon = category.getIcon();
 
         // 判断分类名称是否存在
         Integer count = query().eq("name", goodsCategory.getName()).ne("id", categoryId).count();
@@ -124,7 +167,17 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
         // 修改商品分类
         boolean result = updateById(goodsCategory);
 
-        return result ? ResultVo.ok("修改商品分类成功") : ResultVo.fail("修改商品分类失败");
+        if (result) {
+            // 判断是否修改一级分类
+            if (goodsCategory.getFid() == null) {
+                saveFirstCategory();
+            }
+            if (StrUtil.isNotBlank(icon)) {
+                UploadUtils.deleteFile(icon);
+            }
+        }
+
+        return result ? ResultVo.ok(null,"修改商品分类成功") : ResultVo.fail("修改商品分类失败");
     }
 
     /**
@@ -156,11 +209,16 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
             for (GoodsCategory category : categories) {
                 // 获取分类id
                 Long categoryId = category.getId();
+                // 获取分类图标
+                String icon = category.getIcon();
                 // 删除分类
                 boolean result = delCategory(categoryId);
                 // 遇到删除失败，直接返回 false
                 if (!result) {
                     return false;
+                }
+                if (StrUtil.isNotBlank(icon)) {
+                    UploadUtils.deleteFile(icon);
                 }
             }
         }
@@ -169,5 +227,15 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
         return removeById(id);
     }
 
+    /**
+     * 保存一级分类到缓存
+     */
+    private void saveFirstCategory() {
+        // 查询一级分类
+        List<GoodsCategory> list = query().isNull("fid").list();
+        // 保存redis
+        String jsonStr = JSONUtil.toJsonStr(list);
+        stringRedisTemplate.opsForValue().set(GOODS_CATEGORY_FIRST, jsonStr);
+    }
 
 }

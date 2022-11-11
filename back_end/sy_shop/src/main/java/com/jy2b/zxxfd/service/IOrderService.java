@@ -1,10 +1,7 @@
 package com.jy2b.zxxfd.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jy2b.zxxfd.domain.dto.OrderQueryDTO;
-import com.jy2b.zxxfd.domain.dto.OrderSaveFromDTO;
-import com.jy2b.zxxfd.domain.dto.OrderUpdateFromDTO;
-import com.jy2b.zxxfd.domain.dto.ResultVo;
+import com.jy2b.zxxfd.domain.dto.*;
 import com.jy2b.zxxfd.domain.Order;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +14,13 @@ public interface IOrderService extends IService<Order> {
      * @return ResultVo
      */
     ResultVo submitOrder(OrderSaveFromDTO orderSaveFromDTO);
+
+    /**
+     * 用户修改订单
+     * @param orderSaveDTO 订单信息
+     * @return ResultVo
+     */
+    ResultVo userUpdateOrder(Long id, OrderSaveFromDTO orderSaveDTO);
 
     /**
      * 取消订单
@@ -40,10 +44,22 @@ public interface IOrderService extends IService<Order> {
     ResultVo queryOrderById(Long id);
 
     /**
+     * 查询全部订单
+     * @return ResultVo
+     */
+    ResultVo queryOrderAll();
+
+    /**
      * 查询待付款订单
      * @return ResultVo
      */
     ResultVo queryUnpaidOrder();
+
+    /**
+     * 查询待发货订单
+     * @return ResultVo
+     */
+    ResultVo queryBeShippedOrder();
 
     /**
      * 查询待收货订单
@@ -56,6 +72,13 @@ public interface IOrderService extends IService<Order> {
      * @return ResultVo
      */
     ResultVo queryCompletedOrder();
+
+    /**
+     * 完成订单
+     * @param id 订单号
+     * @return ResultVo
+     */
+    ResultVo completeOrder(Long id);
 
     /**
      * 删除订单

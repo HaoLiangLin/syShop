@@ -169,6 +169,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
             // 修改商品属性库存
             item.setStock(stock -quantity);
+            item.setSales(item.getSales() + 1);
             goodsItemMapper.updateById(item);
 
             // 获取商品邮费
@@ -187,7 +188,97 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
         // TODO 用户提交订单后，若在限定时间中没有进行支付，则删除该订单
 
-        return ResultVo.ok(orderId, "提交订单成功");
+        return ResultVo.ok(String.valueOf(orderId), "提交订单成功");
+    }
+
+    @Override
+    public ResultVo userUpdateOrder(Long id, OrderSaveFromDTO orderSaveDTO) {
+        // 获取用户id
+        Long userId = UserHolder.getUser().getId();
+        // 查询将要修改订单
+        Order beforeOrder = getById(id);
+
+        // 判断订单是否存在
+        if (beforeOrder == null) {
+            return ResultVo.fail("订单不存在");
+        }
+
+        // 判断订单是否属于用户
+        if (!beforeOrder.getUid().equals(userId)) {
+            return ResultVo.fail("订单不存在");
+        }
+
+        // 判断订单是否已付款
+        Integer isPay = beforeOrder.getIsPay();
+        if (isPay > 0) {
+            return ResultVo.fail("订单已交易");
+        }
+
+        Order order = new Order();
+        order.setId(id);
+
+        // 获取收货地址id
+        Long aid = orderSaveDTO.getAid();
+        // 判断是否修改收货地址
+        if (aid != null) {
+            // 获取用户收货地址
+            UserAddress address = addressMapper.selectById(aid);
+
+            // 判断收货地址是否存在
+            if (address == null) {
+                return ResultVo.fail("收货地址不存在");
+            }
+
+            // 获取收货人姓名
+            String name = address.getName();
+            // 获取收货联系电话
+            String phone = address.getPhone();
+            // 获取收货省份
+            String province = address.getProvince();
+            // 获取收货城市
+            String city = address.getCity();
+            // 获取收货区/县
+            String district = address.getDistrict();
+            // 获取详细收货地址
+            String addressInfo = address.getAddress();
+
+            // 设置订单收货人
+            order.setName(name);
+            // 设置订单联系电话
+            order.setPhone(phone);
+            // 设置订单收货省份
+            order.setProvince(province);
+            // 设置订单收货城市
+            order.setCity(city);
+            // 设置订单收货区/县
+            order.setDistrict(district);
+            // 设置订单详细收货地址
+            order.setAddress(addressInfo);
+        }
+
+        // 获取订单备注
+        String remarks = orderSaveDTO.getRemarks();
+        // 判断是否修改订单备注
+        if (remarks != null) {
+            if (StrUtil.isNotBlank(remarks)) {
+                order.setRemarks(remarks);
+            }
+        }
+
+        // 修改订单
+        boolean result = updateById(order);
+
+        // 修改订单成功
+        if (result) {
+            // 获取订单
+            Order afterOrder = getById(id);
+            OrderDTO orderDTO = setQueryDTO(afterOrder);
+
+            // 返回数据
+            return ResultVo.ok(orderDTO);
+        }
+
+        return ResultVo.fail("订单修改失败");
     }
 
     @Override
@@ -251,6 +342,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
                 // 修改商品库存
                 item.setStock(stock + quantity);
+                item.setSales(item.getSales() - 1);
                 int updateItem = goodsItemMapper.updateById(item);
                 int updateOrderItem = orderItemMapper.deleteById(orderItem.getId());
 
@@ -265,7 +357,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         if (!result) {
             throw new RuntimeException("取消订单失败");
         }
-        return ResultVo.ok("取消订单成功");
+        return ResultVo.ok(null,"取消订单成功");
     }
 
     @Override
@@ -321,7 +413,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         BillUtils billUtils = new BillUtils(stringRedisTemplate);
         billUtils.saveBill(userId, "购物消费", amount);
 
-        return ResultVo.ok("支付成功");
+        return ResultVo.ok(null,"支付成功");
     }
 
     @Override
@@ -344,12 +436,43 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     }
 
     @Override
+    public ResultVo queryOrderAll() {
+        // 获取用户id
+        Long userId = UserHolder.getUser().getId();
+        // 查询全部订单
+        List<Order> orders = list(new QueryWrapper<Order>().eq("uid", userId).orderByDesc("time").eq("isDel", 0));
+        ArrayList<OrderDTO> orderDTOS = setQueryDTOS(orders);
+        return ResultVo.ok(orderDTOS);
+    }
+
+    @Override
     public ResultVo queryUnpaidOrder() {
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
 
         // 查询订单
-        List<Order> orderList = query().eq("uid", userId).eq("isPay", 0).eq("isDel", 0).list();
+        List<Order> orderList = query()
+                .eq("uid", userId)
+                .eq("isPay", 0)
+                .orderByDesc("time")
+                .eq("isDel", 0).list();
+
+        ArrayList<OrderDTO> orderDTOS = setQueryDTOS(orderList);
+        return ResultVo.ok(orderDTOS);
+    }
+
+    @Override
+    public ResultVo queryBeShippedOrder() {
+        // 获取用户id
+        Long userId = UserHolder.getUser().getId();
+
+        // 查询订单
+        List<Order> orderList = query()
+                .eq("uid", userId)
+                .eq("isPay", 1)
+                .eq("logistics_status", 0)
+                .orderByDesc("time")
+                .eq("isDel", 0).list();
 
         ArrayList<OrderDTO> orderDTOS = setQueryDTOS(orderList);
         return ResultVo.ok(orderDTOS);
@@ -361,7 +484,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         Long userId = UserHolder.getUser().getId();
 
         // 查询订单
-        List<Order> orderList = query().eq("uid", userId).in("logistics_status", 0, 1).eq("isDel", 0).list();
+        List<Order> orderList = query()
+                .eq("uid", userId)
+                .eq("logistics_status", 1)
+                .orderByDesc("time")
+                .eq("isDel", 0).list();
 
         ArrayList<OrderDTO> orderDTOS = setQueryDTOS(orderList);
         return ResultVo.ok(orderDTOS);
@@ -373,10 +500,41 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         Long userId = UserHolder.getUser().getId();
 
         // 查询订单
-        List<Order> orderList = query().eq("uid", userId).eq("status", 1).eq("isDel", 0).list();
+        List<Order> orderList = query()
+                .eq("uid", userId)
+                .eq("status", 1)
+                .eq("logistics_status", 2)
+                .eq("isDel", 0)
+                .orderByDesc("time").list();
 
         ArrayList<OrderDTO> orderDTOS = setQueryDTOS(orderList);
         return ResultVo.ok(orderDTOS);
+    }
+
+    @Override
+    public ResultVo completeOrder(Long id) {
+        // 获取用户id
+        Long userId = UserHolder.getUser().getId();
+
+        // 查询订单
+        Order order = query()
+                .eq("id", id)
+                .eq("uid", userId)
+                .eq("isPay", 1)
+                .eq("logistics_status", 1).one();
+
+        // 判断订单是否为空
+        if (order == null) {
+            return ResultVo.fail("订单尚未送出或订单不存在，暂无法完成订单");
+        }
+
+        // 完成订单
+        order.setLogisticsStatus(2); // 设置已收货
+        order.setStatus(1); // 设置已完成
+
+        boolean result = updateById(order);
+
+        return result ? ResultVo.ok(null, "订单完成，欢迎再次购买") : ResultVo.fail("订单暂无法完成，请重试");
     }
 
     @Override
@@ -546,7 +704,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // 修改订单
         boolean result = updateById(order);
 
-        return result ? ResultVo.ok("订单修改成功！") : ResultVo.fail("订单修改失败！");
+        return result ? ResultVo.ok(null,"订单修改成功！") : ResultVo.fail("订单修改失败！");
     }
 
     private ArrayList<OrderDTO> setQueryDTOS(List<Order> orderList) {
@@ -596,11 +754,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
         // 设置订单支付方式
         Integer paymentMethods = order.getPaymentMethods();
-        switch (paymentMethods) {
-            case 0: orderDTO.setPaymentMethods("钱包支付");break;
-            case 1: orderDTO.setPaymentMethods("微信支付");break;
-            case 2: orderDTO.setPaymentMethods("支付宝支付");break;
+        if (paymentMethods != null) {
+            if (paymentMethods >= 0) {
+                switch (paymentMethods) {
+                    case 0: orderDTO.setPaymentMethods("钱包支付");break;
+                    case 1: orderDTO.setPaymentMethods("微信支付");break;
+                    case 2: orderDTO.setPaymentMethods("支付宝支付");break;
+                }
+            }
         }
+
 
         // 设置物流状态
         Integer logisticsStatus = order.getLogisticsStatus();
@@ -615,11 +778,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         if (logisticsStatus > 0) {
             Date shippingTime = order.getShippingTime();
 
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-
             // 设置发货时间
-            orderDTO.setShippingTime(simpleDateFormat.format(shippingTime));
+            orderDTO.setShippingTime(TimeUtils.dateToStringTime(shippingTime));
         }
 
         // 获取订单状态
@@ -653,6 +813,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         for (OrderItem orderItem : orderItems) {
             if (orderItem != null) {
                 OrderItemDTO orderItemDTO = new OrderItemDTO();
+                // 获取订单属性id
+                Long id = orderItem.getId();
+                // 设置订单属性
+                orderItemDTO.setOrderItemId(id);
+
                 // 获取商品属性id
                 Long itemId = orderItem.getGid();
                 // 获取商品属性信息
@@ -698,9 +863,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                     commentQueryWrapper.eq("order_id", order.getId()).eq("goodsItem_id", itemId);
                     Integer integer = goodsEvaluationMapper.selectCount(commentQueryWrapper);
 
-                    if (integer < 1) {
-                        // 设置未评论
+                    if (integer > 0) {
+                        // 设置是否评论
                         orderItemDTO.setIsComment(integer);
+                    } else {
+                        orderItemDTO.setIsComment(0);
                     }
                 }
 

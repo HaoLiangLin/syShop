@@ -1,10 +1,12 @@
 package com.jy2b.zxxfd.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 @Data
 public class GoodsItemSaveFromDTO {
-    private String gid; // 商品id
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private Long gid; // 商品id
 
     private String color; // 颜色
 
@@ -18,11 +20,12 @@ public class GoodsItemSaveFromDTO {
 
     private Double discount; // 则扣
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long stock; // 库存
 
+    private Integer status;
+
     private String icon; // 图片
-
-
 
     private String remark; // 备注
 }

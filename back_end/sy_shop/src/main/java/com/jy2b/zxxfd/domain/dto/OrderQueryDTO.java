@@ -1,11 +1,14 @@
 package com.jy2b.zxxfd.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 @Data
 public class OrderQueryDTO {
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long id; // 订单号
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long uid; // 下单用户id
 
     private Integer isPay; // 是否付款

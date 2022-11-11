@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 
 @RestController
 @CrossOrigin
@@ -74,15 +75,15 @@ public class UserController {
     @PutMapping("/updateIcon")
     @ApiOperation(value = "修改用户头像")
     @PreAuthorize("hasAnyAuthority('user:update')")
-    public ResultVo updateIcon(@RequestBody UserDTO user) {
-        return userService.updateIcon(user.getIcon());
+    public ResultVo updateIcon(@RequestBody UserDTO user, @RequestHeader("authorization") String jwt) {
+        return userService.updateIcon(jwt, user.getIcon());
     }
 
     @PutMapping("/updateNickName")
     @ApiOperation(value = "修改用户昵称")
     @PreAuthorize("hasAnyAuthority('user:update')")
-    public ResultVo updateNickName(@RequestBody UserDTO user) {
-        return userService.updateNickName(user.getNickname());
+    public ResultVo updateNickName(@RequestBody UserDTO user, @RequestHeader("authorization") String jwt) {
+        return userService.updateNickName(jwt, user.getNickname());
     }
 
     @GetMapping("/isNotUpdateUsername")
@@ -97,6 +98,20 @@ public class UserController {
     @PreAuthorize("hasAnyAuthority('user:update')")
     public ResultVo updateUsername(@RequestBody UserDTO user) {
         return userService.updateUsername(user.getUsername());
+    }
+
+    @GetMapping("/codePhone")
+    @ApiOperation(value = "修改手机号：发送验证码")
+    @PreAuthorize("hasAnyAuthority('user:update')")
+    public ResultVo codePhone(@RequestParam("phone") String phone) {
+        return userService.codePhone(phone);
+    }
+
+    @PutMapping("/updatePhone/{phone}/{code}")
+    @ApiOperation(value = "修改手机号")
+    @PreAuthorize("hasAnyAuthority('user:update')")
+    public ResultVo updatePhone(@RequestHeader("authorization") String jwt, @PathVariable("phone") String phone, @PathVariable("code") String code) {
+        return userService.updatePhone(jwt, phone, code);
     }
 
     @DeleteMapping("/logout")

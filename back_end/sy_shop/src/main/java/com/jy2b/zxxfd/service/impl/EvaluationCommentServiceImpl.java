@@ -71,7 +71,7 @@ public class EvaluationCommentServiceImpl extends ServiceImpl<EvaluationCommentM
 
             // 新增回复评论
             boolean result = save(evaluationComment);
-            return result ? ResultVo.ok("回复评论成功") : ResultVo.fail("回复评论失败");
+            return result ? ResultVo.ok(null,"回复评论成功") : ResultVo.fail("回复评论失败");
         }
 
         // 获取评价Id
@@ -93,7 +93,7 @@ public class EvaluationCommentServiceImpl extends ServiceImpl<EvaluationCommentM
 
         boolean result = save(evaluationComment);
 
-        return result ? ResultVo.ok("评论成功") : ResultVo.fail("评论失败");
+        return result ? ResultVo.ok(null,"评论成功") : ResultVo.fail("评论失败");
     }
 
     @Override
@@ -118,7 +118,7 @@ public class EvaluationCommentServiceImpl extends ServiceImpl<EvaluationCommentM
             throw new RuntimeException("删除评论失败");
         }
 
-        return ResultVo.ok("删除评论成功");
+        return ResultVo.ok(null,"删除评论成功");
     }
 
     @Override

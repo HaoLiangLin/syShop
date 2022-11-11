@@ -1,6 +1,7 @@
 package com.jy2b.zxxfd.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jy2b.zxxfd.domain.UserInfo;
 import com.jy2b.zxxfd.domain.dto.*;
 import com.jy2b.zxxfd.domain.User;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,14 +50,7 @@ public interface IUserService extends IService<User> {
      * @param icon 头像地址
      * @return ResultVo
      */
-    ResultVo updateIcon(String icon);
-
-    /**
-     * 用户：修改用户昵称
-     * @param nickname 昵称
-     * @return ResultVo
-     */
-    ResultVo updateNickName(String nickname);
+    ResultVo updateIcon(String jwt, String icon);
 
     /**
      * 用户：查看用户是否未修改过账号
@@ -70,6 +64,28 @@ public interface IUserService extends IService<User> {
      * @return ResultVo
      */
     ResultVo updateUsername(String account);
+
+    /**
+     * 用户：修改用户昵称
+     * @param nickname 昵称
+     * @return ResultVo
+     */
+    ResultVo updateNickName(String jwt, String nickname);
+
+    /**
+     * 修改手机号：验证手机号
+     * @param phone 手机号
+     * @return ResultVo
+     */
+    ResultVo codePhone(String phone);
+
+    /**
+     * 用户：修改手机号
+     * @param phone 手机号
+     * @param code 验证码
+     * @return ResultVo
+     */
+    ResultVo updatePhone(String jwt, String phone, String code);
 
     /**
      * 用户登出
