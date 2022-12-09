@@ -1,0 +1,102 @@
+
+.my-header{
+	background-image: linear-gradient(-60deg, #ff5858 0%, #f09819 100%);
+	width: 100%;
+	height: 400rpx;
+	position: relative;
+}
+.header-main{
+	position: relative;
+	margin: auto;
+	padding: auto;
+	text-align: center;
+	top: 60rpx;
+	height: 100%;
+	color: white;
+	font-weight: bold;
+}
+.title{
+	font-size: 54rpx;
+}
+.title2{
+	font-size: 30rpx;
+}
+.header-tip{
+	position: relative;
+	left: 80%;
+	color: white;
+	font-size: 24rpx;
+}
+.box{
+	border: 1px solid gray;
+	background-color: #FFFFFF;
+	width: 600rpx;
+	height: 160rpx;
+	position: absolute;
+	left: 50%;
+	margin-left: -300rpx;
+	margin-right: -300rpx;
+	top: 80%;
+	border-radius: 8px;
+	box-shadow: 1px 2px 5px 0 rgba(0, 0, 0, .5);
+}
+.attendance-btn{
+	color: white;
+	background-color: #f09819;
+	border-radius: 30rpx;
+	padding: 20rpx 20rpx;
+}
+.order{
+	padding-top: 100rpx;
+}
+.order-title{
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 20rpx;
+}
+.order-list{
+	padding: 20rpx;
+	display: flex;
+}
+.order-item{
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	font-size: 30rpx;
+}
+.menWear{
+		display: flex;
+		padding: 10rpx;
+		border: 1rpx solid #efefef;
+		margin: 10rpx;
+}
+.thump image{
+		width: 250rpx;
+		height: 250rpx;
+		display: block;/* 清除照片间的间距 */
+		margin-right: 5rpx;
+}
+.info{
+		display: flex;
+		flex-direction: column;/* 定义纵向排序 */
+		justify-content: space-evenly;/* 分散对齐 */
+		font-size: 28rpx;
+		margin-left: 26rpx;
+}
+.shop-title{
+		font-size: 36rpx;
+		font-weight: bold;
+}
+.shop-price{
+		font-size: 34rpx;
+		color: red;
+		font-weight: bold;
+}
+.shop-score{
+		color: red;
+		font-weight: bold;
+}
+

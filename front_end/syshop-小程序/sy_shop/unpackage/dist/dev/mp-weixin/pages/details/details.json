@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "商品详情",
+  "scrollIndicator": "none",
+  "usingComponents": {
+    "card": "/components/common/Card",
+    "commodity-list": "/components/common/CommodityList",
+    "line": "/components/common/Line",
+    "uni-number-box": "/components/uni/uni-number-box/components/uni-number-box/uni-number-box"
+  }
+}

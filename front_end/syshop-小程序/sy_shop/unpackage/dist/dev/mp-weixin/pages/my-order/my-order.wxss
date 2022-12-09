@@ -1,0 +1,55 @@
+
+.my-order{
+}
+.no-order{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+}
+.no-order-btn{
+	padding: 6rpx 60rpx;
+	border: 2rpx solid orangered;
+	color: orangered;
+}
+.order-main{
+	border: 2rpx solid lightgray;
+	box-shadow: 1px 2px 5px 0 rgba(0, 0, 0, .5);
+	padding: 20rpx 20rpx;
+	border-radius: 30rpx;
+}
+.order-headr{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-bottom: 2rpx solid #F7F7F7;
+}
+.header-item{
+	text-align: center;
+	flex: 1;
+	line-height: 120rpx;
+}
+.active{
+	color: red;
+	border-bottom: 4rpx solid red;
+	font-weight: bold;
+}
+.total-price{
+	display: flex;
+	justify-content: flex-end;
+	padding: 20rpx;
+	font-size: 32rpx;
+}
+.order-pay{
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 20rpx 40rpx;
+	color: orangered;
+}
+.pay-btn{
+	border-radius: 30rpx;
+	border: 2rpx solid orangered;
+	padding: 6rpx 40rpx;
+}
+

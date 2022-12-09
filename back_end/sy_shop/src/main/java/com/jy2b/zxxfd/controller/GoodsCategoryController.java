@@ -39,6 +39,11 @@ public class GoodsCategoryController {
         return goodsCategoryService.queryCategoryChild(id);
     }
 
+    @GetMapping("/select")
+    public ResultVo findSelectCategory() {
+        return goodsCategoryService.findSelectCategory();
+    }
+
     @PostMapping("/uploadIcon")
     @ApiOperation(value = "上传分类图标", notes = "上传成功，返回存放路径")
     @PreAuthorize("hasAnyAuthority('goods:category:save')")

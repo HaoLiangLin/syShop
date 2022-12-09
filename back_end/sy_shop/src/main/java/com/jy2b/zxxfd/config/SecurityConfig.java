@@ -91,6 +91,7 @@ public class SecurityConfig {
             .authorizeRequests()
             .antMatchers(
                     "/users/login",
+                    "/users/loginEnd/**",
                     "/users/code",
                     "/users/register/**",
                     "/users/codePassword",
@@ -98,6 +99,7 @@ public class SecurityConfig {
                     "/users/updatePassword").anonymous() // 只有未登录的才能访问
             .antMatchers(
                     "/goodsCategory/query/**",
+                    "/goodsCategory/select",
                     "/goods/query/**",
                     "/goodsItem/query/**",
                     "/evaluation/query/**",
@@ -105,6 +107,7 @@ public class SecurityConfig {
                     "/events/query/**",
                     "/eventsGoods/query/**",
                     "/noticeCategory/query/**",
+                    "/noticeCategory/select",
                     "/notices/query/**",
                     "/resources/image/**",
                     "/swagger-resources/**",

@@ -22,6 +22,7 @@ public class SystemConstants {
 
     // 商品封面数量
     public static final int GOODS_IMAGES_LENGTH = 3;
+
     // 评价图片数量
     public static final int COMMENT_IMAGES_LENGTH = 10;
 }

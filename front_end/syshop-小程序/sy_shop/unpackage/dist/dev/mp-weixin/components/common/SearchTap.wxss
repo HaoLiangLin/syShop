@@ -1,0 +1,23 @@
+
+.searchTap.data-v-1589f95c{
+	height: 90rpx;
+	background-color: #f8f8f8;
+	display: flex;
+	align-items: center;
+	padding: 0 10rpx;
+}
+.search.data-v-1589f95c{
+	height: 70rpx;
+	background-color: #FFFFFF;
+	border: 1rpx solid #c1bfbf;
+	border-radius: 30rpx;
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.placeholder.data-v-1589f95c{
+	font-size: 35rpx;
+	margin-left: 5rpx;
+}
+

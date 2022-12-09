@@ -144,7 +144,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public ResultVo login(LoginFormDTO loginFormDTO) {
+    public ResultVo login(LoginFormDTO loginFormDTO, Integer userType) {
         // 获取登录类型
         Integer loginType = loginFormDTO.getLoginType();
         if (loginType == null) {
@@ -152,7 +152,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         }
         // 账号密码登录
         if (loginType == 0) {
-            return usernamePasswordLogin(loginFormDTO.getUsername(), loginFormDTO.getPassword());
+            return usernamePasswordLogin(loginFormDTO.getUsername(), loginFormDTO.getPassword(), userType);
         }
         // 手机验证码登录
         if (loginType == 1) {
@@ -588,7 +588,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             }
             // 判断是否根据手机号查询
             if (StrUtil.isNotBlank(userQueryFromDTO.getPhone())) {
-                queryWrapper.eq("phone", userQueryFromDTO.getUsername());
+                queryWrapper.eq("phone", userQueryFromDTO.getPhone());
             }
             // 判断是否根据用户状态查询
             if (userQueryFromDTO.getStatus() != null) {
@@ -605,7 +605,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
      * @param password 密码
      * @return ResultVo
      */
-    private ResultVo usernamePasswordLogin(String username, String password) {
+    private ResultVo usernamePasswordLogin(String username, String password, Integer userType) {
         // 判断账号是否为空
         if (StrUtil.isBlank(username)) {
             return ResultVo.fail("账号不能为空");
@@ -633,6 +633,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         }
         // 获取用户信息
         User user = loginUser.getUser();
+
+        if (userType != null) {
+            // 判断是否不为管理员
+            if (user.getUserType() != 0) {
+                return ResultVo.fail("账号或密码错误");
+            }
+        }
 
         // 存在，将用户信息DTO写入Redis
         String token = saveUserToDTO(user);

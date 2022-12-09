@@ -1,0 +1,50 @@
+
+.list.data-v-7d5e07c6{
+	display: flex;
+}
+/* 左侧滑动样式设置 */
+.list-left.data-v-7d5e07c6{
+	width: 200rpx;
+}
+.left-item.data-v-7d5e07c6{
+	border-bottom: 2rpx solid #FFFFFF;
+	font-size: 35rpx;
+	font-weight: bold;
+	background-color: #F7F7F7;
+}
+.left-name.data-v-7d5e07c6{
+	padding: 30rpx 6rpx;/* 调整上下边距为30rpx；左右边距为6rpx */
+	text-align: center;
+}
+.left-name-active.data-v-7d5e07c6{
+	border-left: 8rpx solid #ff5733;
+	background-color: #FFFFFF;
+}
+/* 右侧滑动样式设置 */
+.list-right.data-v-7d5e07c6{
+	flex: 1;
+	padding-left: 30rpx;
+}
+.right-content.data-v-7d5e07c6{
+	display: flex;
+	flex-wrap: wrap;
+}
+.right-list.data-v-7d5e07c6{
+	padding-top: 30rpx;
+}
+.right-item.data-v-7d5e07c6{
+	width: 150rpx;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 10rpx;
+}
+.right-img.data-v-7d5e07c6{
+	width: 80rpx;
+	height: 80rpx;
+}
+.right-name.data-v-7d5e07c6{
+	padding: 14rpx;
+}
+

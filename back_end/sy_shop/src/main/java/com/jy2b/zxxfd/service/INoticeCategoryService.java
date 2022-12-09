@@ -48,4 +48,10 @@ public interface INoticeCategoryService extends IService<NoticeCategory> {
      * @return ResultVo
      */
     ResultVo queryCategoryChild(Long id);
+
+    /**
+     * 查询全部公告类型
+     * @return ResultVo
+     */
+    ResultVo findSelectCategory();
 }

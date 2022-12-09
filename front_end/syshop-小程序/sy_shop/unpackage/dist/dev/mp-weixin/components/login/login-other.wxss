@@ -1,0 +1,77 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 其他登录方式 */
+.login-other{
+	padding: 10rpx 0;
+}
+.other-text{
+	display: flex;
+	padding: 50rpx 0;
+}
+.other-text view{
+	line-height: 0rpx;
+	padding: 0 10rpx;
+}
+.other-text:after{
+	flex: 1;
+	content:'';
+	height:2rpx;
+	background-color: #CCCCCC;
+}
+.other-text:before{
+	flex: 1;
+	content:'';
+	height:2rpx;
+	background-color: #CCCCCC;
+}
+.other{
+	display: flex;
+	justify-content:space-around;
+}
+.other-item{
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+.other-item image{
+	width: 80rpx;
+	height: 80rpx;
+}
+

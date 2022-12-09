@@ -2,8 +2,10 @@ package com.jy2b.zxxfd.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jy2b.zxxfd.domain.dto.CategoryDTO;
 import com.jy2b.zxxfd.domain.dto.ResultVo;
 import com.jy2b.zxxfd.domain.GoodsCategory;
 import com.jy2b.zxxfd.mapper.GoodsCategoryMapper;
@@ -14,6 +16,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.jy2b.zxxfd.contants.RedisConstants.GOODS_CATEGORY_FIRST;
@@ -32,7 +35,9 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
     @Override
     public ResultVo queryCategoryList(Integer page, Integer size) {
         Page<GoodsCategory> goodsCategoryPage = new Page<>(page, size);
-        goodsCategoryMapper.selectPage(goodsCategoryPage, null);
+
+        // 查询一级分类
+        goodsCategoryMapper.selectPage(goodsCategoryPage, new QueryWrapper<GoodsCategory>().isNull("fid"));
         return ResultVo.ok(goodsCategoryPage);
     }
 
@@ -60,6 +65,16 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
     public ResultVo queryCategoryChild(Long id) {
         List<GoodsCategory> categories = query().eq("fid", id).list();
         return ResultVo.ok(categories, "查询商品子分类成功");
+    }
+
+    @Override
+    public ResultVo findSelectCategory() {
+        // 查询所有一级分类
+        List<GoodsCategory> goodsCategories = query().isNull("fid").list();
+        // 设置分类选择
+        List<CategoryDTO> categoryDTOS = setSelectCategory(goodsCategories);
+
+        return ResultVo.ok(categoryDTOS);
     }
 
     @Override
@@ -150,9 +165,12 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
         String icon = category.getIcon();
 
         // 判断分类名称是否存在
-        Integer count = query().eq("name", goodsCategory.getName()).ne("id", categoryId).count();
-        if (count > 0) {
-            return ResultVo.fail("商品分类已存在");
+        String name = goodsCategory.getName();
+        if (name != null) {
+            Integer count = query().eq("name", goodsCategory.getName()).ne("id", categoryId).count();
+            if (count > 0) {
+                return ResultVo.fail("商品分类已存在");
+            }
         }
 
         // 判断是否为子分类
@@ -172,12 +190,49 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
             if (goodsCategory.getFid() == null) {
                 saveFirstCategory();
             }
-            if (StrUtil.isNotBlank(icon)) {
+            if (StrUtil.isNotBlank(goodsCategory.getIcon())) {
                 UploadUtils.deleteFile(icon);
             }
         }
 
         return result ? ResultVo.ok(null,"修改商品分类成功") : ResultVo.fail("修改商品分类失败");
+    }
+
+    /**
+     * 设置分类选择
+     * @param goodsCategories 分类
+     * @return List<GoodsCategoryDTO>
+     */
+    private List<CategoryDTO> setSelectCategory(List<GoodsCategory> goodsCategories) {
+        // 创建一层分类
+        ArrayList<CategoryDTO> categoryDTOS = new ArrayList<>();
+
+        if (!goodsCategories.isEmpty()) {
+            // 遍历每一个分类
+            for (GoodsCategory goodsCategory : goodsCategories) {
+                if (goodsCategory != null) {
+                    CategoryDTO categoryDTO = setCategoryDTO(goodsCategory);
+                    categoryDTOS.add(categoryDTO);
+                }
+            }
+        }
+
+        return categoryDTOS;
+    }
+
+    private CategoryDTO setCategoryDTO(GoodsCategory goodsCategory) {
+        CategoryDTO categoryDTO = new CategoryDTO();
+        categoryDTO.setId(goodsCategory.getId());
+        categoryDTO.setName(goodsCategory.getName());
+        // 判断分类是否存在子分类
+        List<GoodsCategory> sGoodsCategories = query().eq("fid", goodsCategory.getId()).list();
+        if (!sGoodsCategories.isEmpty()) {
+            // 存在子类
+            List<CategoryDTO> children = setSelectCategory(sGoodsCategories);
+            categoryDTO.setChildren(children);
+        }
+
+        return categoryDTO;
     }
 
     /**

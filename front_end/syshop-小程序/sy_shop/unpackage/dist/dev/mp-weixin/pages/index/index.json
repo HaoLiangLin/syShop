@@ -1,0 +1,19 @@
+{
+  "navigationBarTitleText": "水院商城",
+  "navigationBarBackgroundColor": "#ffffff",
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#efefef",
+  "backgroundTextStyle": "dark",
+  "usingComponents": {
+    "search-tap": "/components/common/SearchTap",
+    "index-swiper": "/components/index/IndexSwiper",
+    "icons": "/components/index/Icons",
+    "slogan": "/components/index/Slogan",
+    "event": "/components/index/Event",
+    "commodity": "/components/common/Commodity",
+    "recommend": "/components/index/Recommend",
+    "shop": "/components/index/Shop",
+    "card": "/components/common/Card",
+    "commodity-list": "/components/common/CommodityList"
+  }
+}

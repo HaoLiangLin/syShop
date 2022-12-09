@@ -36,6 +36,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
     public ResultVo queryInfoMe() {
         // 获取用户
         UserDTO user = UserHolder.getUser();
+
         // 查询redis
         Map<Object, Object> map = stringRedisTemplate.opsForHash().entries(USER_INFO_KEY + user.getId());
         if (!map.isEmpty()) {
@@ -43,6 +44,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
             UserInfo userInfo = BeanUtil.fillBeanWithMap(map, new UserInfo(), false);
             return ResultVo.ok(userInfo);
         }
+
         // 查询用户信息
         UserInfo userInfo = getById(user.getId());
         // 判断是否为空
@@ -86,6 +88,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
     public ResultVo queryInfoAll(Integer page, Integer number, UserInfo userInfo) {
         // 定义分页
         Page<UserInfo> userInfoPage = new Page<>(page, number);
+
         // 根据分页页数与分页条数查询用户信息
         userInfoMapper.selectPage(userInfoPage, userInfo != null ? queryUserInfoWrapper(userInfo) : null);
         // 返回信息

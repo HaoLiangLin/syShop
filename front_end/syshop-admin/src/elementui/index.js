@@ -1,0 +1,92 @@
+import Vue from 'vue'
+import {
+  Container,
+  Header,
+  Main,
+  Aside,
+  Input,
+  Button,
+  Message,
+  Menu,
+  MenuItem,
+  MenuItemGroup,
+  Submenu,
+  Notification,
+  Select,
+  Option,
+  Table,
+  TableColumn,
+  Checkbox,
+  Pagination,
+  Drawer,
+  Radio,
+  RadioGroup,
+  RadioButton,
+  Upload,
+  Avatar,
+  Dialog,
+  Form,
+  FormItem,
+  Breadcrumb,
+  BreadcrumbItem,
+  PageHeader,
+  Switch,
+  Image,
+  MessageBox,
+  InputNumber,
+  Popconfirm,
+  Steps,
+  Step,
+  Result,
+  Tabs,
+  TabPane,
+  Tag,
+  Descriptions,
+  DescriptionsItem,
+  Cascader
+} from 'element-ui'
+
+Vue.use(Container)
+Vue.use(Header)
+Vue.use(Main)
+Vue.use(Aside)
+Vue.use(Input)
+Vue.use(Button)
+Vue.use(Menu)
+Vue.use(MenuItem)
+Vue.use(MenuItemGroup)
+Vue.use(Submenu)
+Vue.use(Select)
+Vue.use(Option)
+Vue.use(Table)
+Vue.use(TableColumn)
+Vue.use(Checkbox)
+Vue.use(Pagination)
+Vue.use(Drawer)
+Vue.use(Radio)
+Vue.use(RadioGroup)
+Vue.use(RadioButton)
+Vue.use(Upload)
+Vue.use(Avatar)
+Vue.use(Dialog)
+Vue.use(Form)
+Vue.use(FormItem)
+Vue.use(Breadcrumb)
+Vue.use(BreadcrumbItem)
+Vue.use(PageHeader)
+Vue.use(Switch)
+Vue.use(Image)
+Vue.use(InputNumber)
+Vue.use(Popconfirm)
+Vue.use(Steps)
+Vue.use(Step)
+Vue.use(Result)
+Vue.use(Tabs)
+Vue.use(TabPane)
+Vue.use(Tag)
+Vue.use(Descriptions)
+Vue.use(DescriptionsItem)
+Vue.use(Cascader)
+Vue.prototype.$message = Message
+Vue.prototype.$notify = Notification
+Vue.prototype.$confirm = MessageBox

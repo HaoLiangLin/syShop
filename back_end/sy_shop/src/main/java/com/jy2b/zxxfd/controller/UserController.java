@@ -43,7 +43,13 @@ public class UserController {
     @PostMapping("/login")
     @ApiOperation(value = "用户登录", notes = "登录类型（loginType）：0是账号密码登录，1是手机号验证码登录")
     public ResultVo login(@RequestBody LoginFormDTO loginFormDTO) {
-        return userService.login(loginFormDTO);
+        return userService.login(loginFormDTO, null);
+    }
+
+    @PostMapping("/loginEnd/{userType}")
+    @ApiOperation(value = "后台登录")
+    public ResultVo loginEnd(@RequestBody LoginFormDTO loginFormDTO, @PathVariable("userType") Integer userType) {
+        return userService.login(loginFormDTO, userType);
     }
 
     @GetMapping("/me")
@@ -145,7 +151,7 @@ public class UserController {
         return userService.queryUser(userQueryFromDTO);
     }
 
-    @GetMapping("/list/{page}/{size}")
+    @PostMapping("/list/{page}/{size}")
     @ApiOperation(value = "根据条件分页查询用户", notes = "page：页码，size：每页数量")
     @PreAuthorize("hasAnyAuthority('user:delete')")
     public ResultVo queryUserList(@PathVariable("page") Integer page, @PathVariable("size") Integer size, @RequestBody(required = false) UserQueryFromDTO userQueryFromDTO) {

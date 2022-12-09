@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jy2b.zxxfd.domain.GoodsCategory;
 import com.jy2b.zxxfd.domain.Notice;
 import com.jy2b.zxxfd.domain.NoticeCategory;
+import com.jy2b.zxxfd.domain.dto.CategoryDTO;
 import com.jy2b.zxxfd.domain.dto.ResultVo;
 import com.jy2b.zxxfd.mapper.NoticeCategoryMapper;
 import com.jy2b.zxxfd.mapper.NoticeMapper;
@@ -16,6 +17,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.jy2b.zxxfd.contants.RedisConstants.NOTICE_CATEGORY_FIRST;
@@ -139,7 +141,7 @@ public class NoticeCategoryServiceImpl extends ServiceImpl<NoticeCategoryMapper,
     @Override
     public ResultVo queryCategoryList(Integer page, Integer size) {
         Page<NoticeCategory> noticeCategoryPage = new Page<>(page, size);
-        noticeCategoryMapper.selectPage(noticeCategoryPage, null);
+        noticeCategoryMapper.selectPage(noticeCategoryPage, new QueryWrapper<NoticeCategory>().isNull("fid"));
         return ResultVo.ok(noticeCategoryPage);
     }
 
@@ -167,6 +169,45 @@ public class NoticeCategoryServiceImpl extends ServiceImpl<NoticeCategoryMapper,
     public ResultVo queryCategoryChild(Long id) {
         List<NoticeCategory> categories = query().eq("fid", id).list();
         return ResultVo.ok(categories, "查询公告类型成功");
+    }
+
+    @Override
+    public ResultVo findSelectCategory() {
+        List<NoticeCategory> noticeCategories = query().isNull("fid").list();
+
+        List<CategoryDTO> categoryDTOS = setSelectCategory(noticeCategories);
+
+        return ResultVo.ok(categoryDTOS);
+    }
+
+    private List<CategoryDTO> setSelectCategory(List<NoticeCategory> noticeCategories) {
+        ArrayList<CategoryDTO> categoryDTOS = new ArrayList<>();
+
+        if (!noticeCategories.isEmpty()) {
+            for (NoticeCategory noticeCategory : noticeCategories) {
+                if (noticeCategory != null) {
+                    CategoryDTO categoryDTO = setCategoryDTO(noticeCategory);
+                    categoryDTOS.add(categoryDTO);
+                }
+            }
+        }
+
+        return categoryDTOS;
+    }
+
+    private CategoryDTO setCategoryDTO(NoticeCategory noticeCategory) {
+        CategoryDTO categoryDTO = new CategoryDTO();
+        categoryDTO.setId(noticeCategory.getId());
+        categoryDTO.setName(noticeCategory.getName());
+        // 判断分类是否存在子分类
+        List<NoticeCategory> sGoodsCategories = query().eq("fid", noticeCategory.getId()).list();
+        if (!sGoodsCategories.isEmpty()) {
+            // 存在子类
+            List<CategoryDTO> children = setSelectCategory(sGoodsCategories);
+            categoryDTO.setChildren(children);
+        }
+
+        return categoryDTO;
     }
 
     /**

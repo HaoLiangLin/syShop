@@ -1,0 +1,32 @@
+
+.commodity.data-v-5ac280a4{
+	display: flex;
+}
+.commodity-item.data-v-5ac280a4{
+	padding-bottom: 20rpx;
+}
+.commodity-img.data-v-5ac280a4{
+	width: 100%;
+}
+.commodity-content.data-v-5ac280a4{
+	text-align: center;
+}
+.commodity-name.data-v-5ac280a4{
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	color: #3333333;
+	word-break: break-all;
+	padding: 5rpx 20rpx;
+}
+.price.data-v-5ac280a4{
+	font-size: 30rpx;
+	margin-left: 25rpx;
+	color: #ff5733;
+}
+.market.data-v-5ac280a4{
+	font-size: 26rpx;
+}
+

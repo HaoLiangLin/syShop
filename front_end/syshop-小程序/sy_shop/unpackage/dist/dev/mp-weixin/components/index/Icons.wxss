@@ -1,0 +1,19 @@
+
+.Icons.data-v-4d8061dc{
+	display: flex;
+	flex-wrap: wrap;
+	margin-top: 10rpx;
+}
+.Icons-item.data-v-4d8061dc{
+	width: 20%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding-bottom: 10rpx;
+}
+.Icons-img.data-v-4d8061dc{
+	width: 110rpx;
+	height: 110rpx;
+}
+

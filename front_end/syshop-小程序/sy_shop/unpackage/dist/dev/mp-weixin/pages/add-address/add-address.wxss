@@ -1,0 +1,28 @@
+
+.my-add-path{
+	padding-left: 20rpx;
+}
+.path-item{
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 16rpx 0;
+	width: 100%;
+	border-bottom: 2rpx solid #CCCCCC;
+}
+.path-item input{
+	flex: 1;
+	text-align: left;
+	padding-left: 10rpx;
+}
+.btn{
+	background-color:gainsboro;
+	width: 100%;
+	line-height: 100rpx;
+	color: black;
+	border-radius: 30rpx;
+	text-align: center;
+	font-weight: bold;
+	margin-top: 20rpx;
+}
+

@@ -1,0 +1,24 @@
+
+.event.data-v-2cf42e92{
+	display: flex;
+}
+.eventLeft.data-v-2cf42e92{
+	width: 50%;
+}
+.imgA.data-v-2cf42e92{
+	width: 375rpx;
+	height: 405rpx;
+}
+.eventRight.data-v-2cf42e92{
+	width: 50%;
+}
+.imgB.data-v-2cf42e92{
+	width: 375rpx;
+	height: 200rpx;
+}
+.imgC.data-v-2cf42e92{
+	margin-top: -5rpx;
+	width: 375rpx;
+	height: 200rpx;
+}
+

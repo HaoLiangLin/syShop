@@ -57,4 +57,9 @@ public class NoticeCategoryController {
     public ResultVo queryCategoryChild(@PathVariable("id") Long id) {
         return noticeCategoryService.queryCategoryChild(id);
     }
+
+    @GetMapping("/select")
+    public ResultVo findSelectCategory() {
+        return noticeCategoryService.findSelectCategory();
+    }
 }

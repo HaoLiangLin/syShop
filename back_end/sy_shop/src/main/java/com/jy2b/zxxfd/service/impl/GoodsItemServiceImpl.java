@@ -49,7 +49,7 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
         List<GoodsItem> list = query().eq("color", color).eq("gid", gid).list();
 
         // 判断属性图片是否不为空
-        if (list.size() < 1) {
+        if (list.isEmpty()) {
             if (StrUtil.isBlank(itemFromDTO.getIcon())) {
                 return ResultVo.fail("添加商品属性失败，图片不能为空！");
             }
@@ -110,6 +110,42 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
     }
 
     @Override
+    public ResultVo deleteItem(Long id) {
+        // 查询商品属性
+        GoodsItem goodsItem = getById(id);
+
+        if (goodsItem == null) {
+            return ResultVo.fail("商品属性不存在");
+        }
+
+        // 获取商品属性销量
+        Long sales = goodsItem.getSales();
+        if (sales > 0) {
+            boolean result = update().set("status", 0).eq("id", id).update();
+            return result ? ResultVo.ok(null, "下架商品属性成功") : ResultVo.fail("下架商品属性失败");
+        }
+
+        // 获取商品属性颜色
+        String color = goodsItem.getColor();
+
+        // 获取商品属性图标
+        String icon = goodsItem.getIcon();
+
+        boolean result = removeById(id);
+
+        if (result) {
+            // 统计相同颜色
+            Integer count = query().eq("color", color).eq("gid", goodsItem.getGid()).count();
+            if (count < 1) {
+                if (StrUtil.isNotBlank(icon)) {
+                    UploadUtils.deleteFiles(icon);
+                }
+            }
+        }
+        return result ? ResultVo.ok(null, "删除商品属性成功") : ResultVo.fail("删除商品属性失败");
+    }
+
+    @Override
     public ResultVo updateItem(Long id, GoodsItemSaveFromDTO itemFromDTO) {
         // 判断商品属性是否存在
         GoodsItem item = getById(id);
@@ -124,13 +160,24 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
             if (goods == null) {
                 return ResultVo.fail("商品不存在");
             }
+        } else {
+            gid = item.getGid();
         }
 
         // 判断属性颜色是否不为空
-        if (itemFromDTO.getColor() != null) {
-            if (StrUtil.isBlank(itemFromDTO.getColor())) {
+        String color = itemFromDTO.getColor();
+        if (color != null) {
+            if (StrUtil.isBlank(color)) {
                 return ResultVo.fail("修改商品属性失败，颜色不能为空");
+            } else {
+                List<GoodsItem> list = query().eq("color", color).eq("gid", gid).list();
+                // 判断属性图片是否不为空
+                if (list.isEmpty()) {
+                    return ResultVo.fail("颜色不存在");
+                }
             }
+        } else {
+            color = item.getColor();
         }
 
         // 判断属性图片是否不为空
@@ -170,29 +217,97 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
 
         boolean result = updateById(goodsItem);
         if (result) {
-            String color;
-            if (StrUtil.isNotBlank(itemFromDTO.getColor())) {
-                color = goodsItem.getColor();
-            } else {
-                color = item.getColor();
-            }
             if (StrUtil.isNotBlank(itemFromDTO.getIcon())) {
-                List<GoodsItem> list = query().select("DISTINCT color,icon").eq("gid", gid).eq("color", color).list();
-                if (list.size() > 1) {
-                    update().set("icon", goodsItem.getIcon()).eq("gid", gid).eq("color", color).update();
-                    UploadUtils.deleteFile(item.getIcon());
+                boolean update = update().set("icon", itemFromDTO.getIcon()).eq("color", color).eq("gid", gid).update();
+                if (!update) {
+                    throw new RuntimeException("修改商品属性失败");
                 }
-            }
-        } else {
-            if (StrUtil.isNotBlank(itemFromDTO.getIcon())) {
-                UploadUtils.deleteFile(itemFromDTO.getColor());
             }
         }
         return result ? ResultVo.ok(null,"修改商品属性成功") : ResultVo.fail("修改商品属性失败");
     }
 
     @Override
-    public ResultVo queryItemList(Integer page, Integer size, GoodsItemQueryFromDTO itemFromDTO) {
+    public ResultVo queryItemList(Long id, GoodsItemQueryFromDTO itemFromDTO) {
+        // 查询商品
+        Goods goods = goodsMapper.selectById(id);
+        // 判断商品是否存在
+        if (goods == null) {
+            return ResultVo.fail("商品不存在");
+        }
+
+        QueryWrapper<GoodsItem> queryWrapper = new QueryWrapper<>();
+
+        queryWrapper.eq("gid", id);
+
+        if (itemFromDTO != null) {
+
+            // 判断属性颜色是否不为空
+            if (StrUtil.isNotBlank(itemFromDTO.getColor())) {
+                queryWrapper.like("color", itemFromDTO.getColor());
+            }
+            // 判断属性套餐是否不为空
+            if (StrUtil.isNotBlank(itemFromDTO.getCombo())) {
+                queryWrapper.like("combo", itemFromDTO.getCombo());
+            }
+            // 判断属性尺寸是否不为空
+            if (StrUtil.isNotBlank(itemFromDTO.getSize())) {
+                queryWrapper.like("size", itemFromDTO.getSize());
+            }
+            // 判断属性版本是否不为空
+            if (StrUtil.isNotBlank(itemFromDTO.getEdition())) {
+                queryWrapper.like("edition", itemFromDTO.getEdition());
+            }
+            // 判断是否根据销量排序
+            if (StrUtil.isNotBlank(itemFromDTO.getSalesSort())) {
+                switch (itemFromDTO.getSalesSort()) {
+                    case "Asc":
+                        // 销量升序排序 1 2 3 4 5
+                        queryWrapper.orderByAsc("sales");
+                        break;
+                    case "Des":
+                        // 销量降序排序 5 4 3 2 1
+                        queryWrapper.orderByDesc("sales");
+                }
+            }
+            // 判断是否根据库存排序
+            if (StrUtil.isNotBlank(itemFromDTO.getStockSort())) {
+                switch (itemFromDTO.getStockSort()) {
+                    case "Asc":
+                        // 销量升序排序 1 2 3 4 5
+                        queryWrapper.orderByAsc("stock");
+                        break;
+                    case "Des":
+                        // 销量降序排序 5 4 3 2 1
+                        queryWrapper.orderByDesc("stock");
+                }
+            }
+            // 判断是否根据价格排序
+            if (StrUtil.isNotBlank(itemFromDTO.getPriceSort())) {
+                switch (itemFromDTO.getPriceSort()) {
+                    case "Asc":
+                        // 销量升序排序 1 2 3 4 5
+                        queryWrapper.orderByAsc("price");
+                        break;
+                    case "Des":
+                        // 销量降序排序 5 4 3 2 1
+                        queryWrapper.orderByDesc("price");
+                }
+            }
+            // 判断属性状态是否不为空
+            if (itemFromDTO.getStatus() != null) {
+                if (itemFromDTO.getStatus() == 0 || itemFromDTO.getStatus() == 1) {
+                    queryWrapper.eq("status", itemFromDTO.getStatus());
+                }
+            }
+        }
+        List<GoodsItem> itemList = list(queryWrapper);
+
+        return ResultVo.ok(itemList);
+    }
+
+    @Override
+    public ResultVo queryItemListPage(Integer page, Integer size, GoodsItemQueryFromDTO itemFromDTO) {
         if (itemFromDTO == null) {
             return ResultVo.fail("商品不存在");
         }

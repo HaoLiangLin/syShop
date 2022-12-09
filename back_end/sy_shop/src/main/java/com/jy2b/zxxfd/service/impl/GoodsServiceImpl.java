@@ -75,6 +75,7 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
 
         // 6. 新增商品
         boolean result = save(goods);
+
         if (!result) {
             String images = goods.getImages();
             UploadUtils.deleteFiles(images);
@@ -85,10 +86,26 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
     @Override
     public ResultVo deleteGoods(Long id) {
         Goods goods = getById(id);
+
+        if (goods == null) {
+            return ResultVo.fail("商品已删除");
+        }
+
+        if (goods.getStatus() == 1) {
+            return ResultVo.fail("上架商品暂无法删除");
+        }
+
+        if (goods.getSale() > 0) {
+            boolean result = update().set("status", 2).eq("id", id).update();
+            return result ? ResultVo.ok(null, "商品下架成功") : ResultVo.fail("商品下架失败");
+        }
+
         String images = goods.getImages();
-        UploadUtils.deleteFiles(images);
 
         boolean result = removeById(id);
+        if (result) {
+            UploadUtils.deleteFiles(images);
+        }
         return result ? ResultVo.ok(null,"删除商品成功") : ResultVo.fail("删除商品失败");
     }
 
@@ -173,22 +190,35 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
     @Override
     public ResultVo findGoodsById(Long id) {
         Goods goods = getById(id);
-        return goods != null ? ResultVo.ok(goods) : ResultVo.fail("商品不存在");
+        if (goods != null) {
+            GoodsFindDTO goodsFindDTO = BeanUtil.copyProperties(goods, GoodsFindDTO.class);
+
+            Long cid = goods.getCid();
+            String name = goodsCategoryMapper.selectById(cid).getName();
+            goodsFindDTO.setCname(name);
+
+            return ResultVo.ok(goodsFindDTO);
+        }
+        return ResultVo.fail("商品不存在");
     }
 
     @Override
     public ResultVo findGoodsList(Integer page, Integer size, Goods goods) {
         Page<Goods> goodsPage = new Page<>();
-        QueryWrapper<Goods> queryWrapper;
+        QueryWrapper<Goods> queryWrapper = new QueryWrapper<>();
         if (goods != null) {
-            queryWrapper = new QueryWrapper<>();
             // 判断商品id是否不为空
             if (goods.getId() != null) {
                 queryWrapper.eq("id", goods.getId());
             }
             // 判断商品分类是否不为空
             if (goods.getCid() != null) {
-                queryWrapper.eq("cid", goods.getCid());
+                List<Long> cidList = getSunCid(goods.getCid());
+                if (!cidList.isEmpty()) {
+                    queryWrapper.in("cid", cidList);
+                } else {
+                    queryWrapper.eq("cid", goods.getCid());
+                }
             }
             // 判断商品发货省份是否不为空
             if (StrUtil.isNotBlank(goods.getProvince())) {
@@ -219,11 +249,36 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
             if (goods.getStatus() != null) {
                 queryWrapper.eq("status", goods.getStatus());
             }
-        } else {
-            queryWrapper = null;
         }
+        queryWrapper.orderByDesc("sale");
+
         goodsMapper.selectPage(goodsPage, queryWrapper);
-        return ResultVo.ok(goodsPage);
+
+        List<Goods> records = goodsPage.getRecords();
+        List<GoodsFindDTO> goodsFindDTOS = new ArrayList<>();
+        for (Goods record : records) {
+            GoodsFindDTO goodsFindDTO = BeanUtil.copyProperties(record, GoodsFindDTO.class);
+
+            Long cid = record.getCid();
+            String name = goodsCategoryMapper.selectById(cid).getName();
+            goodsFindDTO.setCname(name);
+
+            goodsFindDTOS.add(goodsFindDTO);
+        }
+
+
+        Page<GoodsFindDTO> goodsFindDTOPage = new Page<>();
+        goodsFindDTOPage.setRecords(goodsFindDTOS);
+        goodsFindDTOPage.setSize(goodsPage.getSize());
+        goodsFindDTOPage.setCountId(goodsPage.getCountId());
+        goodsFindDTOPage.setCurrent(goodsPage.getCurrent());
+        goodsFindDTOPage.setHitCount(goodsPage.isHitCount());
+        goodsFindDTOPage.setMaxLimit(goodsPage.getMaxLimit());
+        goodsFindDTOPage.setTotal(goodsPage.getTotal());
+        goodsFindDTOPage.setSearchCount(goodsPage.isSearchCount());
+        goodsFindDTOPage.setOrders(goodsPage.getOrders());
+
+        return ResultVo.ok(goodsFindDTOPage);
     }
 
     @Override
@@ -283,11 +338,11 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
                 switch (saleSort) {
                     case "Asc":
                         // 销量升序排序 1 2 3 4 5
-                        queryWrapper.orderByAsc("monthSale");
+                        queryWrapper.orderByAsc("sale");
                         break;
                     case "Des":
                         // 销量降序排序 5 4 3 2 1
-                        queryWrapper.orderByDesc("monthSale");
+                        queryWrapper.orderByDesc("sale");
                 }
             }
         }

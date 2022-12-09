@@ -1,0 +1,1 @@
+<view class="search data-v-78a822c4"><view class="search-box data-v-78a822c4"><uni-search-bar vue-id="9c5b33b0-1" placeholder="请输入搜索内容!" radius="{{100}}" data-event-opts="{{[['^input',[['input']]]]}}" bind:input="__e" class="data-v-78a822c4" bind:__l="__l"></uni-search-bar></view><lines vue-id="9c5b33b0-2" class="data-v-78a822c4" bind:__l="__l"></lines></view>

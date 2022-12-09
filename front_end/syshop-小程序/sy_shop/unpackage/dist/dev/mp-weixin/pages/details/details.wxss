@@ -1,0 +1,258 @@
+
+.card.data-v-3879f0e9{
+	padding: 20rpx 0;
+	display: flex;
+	justify-content: center;
+	font-weight: bold;
+}
+.card-name.data-v-3879f0e9{
+	padding: 0 20rpx;
+	font-size: 32rpx;
+}
+
+
+
+.details.data-v-39cbb4e8{
+	padding-bottom: 90rpx;
+}
+swiper.data-v-39cbb4e8{
+	width: 100%;
+	height: 700rpx;
+}
+.swiper-img.data-v-39cbb4e8{
+	width: 100%;
+	height: 700rpx;
+}
+.details-goods.data-v-39cbb4e8{
+	padding: 10rpx 0;
+}
+.details-img.data-v-39cbb4e8{
+	width: 100%;
+	height: 700rpx;
+}
+.shop-conta.data-v-39cbb4e8{
+	display: flex;
+}
+.shop-contd.data-v-39cbb4e8{
+	font-size: 35rpx;
+	font-weight: bold;
+}
+.shop-conte.data-v-39cbb4e8{
+	font-size: 25rpx;
+	margin: 15rpx;
+	margin-top: 12rpx;
+}
+.shop-contb.data-v-39cbb4e8{
+	display: flex;
+}
+.shop-contx.data-v-39cbb4e8{
+	margin: 5rpx;
+	padding: 5rpx 2rpx;
+	font-size: 33rpx;
+	color: #FFFFFF;
+	border: 1rpx solid #efefef;
+	border-radius: 5rpx;
+	background-color: #66CC00;
+}
+.shop-texa.data-v-39cbb4e8{
+	display: flex;
+}
+.shop-tex.data-v-39cbb4e8{
+	margin-top:6rpx;
+	margin-left: 6rpx;
+}
+.shop-texa image.data-v-39cbb4e8{
+	width: 53rpx;
+	height: 53rpx;
+}
+.shop-texax.data-v-39cbb4e8{
+	color: #C60022;
+	margin-top: 5rpx;
+}
+.shop-texb.data-v-39cbb4e8{
+	display: flex;
+	margin-bottom: 5rpx;
+}
+.goods-name.data-v-39cbb4e8{
+	text-align: center;
+	font-size: 33rpx;
+	font-weight: bold;
+}
+.goods-price.data-v-39cbb4e8{
+	text-align: center;
+	font-size: 36rpx;
+	color: #ff5733;
+}
+.goods-address.data-v-39cbb4e8{
+	/* text-align: center; */
+	margin-left: 50rpx;
+	font-size: 30rpx;
+	color: #aba9a9;
+}
+.goods-market.data-v-39cbb4e8{
+	margin-left: 280rpx;
+	font-size: 30rpx;
+	color: #aba9a9;
+}
+.goods-content.data-v-39cbb4e8{
+	width: 100%;
+	height: 120rpx;
+	margin-left: 6rpx;
+}
+.details-foot.data-v-39cbb4e8{
+	position: fixed;/* 定义在下方 */
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	height: 90rpx;
+	display: flex;/* 弹性盒子 */
+	/* align-items: center;/* 每一个都居中 */ 
+	/* justify-content: center; */
+	background-color: #FFFFFF;
+}
+.details-foot .iconfont.data-v-39cbb4e8{
+	width: 60rpx;
+	height: 60rpx;
+	margin: 0rpx 26rpx;
+	padding-top: 15rpx;
+	font-size: 50rpx;
+}
+.fonta.data-v-39cbb4e8{
+	font-size: 17rpx;
+	margin-left: 5rpx;
+}
+.fontb.data-v-39cbb4e8{
+	font-size: 17rpx;
+	margin-left: 12rpx;
+}
+.add-shopcart.data-v-39cbb4e8{
+	width: 230rpx;
+	height: 90rpx;
+	padding-top: 20rpx;
+	padding-left: 50rpx;
+	background-color: orange;
+	color: #FFFFFF;
+	font-weight: bold;
+	font-size: 36rpx;
+}
+.purchase.data-v-39cbb4e8{
+	width: 200rpx;
+	height: 90rpx;
+	padding-top: 20rpx;
+	padding-left: 60rpx;
+	background-color: red;
+	color: #FFFFFF;
+	font-weight: bold;
+	font-size: 36rpx;
+}
+.pop.data-v-39cbb4e8{
+	position: fixed;/* 定位 */
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 9999;/* 设置为最大值 */
+}
+.pop-mask.data-v-39cbb4e8{
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+}
+.pop-box.data-v-39cbb4e8{
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	/* height: 600rpx; */
+	background-color: #FFFFFF;
+}
+.pop-cont.data-v-39cbb4e8{
+	display: flex;
+}
+.pop-price.data-v-39cbb4e8{
+	margin-left: 50rpx;
+	margin-top: 40rpx;
+	color: #ff5733;
+}
+.pop-name.data-v-39cbb4e8{
+	width: 420rpx;
+	margin-top: 10rpx;
+	margin-left: 50rpx;
+	font-weight: bold;
+}
+.pop-address.data-v-39cbb4e8{
+	margin-top: 6rpx;
+	margin-left: 50rpx;
+	font-size: 30rpx;
+	color: #aba9a9;
+}
+.pop-market.data-v-39cbb4e8{
+	margin-top: 6rpx;
+	margin-left: 50rpx;
+	font-size: 30rpx;
+}
+.pop-img.data-v-39cbb4e8{
+	width: 260rpx;
+	height: 260rpx;
+}
+.pop-color.data-v-39cbb4e8{
+	padding: 20rpx;
+}
+.pop-col.data-v-39cbb4e8{
+	display: flex;
+	padding: 5rpx;
+}
+.pop-colx.data-v-39cbb4e8{
+	width: 200rpx;
+	padding: 5rpx;
+	margin-left: 10rpx;
+	border: 1rpx solid black;
+	background-color: #efefef;
+	border-radius: 5rpx;
+	text-align: center;
+}
+.pop-size.data-v-39cbb4e8{
+	padding: 20rpx;
+}
+.pop-siz.data-v-39cbb4e8{
+	display: flex;
+	padding: 5rpx;
+}
+.pop-sizx.data-v-39cbb4e8{
+	width: 200rpx;
+	padding: 5rpx;
+	margin-left: 10rpx;
+	border: 1rpx solid black;
+	background-color: #efefef;
+	border-radius: 5rpx;
+	text-align: center;
+}
+.pop-num.data-v-39cbb4e8{
+	display: flex;
+	padding: 20rpx;
+	justify-content: space-between;
+}
+.pop-sub.data-v-39cbb4e8{
+	text-align: center;
+	line-height: 80rpx;
+	background-color: red;
+	color: #FFFFFF;
+	font-weight: bold;
+}
+.isSelect.data-v-39cbb4e8{
+	background-color: #fde7ea;
+	color: #ee0a24;
+	border: 1rpx solid #ee0a24;
+}
+.notSelect.data-v-39cbb4e8{
+	background-color: #f5f5f5;
+	border: 1rpx solid transparent;
+}
+.isSellOut.data-v-39cbb4e8{
+	background-color: rgba(255, 255, 255, 0.7);
+	color: #ccc;
+	border: 1rpx solid #ccc;
+}
+

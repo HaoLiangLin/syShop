@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "订单详情",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "count-down": "/components/uni/uni-countdown/components/uni-countdown/uni-countdown"
+  }
+}

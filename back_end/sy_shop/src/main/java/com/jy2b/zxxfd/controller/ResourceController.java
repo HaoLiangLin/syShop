@@ -18,7 +18,13 @@ public class ResourceController {
     public byte[] getUploadImage(@RequestParam("name") String name) {
         String imagePath = SystemConstants.UPLOAD_IMAGE_PATH + name;
 
+        String firstStr = name.substring(0, 1);
+        if (!("/".equals(firstStr))) {
+            imagePath = SystemConstants.UPLOAD_IMAGE_PATH + "/syLogo.png";
+        }
+
         File file = new File(imagePath);
+
         byte[] bytes = new byte[0];
         try {
             FileInputStream fileInputStream = new FileInputStream(file);

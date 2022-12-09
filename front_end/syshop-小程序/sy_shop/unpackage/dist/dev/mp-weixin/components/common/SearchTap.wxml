@@ -1,0 +1,1 @@
+<view data-event-opts="{{[['tap',[['searchTap',['$event']]]]]}}" class="searchTap data-v-1589f95c" style="{{('margin-top:'+marginTop+';')}}" bindtap="__e"><view class="search data-v-1589f95c"><uni-icons vue-id="9bb43018-1" type="search" size="20" class="data-v-1589f95c" bind:__l="__l"></uni-icons><text class="placeholder data-v-1589f95c">搜索</text></view></view>

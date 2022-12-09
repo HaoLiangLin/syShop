@@ -18,6 +18,13 @@ public interface IGoodsItemService extends IService<GoodsItem> {
     ResultVo saveItem(GoodsItemSaveFromDTO itemFromDTO);
 
     /**
+     * 删除商品属性
+     * @param id 商品属性id
+     * @return ResultVo
+     */
+    ResultVo deleteItem(Long id);
+
+    /**
      * 修改商品属性
      * @param itemFromDTO 商品属性信息
      * @return ResultVo
@@ -25,13 +32,21 @@ public interface IGoodsItemService extends IService<GoodsItem> {
     ResultVo updateItem(Long id, GoodsItemSaveFromDTO itemFromDTO);
 
     /**
-     * 查询商品属性
+     * 查询全部商品属性
+     * @param id 商品id
+     * @param itemFromDTO 查询信息
+     * @return
+     */
+    ResultVo queryItemList(Long id, GoodsItemQueryFromDTO itemFromDTO);
+
+    /**
+     * 分页查询商品属性
      * @param page 页码
      * @param size 每页数量
      * @param itemFromDTO 查询信息
      * @return ResultVo
      */
-    ResultVo queryItemList(Integer page, Integer size, GoodsItemQueryFromDTO itemFromDTO);
+    ResultVo queryItemListPage(Integer page, Integer size, GoodsItemQueryFromDTO itemFromDTO);
 
     /**
      * 根据商品id获取商品属性

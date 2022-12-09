@@ -1,0 +1,29 @@
+
+.search-result.data-v-b5b2b83c {
+		padding-top: 10px;
+		padding-bottom: 20px;
+		text-align: center;
+}
+.search-result-text.data-v-b5b2b83c {
+		text-align: center;
+		font-size: 14px;
+		color:#666;
+}
+.example-body.data-v-b5b2b83c {
+
+		display: block;
+
+		padding: 0px;
+}
+.uni-mt-10.data-v-b5b2b83c {
+		margin-top: 10px;
+}
+swiper.data-v-b5b2b83c{
+		width: 100%;
+		height: 400rpx;
+}
+.swiper-img.data-v-b5b2b83c{
+		width: 100%;
+		height: 400rpx;
+}
+

@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "添加地址",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "mpvue-city-picker": "/components/mpvue-citypicker/mpvueCityPicker"
+  }
+}

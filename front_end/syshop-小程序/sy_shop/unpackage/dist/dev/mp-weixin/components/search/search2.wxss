@@ -1,0 +1,28 @@
+
+.search-box.data-v-78a822c4{
+	margin-top: 20rpx;
+	height: 120rpx;
+	background-color: #FFFFFF;
+}
+.search-item.data-v-78a822c4{
+	padding: 20rpx;
+	margin-bottom: 10rpx;
+}
+.search-title.data-v-78a822c4{
+	display: flex;
+	justify-content: space-between;
+	padding-bottom: 10rpx;
+}
+.search-name.data-v-78a822c4{
+	padding: 4rpx 24rpx;
+	background-color: #e1e1e1;
+	display: inline-block;/* 行级块元素 */
+	border-radius: 26rpx;/* 圆角边框 */
+	margin: 10rpx;
+}
+.search-end.data-v-78a822c4{
+	text-align: center;
+	font-size: 28rpx;
+}
+
+

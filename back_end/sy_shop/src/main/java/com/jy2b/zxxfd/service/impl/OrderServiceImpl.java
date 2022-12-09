@@ -118,7 +118,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             GoodsItem item = goodsItemMapper.selectById(gid);
 
             if (item == null) {
-                throw new RuntimeException("商品不存在");
+                throw new RuntimeException("商品属性不存在");
             }
 
             // 获取商品id
@@ -168,9 +168,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             orderItemMapper.insert(orderItem);
 
             // 修改商品属性库存
-            item.setStock(stock -quantity);
-            item.setSales(item.getSales() + 1);
+            item.setStock(stock - quantity);
+            item.setSales(item.getSales() + quantity);
             goodsItemMapper.updateById(item);
+
+            // 修改商品销量
+            goods.setSale(goods.getSale() + quantity);
+            goodsMapper.updateById(goods);
 
             // 获取商品邮费
             Double goodsPostage = goods.getPostage();
@@ -305,52 +309,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         }
         // 判断订单是否已付款
         if (order.getIsPay() != 0) {
-            // 获取用户钱包
-            UserAccount userAccount = accountMapper.selectById(userId);
-
-            // 获取用户余额
-            Double balance = userAccount.getBalance();
-            // 退还付款
-            userAccount.setBalance(balance + order.getPrice());
-
-            int update = accountMapper.updateById(userAccount);
-
-            if (update < 1) {
-                throw new RuntimeException("取消订单失败");
-            }
-
-            String price = String.valueOf(order.getPrice());
-
-            // 新增账单
-            BillUtils billUtils = new BillUtils(stringRedisTemplate);
-            billUtils.saveBill(userId, "退款", price);
+            // 退款
+            returnMoney(order, "取消订单失败");
         }
 
-        // 获取订单属性
-        QueryWrapper<OrderItem> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("order_id", id);
-        List<OrderItem> orderItems = orderItemMapper.selectList(queryWrapper);
-        for (OrderItem orderItem : orderItems) {
-            if (orderItem != null) {
-                Long itemId = orderItem.getGid();
-                // 获取商品属性
-                GoodsItem item = goodsItemMapper.selectById(itemId);
-                // 获取购买数量
-                Integer quantity = orderItem.getQuantity();
-                // 获取商品库存
-                Long stock = item.getStock();
-
-                // 修改商品库存
-                item.setStock(stock + quantity);
-                item.setSales(item.getSales() - 1);
-                int updateItem = goodsItemMapper.updateById(item);
-                int updateOrderItem = orderItemMapper.deleteById(orderItem.getId());
-
-                if (updateItem < 1 || updateOrderItem < 1) {
-                    throw new RuntimeException("取消订单失败");
-                }
-            }
-        }
+        // 退货
+        returnGoods(id, "取消订单失败");
 
         // 取消订单
         boolean result = removeById(id);
@@ -692,6 +656,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 Date date = new Date();
                 // 设置退货时间
                 order.setReturnTime(date);
+                // 退货
+                returnGoods(order.getId(), "订单退货失败");
             }
         }
         // 修改订单状态
@@ -699,6 +665,19 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         if (status != null) {
             // 修改订单状态
             order.setStatus(status);
+            // 判断是否已退款
+            if (status == 3) {
+                // 获取订单物流状态
+                Integer orderLogisticsStatus = order.getLogisticsStatus();
+                if (orderLogisticsStatus != null) {
+                    if (orderLogisticsStatus == 0 || orderLogisticsStatus == 6) {
+                        // 退款
+                        returnMoney(order, "订单退款失败");
+                    } else {
+                        return ResultVo.fail("订单未退货，暂无法退款");
+                    }
+                }
+            }
         }
 
         // 修改订单
@@ -881,4 +860,65 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         return orderDTO;
     }
 
+
+    private void returnMoney(Order order, String errMsg) {
+        // 获取用户id
+        Long userId = order.getUid();
+        // 获取用户钱包
+        UserAccount userAccount = accountMapper.selectById(userId);
+
+        // 获取用户余额
+        Double balance = userAccount.getBalance();
+        // 退还付款
+        userAccount.setBalance(balance + order.getPrice());
+
+        int update = accountMapper.updateById(userAccount);
+
+        if (update < 1) {
+            throw new RuntimeException(errMsg);
+        }
+
+        String price = String.valueOf(order.getPrice());
+
+        // 新增账单
+        BillUtils billUtils = new BillUtils(stringRedisTemplate);
+        billUtils.saveBill(userId, "退款", price);
+    }
+
+    private void returnGoods(Long orderId, String errMsg) {
+        // 获取订单属性
+        QueryWrapper<OrderItem> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("order_id", orderId);
+        List<OrderItem> orderItems = orderItemMapper.selectList(queryWrapper);
+        for (OrderItem orderItem : orderItems) {
+            if (orderItem != null) {
+                Long itemId = orderItem.getGid();
+                // 获取商品属性
+                GoodsItem item = goodsItemMapper.selectById(itemId);
+                // 获取购买数量
+                Integer quantity = orderItem.getQuantity();
+                // 获取商品库存
+                Long stock = item.getStock();
+
+                // 修改商品库存
+                item.setStock(stock + quantity);
+                item.setSales(item.getSales() - quantity);
+
+                // 获取商品id
+                Long gid = item.getGid();
+                // 查询商品
+                Goods goods = goodsMapper.selectById(gid);
+                // 修改商品销量
+                goods.setSale(goods.getSale() - quantity);
+
+                int updateGoods = goodsMapper.updateById(goods);
+                int updateItem = goodsItemMapper.updateById(item);
+                int updateOrderItem = orderItemMapper.deleteById(orderItem.getId());
+
+                if (updateGoods < 1 || updateItem < 1 || updateOrderItem < 1) {
+                    throw new RuntimeException(errMsg);
+                }
+            }
+        }
+    }
 }

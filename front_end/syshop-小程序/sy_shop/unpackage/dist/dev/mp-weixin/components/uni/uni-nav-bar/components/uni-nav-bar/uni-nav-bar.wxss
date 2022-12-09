@@ -1,0 +1,149 @@
+@charset "UTF-8";
+@font-face {
+  font-family: 'iconfont';  /* Project id 3712792 */
+  src: url('//at.alicdn.com/t/c/font_3712792_laoczbq7olf.woff2?t=1666955757033') format('woff2'),
+       url('//at.alicdn.com/t/c/font_3712792_laoczbq7olf.woff?t=1666955757033') format('woff'),
+       url('//at.alicdn.com/t/c/font_3712792_laoczbq7olf.ttf?t=1666955757033') format('truetype');
+}
+.iconfont.data-v-64314a6d {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.icon-shoucang1.data-v-64314a6d:before {
+  content: "\e627";
+}
+.icon-shoucang.data-v-64314a6d:before {
+  content: "\e62a";
+}
+.icon-shoucangxuanzhong.data-v-64314a6d:before {
+  content: "\e62b";
+}
+.icon-laji_huabanfuben.data-v-64314a6d:before {
+  content: "\e634";
+}
+.icon-fenlei.data-v-64314a6d:before {
+  content: "\e61b";
+}
+.icon-gouwuche.data-v-64314a6d:before {
+  content: "\e63f";
+}
+.icon-fangdajing.data-v-64314a6d:before {
+  content: "\e653";
+}
+.icon-shangjiantou.data-v-64314a6d:before {
+  content: "\e60a";
+}
+.icon-arrow-down.data-v-64314a6d:before {
+  content: "\e610";
+}
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.uni-nav-bar-text.data-v-64314a6d {
+  font-size: 14px;
+}
+.uni-nav-bar-right-text.data-v-64314a6d {
+  font-size: 12px;
+}
+.uni-navbar__content.data-v-64314a6d {
+  position: relative;
+  background-color: transparent;
+}
+.uni-navbar-btn-text.data-v-64314a6d {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  line-height: 12px;
+}
+.uni-navbar__header.data-v-64314a6d {
+  display: flex;
+  padding: 0 10px;
+  flex-direction: row;
+  height: 44px;
+  font-size: 12px;
+}
+.uni-navbar__header-btns.data-v-64314a6d {
+  overflow: hidden;
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: row;
+  width: 120rpx;
+  justify-content: center;
+  align-items: center;
+}
+.uni-navbar__header-btns-left.data-v-64314a6d {
+  display: flex;
+  width: 120rpx;
+  justify-content: flex-start;
+  align-items: center;
+}
+.uni-navbar__header-btns-right.data-v-64314a6d {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+}
+.uni-navbar__header-container.data-v-64314a6d {
+  display: flex;
+  flex: 1;
+  padding: 0 10px;
+  overflow: hidden;
+}
+.uni-navbar__header-container-inner.data-v-64314a6d {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  overflow: hidden;
+}
+.uni-navbar__placeholder-view.data-v-64314a6d {
+  height: 44px;
+}
+.uni-navbar--fixed.data-v-64314a6d {
+  position: fixed;
+  z-index: 998;
+  left: 0;
+  right: 0;
+}
+.uni-navbar--shadow.data-v-64314a6d {
+  box-shadow: 0 1px 6px #ccc;
+}
+.uni-navbar--border.data-v-64314a6d {
+  border-bottom-width: 1rpx;
+  border-bottom-style: solid;
+  border-bottom-color: #eee;
+}
+.uni-ellipsis-1.data-v-64314a6d {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+

@@ -29,6 +29,7 @@ public class AddressServiceImpl extends ServiceImpl<AddressMapper, UserAddress> 
     public ResultVo queryAddress() {
         // 获取用户id
         Long id = UserHolder.getUser().getId();
+
         // 从Redis中查询
         String result = stringRedisTemplate.opsForValue().get(USER_ADDRESS_KEY + id);
         if (StrUtil.isNotBlank(result)) {
@@ -73,6 +74,7 @@ public class AddressServiceImpl extends ServiceImpl<AddressMapper, UserAddress> 
     public ResultVo queryAddressById(Long id) {
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
+
         UserAddress address = query().eq("id", id).eq("uid", userId).one();
 
         if (address == null) {
@@ -177,6 +179,7 @@ public class AddressServiceImpl extends ServiceImpl<AddressMapper, UserAddress> 
         Long userId = UserHolder.getUser().getId();
         // 删除成功的id集合
         int success = 0;
+
         for (Long id : ids) {
             // 获取将要删除的收货地址
             UserAddress userAddress = getById(id);

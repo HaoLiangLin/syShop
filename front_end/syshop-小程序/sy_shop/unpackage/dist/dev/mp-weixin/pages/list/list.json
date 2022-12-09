@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "分类",
+  "navigationBarBackgroundColor": "#ffffff",
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#efefef",
+  "backgroundTextStyle": "dark",
+  "usingComponents": {
+    "search-tap": "/components/common/SearchTap",
+    "lines": "/components/common/Line"
+  }
+}

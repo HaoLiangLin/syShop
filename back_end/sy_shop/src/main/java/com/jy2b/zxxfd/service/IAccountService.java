@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public interface IAccountService extends IService<UserAccount> {
     /**
-     * 查询钱包信息
+     * 查询钱包信息 简易
      * @return ResultVo
      */
     ResultVo queryAccount();

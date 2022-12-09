@@ -1,0 +1,1 @@
+<view class="Recommend data-v-7ae9bbb4"><commodity vue-id="3b63885c-1" dataList="{{RecommendData}}" itemWidth="250rpx" marketLeft="-5rpx" imgHeight="250rpx" nameSize="25rpx" class="data-v-7ae9bbb4" bind:__l="__l"></commodity></view>

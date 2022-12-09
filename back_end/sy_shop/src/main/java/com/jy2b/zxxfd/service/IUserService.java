@@ -36,7 +36,7 @@ public interface IUserService extends IService<User> {
      * @param loginFormDTO 登录信息
      * @return ResultVo
      */
-    ResultVo login(LoginFormDTO loginFormDTO);
+    ResultVo login(LoginFormDTO loginFormDTO, Integer userType);
 
     /**
      * 用户：修改密码

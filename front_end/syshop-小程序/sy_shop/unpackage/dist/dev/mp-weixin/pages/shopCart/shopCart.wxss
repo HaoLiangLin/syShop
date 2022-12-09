@@ -1,0 +1,120 @@
+
+.shop-list.data-v-300b9974{
+	padding-bottom: 100rpx;
+}
+.shop-else-list.data-v-300b9974{
+	background-color: #F7F7F7;
+}
+.uniNavBar.data-v-300b9974{
+	margin-top: -70rpx;
+}
+.null-img.data-v-300b9974{
+	position: absolute;
+	left: 0;
+	top: 150rpx;
+	right: 0;
+	bottom: 0;
+}
+.null-conta.data-v-300b9974{
+	position: absolute;
+	left: 0;
+	top: 680rpx;
+	right: 0;
+	bottom: 0;
+	text-align: center;
+	font-size: 36rpx;
+}
+.null-contb.data-v-300b9974{
+	position: absolute;
+	left: 0;
+	top: 725rpx;
+	right: 0;
+	bottom: 0;
+	text-align: center;
+	font-size: 31rpx;
+	font-weight: bold;
+}
+.shop-item.data-v-300b9974{
+	display: flex;
+	margin-bottom: 10rpx;
+	padding: 10rpx;
+	align-items: center;
+	background-color: #F7F7F7;
+}
+.shop-img.data-v-300b9974{
+	width: 200rpx;
+	height: 220rpx;
+}
+.shop-text.data-v-300b9974{
+	flex: 1;
+	padding-left: 20rpx;
+}
+.shop-name.data-v-300b9974{
+	font-size: 38rpx;
+	color: black;
+}
+.shop-color.data-v-300b9974{
+	font-size: 30rpx;
+	padding: 10rpx;
+}
+.shop-det.data-v-300b9974{
+	display: flex;
+	justify-content: space-between;/* 左右排开 */
+}
+.shop-pice.data-v-300b9974{
+	font-size: 35rpx;
+	color: orangered;
+}
+.shop-sum.data-v-300b9974{
+	font-size: 35rpx;
+}
+/* 底部样式 */
+.shop-foot.data-v-300b9974{
+	display: flex;
+	justify-content: space-between;
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 100rpx;
+	align-content: center;
+	background-color: #F7F7F7;
+	border-top:2rpx solid #F7F7F7;
+}
+.foot-radio.data-v-300b9974{
+	padding-left: 20rpx;
+	line-height: 100rpx;
+	font-size: 33rpx;
+}
+.foot-total.data-v-300b9974{
+	display: flex;
+	font-size: 33rpx;
+}
+.foot-count.data-v-300b9974{
+	line-height: 100rpx;
+	padding: 0 20rpx;
+}
+.foot-countColor.data-v-300b9974{
+	color: orangered;
+}
+.foot-num.data-v-300b9974{
+	background-color: red;
+	color: #FFFFFF;
+	padding: 0 60rpx;
+	line-height: 100rpx;
+}
+.foot-collect.data-v-300b9974{
+	background-color: #2979FF;
+	color: #FFFFFF;
+	padding: 0 60rpx;
+	margin-right: -130rpx;
+	line-height: 100rpx;
+}
+.foot-clear.data-v-300b9974{
+	background-color: red;
+	color: #FFFFFF;
+	padding: 0 60rpx;
+	margin-left: -15rpx;
+	line-height: 100rpx;
+}
+

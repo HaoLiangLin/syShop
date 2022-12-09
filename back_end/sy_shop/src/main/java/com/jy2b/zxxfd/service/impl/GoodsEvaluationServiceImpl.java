@@ -64,6 +64,11 @@ public class GoodsEvaluationServiceImpl extends ServiceImpl<GoodsEvaluationMappe
         // 查询订单
         Order order = orderMapper.selectById(orderId);
 
+        // 判断订单是否完成
+        if (order.getStatus() != 1) {
+            return ResultVo.fail("订单未完成");
+        }
+
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
         // 判断是否本人上传
@@ -200,14 +205,14 @@ public class GoodsEvaluationServiceImpl extends ServiceImpl<GoodsEvaluationMappe
         QueryWrapper<EvaluationComment> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("evaluation_id", id);
         List<EvaluationComment> commentList = commentMapper.selectList(queryWrapper);
-        // 删除评价评论
-        int delete = commentMapper.delete(queryWrapper);
-
-        if (delete < 1) {
-            return ResultVo.fail("删除评价失败");
-        }
-
         if (!commentList.isEmpty()) {
+            // 删除评价评论
+            int delete = commentMapper.delete(queryWrapper);
+
+            if (delete < 1) {
+                return ResultVo.fail("删除评价失败");
+            }
+
             for (EvaluationComment evaluationComment : commentList) {
                 if (evaluationComment != null) {
                     Long commentId = evaluationComment.getId();
@@ -338,6 +343,12 @@ public class GoodsEvaluationServiceImpl extends ServiceImpl<GoodsEvaluationMappe
         // 设置评价id
         goodsEvaluationDTO.setId(comment.getId());
 
+        // 设置评论条数
+        QueryWrapper<EvaluationComment> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("evaluation_id", comment.getId());
+        Integer integer = commentMapper.selectCount(queryWrapper);
+        goodsEvaluationDTO.setComment(integer);
+
         // 获取用户id
         Long uid = comment.getUid();
         // 查询用户
@@ -407,7 +418,13 @@ public class GoodsEvaluationServiceImpl extends ServiceImpl<GoodsEvaluationMappe
 
         // 设置用户是否点赞
         goodsEvaluationDTO.setIsLiked(0);
+        goodsEvaluationDTO.setIsMe(0);
         if (userDTO != null) {
+            // 设置是否用户评论
+            if (comment.getUid().equals(userDTO.getId())) {
+                goodsEvaluationDTO.setIsMe(1);
+            }
+
             // 查询用户是否已对该评价进行点赞
             Double score = stringRedisTemplate.opsForZSet().score(EVALUATION_LIKED_KEY + comment.getId(), userDTO.getId().toString());
             if (score != null && score > 0) {

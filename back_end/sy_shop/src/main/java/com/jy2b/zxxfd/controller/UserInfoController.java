@@ -32,14 +32,14 @@ public class UserInfoController {
         return userInfoService.updateInfo(userInfo);
     }
 
-    @GetMapping("/query")
+    @PostMapping("/query")
     @ApiOperation(value = "查询用户信息")
     @PreAuthorize("hasAnyAuthority('userinfo:delete')")
     public ResultVo queryInfo(@RequestBody UserInfo userInfo) {
         return userInfoService.queryInfo(userInfo);
     }
 
-    @GetMapping("/list/{page}/{size}")
+    @PostMapping("/list/{page}/{size}")
     @ApiOperation(value = "分页查询用户信息")
     @PreAuthorize("hasAnyAuthority('userinfo:delete')")
     public ResultVo queryList(@PathVariable("page") Integer page, @PathVariable("size") Integer size, @RequestBody(required = false) UserInfo userInfo) {

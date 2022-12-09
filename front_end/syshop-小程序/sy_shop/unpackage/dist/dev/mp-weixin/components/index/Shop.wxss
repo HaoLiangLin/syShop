@@ -1,0 +1,11 @@
+
+.scroll-content.data-v-aaa41fa4{
+	width: 100%;
+	white-space: nowrap;/* 不能进行换行 */
+}
+.scroll-item.data-v-aaa41fa4{
+	display: inline-block;
+	/* width: 300rpx;
+	height: 300rpx; */
+}
+

@@ -38,19 +38,31 @@ public class GoodsItemController {
         return itemService.saveItem(itemFromDTO);
     }
 
+    @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasAnyAuthority('goods:item:delete')")
+    public ResultVo deleteItem(@PathVariable("id") Long id) {
+        return itemService.deleteItem(id);
+    }
+
     @PutMapping("/update/{id}")
     @PreAuthorize("hasAnyAuthority('goods:item:update')")
     public ResultVo updateItem(@PathVariable("id") Long id, @RequestBody GoodsItemSaveFromDTO itemSaveFromDTO) {
         return itemService.updateItem(id, itemSaveFromDTO);
     }
 
+    @PostMapping("/all/{id}")
+    @PreAuthorize("hasAnyAuthority('goods:item:update')")
+    public ResultVo queryItemList(@PathVariable("id") Long id, @RequestBody(required = false) GoodsItemQueryFromDTO itemFromDTO) {
+        return itemService.queryItemList(id, itemFromDTO);
+    }
+
     @PostMapping("/list/{page}/{size}")
     @PreAuthorize("hasAnyAuthority('goods:item:update')")
-    public ResultVo queryItemList(
+    public ResultVo queryItemListPage(
             @PathVariable("page") Integer page,
             @PathVariable("size") Integer size,
             @RequestBody(required = false) GoodsItemQueryFromDTO itemFromDTO) {
-        return itemService.queryItemList(page, size, itemFromDTO);
+        return itemService.queryItemListPage(page, size, itemFromDTO);
     }
 
     @GetMapping("/query/{gid}")

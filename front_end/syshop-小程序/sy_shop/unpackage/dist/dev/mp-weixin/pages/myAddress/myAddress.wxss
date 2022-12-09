@@ -1,0 +1,47 @@
+
+.add-address{
+	width: 100%;
+	display: flex;
+	justify-content: center;
+}
+.add-btn{
+	border: 2rpx solid coral;
+	background-color: coral;
+	color: white;
+	border-radius: 30rpx;
+	padding: 10rpx 120rpx;
+}
+.address-list{
+	padding-left: 20rpx;
+	padding-bottom: 10rpx;
+}
+.address-item{
+	padding: 10rpx 0;
+	border: 2rpx solid gainsboro;
+}
+.item-main{
+	display: flex;
+	justify-content: space-between;
+}
+.main-name{
+	padding-right: 20rpx;
+}
+.active{
+	padding: 2rpx 6rpx;
+	margin: 0 10rpx;
+	background-color: lightblue;
+	color: #FFFFFF;
+	border-radius: 10rpx;
+	font-size: 32rpx;
+	text-align: center;
+}
+.del-btn{
+	background-color: red;
+	color: white;
+	border-radius:12rpx;
+	font-size: 32rpx;
+	text-align: center;
+	font-weight: bold;
+	padding: 0 10rpx;
+}
+

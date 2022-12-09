@@ -8,6 +8,7 @@ com\jy2b\zxxfd\mapper\GoodsEvaluationMapper.class
 com\jy2b\zxxfd\controller\ShoppingCartController.class
 com\jy2b\zxxfd\mapper\UserInfoMapper.class
 com\jy2b\zxxfd\domain\dto\EvaluationCommentSaveDTO.class
+com\jy2b\zxxfd\controller\OrderItemController.class
 com\jy2b\zxxfd\utils\WebUtils.class
 com\jy2b\zxxfd\contants\RedisConstants.class
 com\jy2b\zxxfd\domain\UserInfo.class
@@ -62,6 +63,7 @@ com\jy2b\zxxfd\authentication\UsernamePasswordAuthenticationProvider.class
 com\jy2b\zxxfd\domain\dto\GoodsItemDTO.class
 com\jy2b\zxxfd\utils\UserHolder.class
 com\jy2b\zxxfd\service\IGoodsCategoryService.class
+com\jy2b\zxxfd\domain\dto\CategoryDTO.class
 com\jy2b\zxxfd\controller\GoodsController.class
 com\jy2b\zxxfd\domain\User.class
 com\jy2b\zxxfd\authentication\SmsCodeAuthenticationToken.class
@@ -79,6 +81,7 @@ com\jy2b\zxxfd\service\impl\AddressServiceImpl.class
 com\jy2b\zxxfd\service\impl\EventsGoodsServiceImpl.class
 com\jy2b\zxxfd\mapper\RechargeComboMapper.class
 com\jy2b\zxxfd\config\MyBatisConfig.class
+com\jy2b\zxxfd\service\IOrderItemService.class
 com\jy2b\zxxfd\mapper\OrderMapper.class
 com\jy2b\zxxfd\controller\EventsController.class
 com\jy2b\zxxfd\domain\dto\RechargeComboSaveDTO.class
@@ -123,6 +126,7 @@ com\jy2b\zxxfd\domain\dto\GoodsEvaluationDTO.class
 com\jy2b\zxxfd\mapper\GoodsCategoryMapper.class
 com\jy2b\zxxfd\service\IOrderService.class
 com\jy2b\zxxfd\headle\AccessDeniedHandleImpl.class
+com\jy2b\zxxfd\service\impl\OrderItemServiceImpl.class
 com\jy2b\zxxfd\controller\AddressController.class
 com\jy2b\zxxfd\mapper\EventsMapper.class
 com\jy2b\zxxfd\service\impl\GoodsItemServiceImpl.class
@@ -146,6 +150,7 @@ com\jy2b\zxxfd\domain\dto\BillDTO.class
 com\jy2b\zxxfd\domain\dto\UserQueryFromDTO.class
 com\jy2b\zxxfd\service\impl\UserInfoServiceImpl.class
 com\jy2b\zxxfd\service\impl\EventsServiceImpl.class
+com\jy2b\zxxfd\domain\dto\GoodsFindDTO.class
 com\jy2b\zxxfd\mapper\AccountMapper.class
 com\jy2b\zxxfd\service\impl\EvaluationCommentServiceImpl.class
 com\jy2b\zxxfd\service\impl\GoodsServiceImpl.class

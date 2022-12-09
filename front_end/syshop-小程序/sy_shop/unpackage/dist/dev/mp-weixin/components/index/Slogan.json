@@ -1,0 +1,7 @@
+{
+  "component": true,
+  "usingComponents": {
+    "uni-section": "/components/uni/uni-section/components/uni-section/uni-section",
+    "uni-notic-bar": "/components/uni/uni-notice-bar/components/uni-notice-bar/uni-notice-bar"
+  }
+}

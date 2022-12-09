@@ -27,4 +27,8 @@ public class GoodsEvaluationDTO {
     private Integer liked;
 
     private Integer isLiked;
+
+    private Integer isMe;
+
+    private Integer comment;
 }

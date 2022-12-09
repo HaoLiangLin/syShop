@@ -29,6 +29,12 @@ public interface IGoodsCategoryService extends IService<GoodsCategory> {
     ResultVo queryCategoryChild(Long id);
 
     /**
+     * 查询全部分类
+     * @return ResultVo
+     */
+    ResultVo findSelectCategory();
+
+    /**
      * 新增商品分类
      * @param goodsCategory
      * @return ResultVo

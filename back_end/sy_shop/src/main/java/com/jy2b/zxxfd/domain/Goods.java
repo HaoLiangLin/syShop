@@ -45,8 +45,8 @@ public class Goods {
     private Integer recommend;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    @TableField("monthSale")
-    private Long monthSale;
+    @TableField("sale")
+    private Long sale;
 
     @TableField("warranty_time")
     private Integer warrantyTime;

@@ -18,9 +18,9 @@ public class GoodsEvaluationController {
     @Resource
     private IGoodsEvaluationService commentService;
 
-    @PostMapping("/uploadImages")
+    @PostMapping("/uploadImages/{orderItemId}")
     @PreAuthorize("hasAnyAuthority('comment:save')")
-    public ResultVo uploadImages(@RequestParam("files") MultipartFile[] files, @RequestParam("orderItemId") Long orderItemId) {
+    public ResultVo uploadImages(@RequestPart("files") MultipartFile[] files, @PathVariable("orderItemId") Long orderItemId) {
         return commentService.uploadImages(files, orderItemId);
     }
 

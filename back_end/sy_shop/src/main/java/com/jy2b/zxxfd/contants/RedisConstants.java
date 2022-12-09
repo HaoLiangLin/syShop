@@ -39,6 +39,8 @@ public class RedisConstants {
     public static final String USER_DEFAULT_ADDRESS_KEY = "user:address:default:";
     // 用户账单key
     public static final String BILL_KEY = "bill:";
+    // 用户足迹key
+    public static final String USER_FOOTPRINT_KEY = "footprint:";
 
     // 商品一级分类key
     public static final String GOODS_CATEGORY_FIRST = "goods:category:first";

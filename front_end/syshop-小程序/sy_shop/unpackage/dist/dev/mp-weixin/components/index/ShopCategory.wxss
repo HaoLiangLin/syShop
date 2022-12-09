@@ -1,0 +1,61 @@
+
+.shop-tit.data-v-75455c4c{
+	display: flex;
+	background-color: #F8F8F8;
+}
+.shop-item.data-v-75455c4c{
+	flex: 1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 80rpx;
+}
+.shop-icon.data-v-75455c4c{
+	position: relative;
+	margin-left: 10rpx;
+}
+.iconfont.data-v-75455c4c{
+	width: 16rpx;
+	height: 8rpx;
+	position: absolute;
+	left: 0;
+}
+.up.data-v-75455c4c{
+	top: -27rpx;
+}
+.down.data-v-75455c4c{
+	top: -7rpx;
+}
+.menWear.data-v-75455c4c{
+	display: flex;
+	padding: 10rpx;
+	border: 1rpx solid #efefef;
+	margin: 10rpx;
+}
+.thump image.data-v-75455c4c{
+	width: 250rpx;
+	height: 250rpx;
+	display: block;/* 清除照片间的间距 */
+	margin-right: 5rpx;
+}
+.info.data-v-75455c4c{
+	display: flex;
+	flex-direction: column;/* 定义纵向排序 */
+	justify-content: space-evenly;/* 分散对齐 */
+	font-size: 28rpx;
+	margin-left: 26rpx;
+}
+.shop-title.data-v-75455c4c{
+	font-size: 36rpx;
+	font-weight: bold;
+}
+.shop-price.data-v-75455c4c{
+	font-size: 34rpx;
+	color: red;
+	font-weight: bold;
+}
+.shop-score.data-v-75455c4c{
+	color: red;
+	font-weight: bold;
+}
+
