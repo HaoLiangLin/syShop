@@ -1,7 +1,7 @@
 package com.jy2b.zxxfd.authentication;
 
 import cn.hutool.json.JSONUtil;
-import com.jy2b.zxxfd.domain.dto.LoginFormDTO;
+import com.jy2b.zxxfd.domain.dto.LoginDTO;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -10,12 +10,12 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 /**
  * 手机验证码登录过滤器
@@ -29,39 +29,39 @@ public class MyAuthenticationFilter extends AbstractAuthenticationProcessingFilt
     public MyAuthenticationFilter() {super(DEFAULT_ANT_PATH_REQUEST_MATCHER);}
 
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException {
         if (this.postOnly && !request.getMethod().equals("POST")) {
             throw new AuthenticationServiceException("Authentication method not supported: " + request.getMethod());
         } else {
 
-            BufferedReader streamReader = new BufferedReader(new InputStreamReader(request.getInputStream(), "UTF-8"));
+            BufferedReader streamReader = new BufferedReader(new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8));
             StringBuilder responseStrBuilder = new StringBuilder();
             String inputStr;
             while ((inputStr = streamReader.readLine()) != null){
                 responseStrBuilder.append(inputStr);
             }
 
-            LoginFormDTO loginFormDTO = JSONUtil.toBean(responseStrBuilder.toString(), LoginFormDTO.class);
+            LoginDTO loginDTO = JSONUtil.toBean(responseStrBuilder.toString(), LoginDTO.class);
 
             AbstractAuthenticationToken authenticationToken = null;
 
             // 获取登录类型
-            Integer loginType = loginFormDTO.getLoginType();
+            Integer loginType = loginDTO.getLoginType();
 
             if (loginType != null && loginType == 0) {
                 // 获取用户名
-                String username = loginFormDTO.getUsername();
+                String username = loginDTO.getUsername();
                 // 获取密码
-                String password = loginFormDTO.getPassword();
+                String password = loginDTO.getPassword();
                 // 账号密码登录
                 authenticationToken = UsernamePasswordAuthenticationToken.unauthenticated(username, password);
             }
 
             if (loginType != null && loginType == 1) {
                 // 获取手机号
-                String phone = loginFormDTO.getPhone();
+                String phone = loginDTO.getPhone();
                 // 获取验证码
-                String code = loginFormDTO.getCode();
+                String code = loginDTO.getCode();
                 // 手机号验证码登录
                 authenticationToken = SmsCodeAuthenticationToken.unauthenticated(phone, code);
             }

@@ -2,7 +2,7 @@ package com.jy2b.zxxfd.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jy2b.zxxfd.domain.NoticeCategory;
-import com.jy2b.zxxfd.domain.dto.ResultVo;
+import com.jy2b.zxxfd.domain.vo.ResultVO;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
@@ -12,21 +12,21 @@ public interface INoticeCategoryService extends IService<NoticeCategory> {
      * @param noticeCategory
      * @return ResultVo
      */
-    ResultVo saveCategory(NoticeCategory noticeCategory);
+    ResultVO saveCategory(NoticeCategory noticeCategory);
 
     /**
      * 删除公告类型
      * @param id 将要删除的公告类型id
      * @return ResultVo
      */
-    ResultVo deleteCategory(Long id);
+    ResultVO deleteCategory(Long id);
 
     /**
      * 修改公告类型
      * @param noticeCategory 公告类型信息
      * @return ResultVo
      */
-    ResultVo updateCategory(NoticeCategory noticeCategory);
+    ResultVO updateCategory(NoticeCategory noticeCategory);
 
     /**
      * 分页查询公告类型
@@ -34,24 +34,24 @@ public interface INoticeCategoryService extends IService<NoticeCategory> {
      * @param size 每页数量
      * @return ResultVo
      */
-    ResultVo queryCategoryList(Integer page, Integer size);
+    ResultVO queryCategoryList(Integer page, Integer size);
 
     /**
      * 查询所有一级公告类型
      * @return ResultVo
      */
-    ResultVo queryCategoryByOne();
+    ResultVO queryCategoryByOne();
 
     /**
      * 查询公告类型分类的子分类
      * @param id 商品分类id
      * @return ResultVo
      */
-    ResultVo queryCategoryChild(Long id);
+    ResultVO queryCategoryChild(Long id);
 
     /**
      * 查询全部公告类型
      * @return ResultVo
      */
-    ResultVo findSelectCategory();
+    ResultVO findSelectCategory();
 }

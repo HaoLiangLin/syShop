@@ -5,7 +5,7 @@ import com.jy2b.zxxfd.domain.Goods;
 import com.jy2b.zxxfd.domain.GoodsItem;
 import com.jy2b.zxxfd.domain.OrderItem;
 import com.jy2b.zxxfd.domain.dto.OrderItemDTO;
-import com.jy2b.zxxfd.domain.dto.ResultVo;
+import com.jy2b.zxxfd.domain.vo.ResultVO;
 import com.jy2b.zxxfd.mapper.GoodsItemMapper;
 import com.jy2b.zxxfd.mapper.GoodsMapper;
 import com.jy2b.zxxfd.mapper.OrderItemMapper;
@@ -23,12 +23,12 @@ public class OrderItemServiceImpl extends ServiceImpl<OrderItemMapper, OrderItem
     private GoodsMapper goodsMapper;
 
     @Override
-    public ResultVo queryById(Long id) {
+    public ResultVO queryById(Long id) {
         // 根据id查询订单属性
         OrderItem orderItem = getById(id);
         // 判断订单属性是否存在
         if (orderItem == null) {
-            return ResultVo.fail("订单不存在");
+            return ResultVO.fail("订单不存在");
         }
 
         OrderItemDTO orderItemDTO = new OrderItemDTO();
@@ -74,6 +74,6 @@ public class OrderItemServiceImpl extends ServiceImpl<OrderItemMapper, OrderItem
         // 设置商品属性数量
         orderItemDTO.setQuantity(orderItem.getQuantity());
 
-        return ResultVo.ok(orderItemDTO);
+        return ResultVO.ok(orderItemDTO, "查询成功");
     }
 }

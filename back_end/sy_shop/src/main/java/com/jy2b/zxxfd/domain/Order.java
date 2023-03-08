@@ -55,6 +55,9 @@ public class Order {
     @TableField("payment_methods")
     private Integer paymentMethods;
 
+    @TableField("payment_time")
+    private Date paymentTime;
+
     @TableField("logistics_status")
     private Integer logisticsStatus;
 

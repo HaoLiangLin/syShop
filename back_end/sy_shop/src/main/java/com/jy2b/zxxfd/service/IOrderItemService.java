@@ -2,7 +2,7 @@ package com.jy2b.zxxfd.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jy2b.zxxfd.domain.OrderItem;
-import com.jy2b.zxxfd.domain.dto.ResultVo;
+import com.jy2b.zxxfd.domain.vo.ResultVO;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
@@ -12,5 +12,5 @@ public interface IOrderItemService extends IService<OrderItem> {
      * @param id 订单属性id
      * @return ResultVo
      */
-    ResultVo queryById(Long id);
+    ResultVO queryById(Long id);
 }

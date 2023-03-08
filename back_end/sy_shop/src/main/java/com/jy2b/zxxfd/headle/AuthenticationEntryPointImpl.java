@@ -1,7 +1,7 @@
 package com.jy2b.zxxfd.headle;
 
 import cn.hutool.json.JSONUtil;
-import com.jy2b.zxxfd.domain.dto.ResultVo;
+import com.jy2b.zxxfd.domain.vo.ResultVO;
 import com.jy2b.zxxfd.utils.WebUtils;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -16,14 +16,12 @@ import java.io.IOException;
 public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        ResultVo resultVo = ResultVo.fail(authException.getMessage());
+        ResultVO resultVo = ResultVO.fail(authException.getMessage());
 
         if (authException.getMessage().equals("Full authentication is required to access this resource")) {
-            resultVo.setMessage("登录认证未通过，请重新登录");
+            resultVo.setMessage("您的登录认证无效");
         }
 
         WebUtils.renderString(response, JSONUtil.toJsonStr(resultVo));
-
-        authException.printStackTrace();
     }
 }

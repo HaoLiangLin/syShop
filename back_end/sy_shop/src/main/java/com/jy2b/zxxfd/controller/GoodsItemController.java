@@ -2,9 +2,8 @@ package com.jy2b.zxxfd.controller;
 
 import com.jy2b.zxxfd.domain.dto.GoodsItemFromDTO;
 import com.jy2b.zxxfd.domain.dto.GoodsItemQueryFromDTO;
-import com.jy2b.zxxfd.domain.dto.ResultVo;
 import com.jy2b.zxxfd.domain.dto.GoodsItemSaveFromDTO;
-import com.jy2b.zxxfd.domain.GoodsItem;
+import com.jy2b.zxxfd.domain.vo.ResultVO;
 import com.jy2b.zxxfd.service.IGoodsItemService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,38 +26,38 @@ public class GoodsItemController {
     @PostMapping("/uploadIcon")
     @ApiOperation(value = "上传商品属性图片", notes = "上传成功，返回存放路径")
     @PreAuthorize("hasAnyAuthority('goods:item:save')")
-    public ResultVo uploadIcon(@RequestPart("file") MultipartFile file) {
+    public ResultVO uploadIcon(@RequestPart("file") MultipartFile file) {
         // 保存文件
         return saveFile(file, "/goods/item/icon");
     }
 
     @PostMapping("/save")
     @PreAuthorize("hasAnyAuthority('goods:item:save')")
-    public ResultVo saveItem(@RequestBody GoodsItemSaveFromDTO itemFromDTO) {
+    public ResultVO saveItem(@RequestBody GoodsItemSaveFromDTO itemFromDTO) {
         return itemService.saveItem(itemFromDTO);
     }
 
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasAnyAuthority('goods:item:delete')")
-    public ResultVo deleteItem(@PathVariable("id") Long id) {
+    public ResultVO deleteItem(@PathVariable("id") Long id) {
         return itemService.deleteItem(id);
     }
 
     @PutMapping("/update/{id}")
     @PreAuthorize("hasAnyAuthority('goods:item:update')")
-    public ResultVo updateItem(@PathVariable("id") Long id, @RequestBody GoodsItemSaveFromDTO itemSaveFromDTO) {
+    public ResultVO updateItem(@PathVariable("id") Long id, @RequestBody GoodsItemSaveFromDTO itemSaveFromDTO) {
         return itemService.updateItem(id, itemSaveFromDTO);
     }
 
     @PostMapping("/all/{id}")
     @PreAuthorize("hasAnyAuthority('goods:item:update')")
-    public ResultVo queryItemList(@PathVariable("id") Long id, @RequestBody(required = false) GoodsItemQueryFromDTO itemFromDTO) {
+    public ResultVO queryItemList(@PathVariable("id") Long id, @RequestBody(required = false) GoodsItemQueryFromDTO itemFromDTO) {
         return itemService.queryItemList(id, itemFromDTO);
     }
 
     @PostMapping("/list/{page}/{size}")
     @PreAuthorize("hasAnyAuthority('goods:item:update')")
-    public ResultVo queryItemListPage(
+    public ResultVO queryItemListPage(
             @PathVariable("page") Integer page,
             @PathVariable("size") Integer size,
             @RequestBody(required = false) GoodsItemQueryFromDTO itemFromDTO) {
@@ -66,12 +65,12 @@ public class GoodsItemController {
     }
 
     @GetMapping("/query/{gid}")
-    public ResultVo queryItemByGid(@PathVariable("gid") Long gid) {
+    public ResultVO queryItemByGid(@PathVariable("gid") Long gid) {
         return itemService.queryItemByGid(gid);
     }
 
     @PostMapping("/query")
-    public ResultVo queryItemByColor(@RequestBody GoodsItemFromDTO itemFromDTO) {
+    public ResultVO queryItemByColor(@RequestBody GoodsItemFromDTO itemFromDTO) {
         return itemService.queryItem(itemFromDTO);
     }
 }

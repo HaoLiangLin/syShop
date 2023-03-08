@@ -1,37 +1,54 @@
 package com.jy2b.zxxfd.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jy2b.zxxfd.domain.dto.RechargeComboSaveDTO;
-import com.jy2b.zxxfd.domain.dto.ResultVo;
+import com.jy2b.zxxfd.domain.dto.RechargeComboManageDTO;
 import com.jy2b.zxxfd.domain.RechargeCombo;
+import com.jy2b.zxxfd.domain.vo.ResultVO;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Transactional
 public interface IRechargeComboService extends IService<RechargeCombo> {
     /**
-     * 新增充值套餐
-     * @param comboSaveDTO 套餐信息
-     * @return ResultVo
+     * 查询全部充值套餐
+     * @return List<RechargeCombo>
      */
-    ResultVo saveCombo(RechargeComboSaveDTO comboSaveDTO);
+    List<RechargeCombo> selectAllRechargeCombo();
 
     /**
-     * 删除充值套餐
-     * @param id 套餐id
-     * @return ResultVo
+     * 根据套餐id查询充值套餐
+     * @param rechargeComboId 充值套餐id
+     * @return RechargeCombo
      */
-    ResultVo delCombo(Long id);
+    RechargeCombo selectRechargeComboById(Long rechargeComboId);
 
     /**
      * 修改充值套餐
-     * @param rechargeCombo 套餐信息
-     * @return ResultVo
+     * @param rechargeComboId 充值套餐Id
+     * @param rechargeComboManageDTO 充值套餐信息
+     * @return ResultVO
      */
-    ResultVo updateCombo(RechargeCombo rechargeCombo);
+    ResultVO updateRechargeCombo(Long rechargeComboId, RechargeComboManageDTO rechargeComboManageDTO);
 
     /**
-     * 查询充值套餐
-     * @return ResultVo
+     * 新增充值套餐
+     * @param rechargeComboManageDTO 充值套餐信息
+     * @return ResultVO
      */
-    ResultVo queryCombo();
+    ResultVO saveRechargeCombo(RechargeComboManageDTO rechargeComboManageDTO);
+
+    /**
+     * 删除充值套餐
+     * @param rechargeComboId 充值套餐id
+     * @return ResultVO
+     */
+    ResultVO delRechargeCombo(Long rechargeComboId);
+
+    /**
+     * 更新缓存
+     * @param rechargeComboId 充值套餐Id
+     * @param rechargeCombo 充值套餐
+     */
+    void updateCache(Long rechargeComboId, RechargeCombo rechargeCombo);
 }

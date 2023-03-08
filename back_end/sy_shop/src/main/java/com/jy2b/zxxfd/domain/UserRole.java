@@ -14,9 +14,9 @@ import lombok.NoArgsConstructor;
 public class UserRole {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     @TableField("user_id")
-    private Long userId;
+    private Long userId; // 用户id
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     @TableField("role_id")
-    private Long roleId;
+    private Long roleId; // 角色id
 }

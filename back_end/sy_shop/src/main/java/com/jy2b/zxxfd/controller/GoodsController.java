@@ -3,8 +3,8 @@ package com.jy2b.zxxfd.controller;
 import com.jy2b.zxxfd.domain.dto.GoodsQueryFromDTO;
 import com.jy2b.zxxfd.domain.dto.GoodsSaveFromDTO;
 import com.jy2b.zxxfd.domain.dto.GoodsUpdateFromDTO;
-import com.jy2b.zxxfd.domain.dto.ResultVo;
 import com.jy2b.zxxfd.domain.Goods;
+import com.jy2b.zxxfd.domain.vo.ResultVO;
 import com.jy2b.zxxfd.service.IGoodsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -24,54 +24,54 @@ public class GoodsController {
 
     @PostMapping("/uploadImages")
     @PreAuthorize("hasAnyAuthority('goods:save')")
-    public ResultVo uploadImages(@RequestPart("files") MultipartFile[] files) {
+    public ResultVO uploadImages(@RequestPart("files") MultipartFile[] files) {
         return goodsService.uploadImage(files);
     }
 
     @PostMapping("/save")
     @PreAuthorize("hasAnyAuthority('goods:save')")
     @ApiOperation(value = "新增商品")
-    public ResultVo saveGoods(@RequestBody GoodsSaveFromDTO goodsSaveFromDTO) {
+    public ResultVO saveGoods(@RequestBody GoodsSaveFromDTO goodsSaveFromDTO) {
         return goodsService.saveGoods(goodsSaveFromDTO);
     }
 
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasAnyAuthority('goods:delete')")
     @ApiOperation(value = "删除商品")
-    public ResultVo deleteGoods(@PathVariable("id") Long id) {
+    public ResultVO deleteGoods(@PathVariable("id") Long id) {
         return goodsService.deleteGoods(id);
     }
 
     @PutMapping("/update")
     @PreAuthorize("hasAnyAuthority('goods:update')")
     @ApiOperation(value = "修改商品")
-    public ResultVo updateGoods(@RequestBody GoodsUpdateFromDTO updateFromDTO) {
+    public ResultVO updateGoods(@RequestBody GoodsUpdateFromDTO updateFromDTO) {
         return goodsService.updateGoods(updateFromDTO);
     }
 
     @GetMapping("/find")
     @PreAuthorize("hasAnyAuthority('goods:update')")
     @ApiOperation(value = "管理员：根据id查询商品")
-    public ResultVo findGoodsById(@RequestParam("id") Long id) {
+    public ResultVO findGoodsById(@RequestParam("id") Long id) {
         return goodsService.findGoodsById(id);
     }
 
     @PostMapping("/list/{page}/{size}")
     @PreAuthorize("hasAnyAuthority('goods:update')")
     @ApiOperation(value = "管理员：分页查询商品")
-    public ResultVo findGoodsList(@PathVariable("page") Integer page, @PathVariable("size") Integer size, @RequestBody(required = false) Goods goods) {
+    public ResultVO findGoodsList(@PathVariable("page") Integer page, @PathVariable("size") Integer size, @RequestBody(required = false) Goods goods) {
         return goodsService.findGoodsList(page, size, goods);
     }
 
     @GetMapping("/query/{id}")
     @ApiOperation(value = "查询商品")
-    public ResultVo queryGoodsById(@PathVariable("id") Long id) {
+    public ResultVO queryGoodsById(@PathVariable("id") Long id) {
         return goodsService.queryGoodsById(id);
     }
 
     @PostMapping("/query/{page}/{size}")
     @ApiOperation(value = "分页查询商品")
-    public ResultVo queryGoodsList(@PathVariable("page") Integer page, @PathVariable("size") Integer size, @RequestBody(required = false) GoodsQueryFromDTO goodsFromDTO) {
+    public ResultVO queryGoodsList(@PathVariable("page") Integer page, @PathVariable("size") Integer size, @RequestBody(required = false) GoodsQueryFromDTO goodsFromDTO) {
         return goodsService.queryGoodsList(page, size, goodsFromDTO);
     }
 }

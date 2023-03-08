@@ -1,5 +1,6 @@
 package com.jy2b.zxxfd.controller;
 
+import cn.hutool.core.util.StrUtil;
 import com.jy2b.zxxfd.contants.SystemConstants;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -18,9 +19,14 @@ public class ResourceController {
     public byte[] getUploadImage(@RequestParam("name") String name) {
         String imagePath = SystemConstants.UPLOAD_IMAGE_PATH + name;
 
-        String firstStr = name.substring(0, 1);
-        if (!("/".equals(firstStr))) {
-            imagePath = SystemConstants.UPLOAD_IMAGE_PATH + "/syLogo.png";
+        if (StrUtil.isBlank(name)) {
+            imagePath = SystemConstants.UPLOAD_IMAGE_PATH + "/blankImg.jpg";
+        }
+        if (StrUtil.isNotBlank(name)) {
+            String firstStr = name.substring(0, 1);
+            if (!("/".equals(firstStr))) {
+                imagePath = SystemConstants.UPLOAD_IMAGE_PATH + "/blankImg.jpg";
+            }
         }
 
         File file = new File(imagePath);

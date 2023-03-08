@@ -7,10 +7,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jy2b.zxxfd.domain.Notice;
-import com.jy2b.zxxfd.domain.NoticeCategory;
 import com.jy2b.zxxfd.domain.dto.NoticeDTO;
 import com.jy2b.zxxfd.domain.dto.NoticeQueryDTO;
-import com.jy2b.zxxfd.domain.dto.ResultVo;
+import com.jy2b.zxxfd.domain.vo.ResultVO;
 import com.jy2b.zxxfd.mapper.NoticeCategoryMapper;
 import com.jy2b.zxxfd.mapper.NoticeMapper;
 import com.jy2b.zxxfd.service.INoticeService;
@@ -34,24 +33,24 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
     private StringRedisTemplate stringRedisTemplate;
 
     @Override
-    public ResultVo saveNotice(NoticeDTO noticeDTO) {
+    public ResultVO saveNotice(NoticeDTO noticeDTO) {
         // 获取公告标题
         String title = noticeDTO.getTitle();
         if (StrUtil.isBlank(title)) {
-            return ResultVo.fail("公告标题不能为空");
+            return ResultVO.fail("公告标题不能为空");
         }
         // 获取公告类型
         Long cid = noticeDTO.getCid();
         if (cid == null) {
-            return ResultVo.fail("公告类型不能为空");
+            return ResultVO.fail("公告类型不能为空");
         }
         if (categoryMapper.selectById(cid) == null) {
-            return ResultVo.fail("公告类型不存在");
+            return ResultVO.fail("公告类型不存在");
         }
         // 获取公告内容
         String content = noticeDTO.getContent();
         if (StrUtil.isBlank(content)) {
-            return ResultVo.fail("公告内容不能为空");
+            return ResultVO.fail("公告内容不能为空");
         }
 
         // 新增公告
@@ -60,15 +59,15 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
         if (result) {
             saveNoticeCache(notice);
         }
-        return result ? ResultVo.ok(null,"公告发布成功") : ResultVo.fail("公告发布失败");
+        return result ? ResultVO.ok(null, "公告发布成功") : ResultVO.fail("公告发布失败");
     }
 
     @Override
-    public ResultVo delNotice(Long id) {
+    public ResultVO delNotice(Long id) {
         // 获取公告
         Notice notice = getById(id);
         if (notice == null) {
-            return ResultVo.fail("公告不存在");
+            return ResultVO.fail("公告不存在");
         }
 
         // 删除公告
@@ -77,22 +76,22 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
             // 删除公告缓存
             stringRedisTemplate.delete(NOTICE_KEY + id);
         }
-        return result ? ResultVo.ok(null,"删除公告成功") : ResultVo.fail("删除公告失败");
+        return result ? ResultVO.ok(null,"删除公告成功") : ResultVO.fail("删除公告失败");
     }
 
     @Override
-    public ResultVo updateNotice(Long id, NoticeDTO noticeDTO) {
+    public ResultVO updateNotice(Long id, NoticeDTO noticeDTO) {
         // 获取公告
         Notice notice = getById(id);
         if (notice == null) {
-            return ResultVo.fail("公告不存在");
+            return ResultVO.fail("公告不存在");
         }
 
         // 获取公告类型
         Long cid = noticeDTO.getCid();
         if (cid != null) {
             if (categoryMapper.selectById(cid) == null) {
-                return ResultVo.fail("公告类型不存在");
+                return ResultVO.fail("公告类型不存在");
             }
         }
 
@@ -112,18 +111,18 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
             saveNoticeCache(notice);
         }
 
-        return result ? ResultVo.ok(null,"修改公告成功") : ResultVo.fail("修改公告失败");
+        return result ? ResultVO.ok(null,"修改公告成功") : ResultVO.fail("修改公告失败");
     }
 
     @Override
-    public ResultVo queryNotice(NoticeQueryDTO queryDTO) {
+    public ResultVO queryNotice(NoticeQueryDTO queryDTO) {
         if (queryDTO.getId() != null && queryDTO.getNoticeCategoryId() == null) {
             Long id = queryDTO.getId();
             String result = stringRedisTemplate.opsForValue().get(NOTICE_KEY + id);
 
             if (StrUtil.isNotBlank(result)) {
                 Notice notice = JSONUtil.toBean(result, Notice.class);
-                return ResultVo.ok(notice);
+                return ResultVO.ok(notice, "查询成功");
             }
         }
 
@@ -148,15 +147,15 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
         if (queryDTO.getId() != null && queryDTO.getNoticeCategoryId() == null) {
             Notice notice = result.get(0);
             if (notice != null) {
-                return ResultVo.ok(saveNoticeCache(notice));
+                return ResultVO.ok(saveNoticeCache(notice), "查询成功");
             }
         }
 
-        return ResultVo.ok(result);
+        return ResultVO.ok(result, "查询成功");
     }
 
     @Override
-    public ResultVo queryNoticePage(Integer page, Integer size, NoticeQueryDTO queryDTO) {
+    public ResultVO queryNoticePage(Integer page, Integer size, NoticeQueryDTO queryDTO) {
         Page<Notice> noticePage = new Page<>(page, size);
         QueryWrapper<Notice> queryWrapper = null;
 
@@ -180,7 +179,7 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
         }
 
         noticeMapper.selectPage(noticePage, queryWrapper);
-        return ResultVo.ok(noticePage);
+        return ResultVO.ok(noticePage, "查询成功");
     }
 
     private Notice saveNoticeCache(Notice notice) {

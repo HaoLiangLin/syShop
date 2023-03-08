@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jy2b.zxxfd.domain.dto.GoodsQueryFromDTO;
 import com.jy2b.zxxfd.domain.dto.GoodsSaveFromDTO;
 import com.jy2b.zxxfd.domain.dto.GoodsUpdateFromDTO;
-import com.jy2b.zxxfd.domain.dto.ResultVo;
 import com.jy2b.zxxfd.domain.Goods;
+import com.jy2b.zxxfd.domain.vo.ResultVO;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,35 +16,35 @@ public interface IGoodsService extends IService<Goods> {
      * @param files 上传图片
      * @return ResultVo
      */
-    ResultVo uploadImage(MultipartFile[] files);
+    ResultVO uploadImage(MultipartFile[] files);
 
     /**
      * 新增商品
      * @param goodsSaveFromDTO 商品信息
      * @return ResultVo
      */
-    ResultVo saveGoods(GoodsSaveFromDTO goodsSaveFromDTO);
+    ResultVO saveGoods(GoodsSaveFromDTO goodsSaveFromDTO);
 
     /**
      * 删除商品
      * @param id 商品id
      * @return ResultVo
      */
-    ResultVo deleteGoods(Long id);
+    ResultVO deleteGoods(Long id);
 
     /**
      * 修改商品
      * @param updateFromDTO 商品修改信息
      * @return ResultVO
      */
-    ResultVo updateGoods(GoodsUpdateFromDTO updateFromDTO);
+    ResultVO updateGoods(GoodsUpdateFromDTO updateFromDTO);
 
     /**
      * 管理员：根据id查询商品
      * @param id 商品id
      * @return ResultVo
      */
-    ResultVo findGoodsById(Long id);
+    ResultVO findGoodsById(Long id);
 
     /**
      * 管理员：分页查询所有商品
@@ -53,14 +53,14 @@ public interface IGoodsService extends IService<Goods> {
      * @param goods
      * @return
      */
-    ResultVo findGoodsList(Integer page, Integer size, Goods goods);
+    ResultVO findGoodsList(Integer page, Integer size, Goods goods);
 
     /**
      * 用户：根据id查询商品
      * @param id 商品id
      * @return ResultVo
      */
-    ResultVo queryGoodsById(Long id);
+    ResultVO queryGoodsById(Long id);
 
     /**
      * 用户：分页查询所有商品
@@ -69,5 +69,5 @@ public interface IGoodsService extends IService<Goods> {
      * @param goodsFromDTO 商品条件信息
      * @return ResultVo
      */
-    ResultVo queryGoodsList(Integer page, Integer size, GoodsQueryFromDTO goodsFromDTO);
+    ResultVO queryGoodsList(Integer page, Integer size, GoodsQueryFromDTO goodsFromDTO);
 }

@@ -13,12 +13,14 @@ public class PasswordEncoderTest {
 
     @Test
     void test() {
+        String pwd = "userAdmin";
+
         // 密码加密
-        String password = passwordEncoder.encode("");
-        System.out.println(password);
+        String password = passwordEncoder.encode(pwd);
+        System.out.println("加密后：" + password);
 
         // 密码校验
-        boolean flag = passwordEncoder.matches("", password);
+        boolean flag = passwordEncoder.matches(pwd, password);
         System.out.println("flag = " + flag);
     }
 }

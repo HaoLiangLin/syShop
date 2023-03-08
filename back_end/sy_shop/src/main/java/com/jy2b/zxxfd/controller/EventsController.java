@@ -1,7 +1,7 @@
 package com.jy2b.zxxfd.controller;
 
 import com.jy2b.zxxfd.domain.dto.EventsDTO;
-import com.jy2b.zxxfd.domain.dto.ResultVo;
+import com.jy2b.zxxfd.domain.vo.ResultVO;
 import com.jy2b.zxxfd.service.IEventsService;
 import com.jy2b.zxxfd.utils.UploadUtils;
 import io.swagger.annotations.Api;
@@ -21,30 +21,30 @@ public class EventsController {
 
     @PostMapping("/uploadIcon")
     @PreAuthorize("hasAnyAuthority('events:save')")
-    public ResultVo uploadIcon(@RequestPart("file") MultipartFile file) {
+    public ResultVO uploadIcon(@RequestPart("file") MultipartFile file) {
         return UploadUtils.saveFile(file, "/events/icon");
     }
 
     @PostMapping("/save")
     @PreAuthorize("hasAnyAuthority('events:save')")
-    public ResultVo saveEvents(@RequestBody EventsDTO eventsDTO) {
+    public ResultVO saveEvents(@RequestBody EventsDTO eventsDTO) {
         return eventsService.saveEvents(eventsDTO);
     }
 
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasAnyAuthority('events:delete')")
-    public ResultVo delEvents(@PathVariable("id") Long id) {
+    public ResultVO delEvents(@PathVariable("id") Long id) {
         return eventsService.delEvents(id);
     }
 
     @PutMapping("/update/{id}")
     @PreAuthorize("hasAnyAuthority('events:update')")
-    public ResultVo updateEvents(@PathVariable("id") Long id, @RequestBody EventsDTO eventsDTO) {
+    public ResultVO updateEvents(@PathVariable("id") Long id, @RequestBody EventsDTO eventsDTO) {
         return eventsService.updateEvents(id, eventsDTO);
     }
 
     @GetMapping("/query")
-    public ResultVo queryEvents() {
+    public ResultVO queryEvents() {
         return eventsService.queryEvents();
     }
 }

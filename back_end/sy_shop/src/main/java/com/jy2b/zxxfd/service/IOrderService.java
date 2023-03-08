@@ -3,6 +3,7 @@ package com.jy2b.zxxfd.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jy2b.zxxfd.domain.dto.*;
 import com.jy2b.zxxfd.domain.Order;
+import com.jy2b.zxxfd.domain.vo.ResultVO;
 import org.springframework.transaction.annotation.Transactional;
 
 
@@ -13,79 +14,80 @@ public interface IOrderService extends IService<Order> {
      * @param orderSaveFromDTO 订单详情
      * @return ResultVo
      */
-    ResultVo submitOrder(OrderSaveFromDTO orderSaveFromDTO);
+    ResultVO submitOrder(OrderSaveFromDTO orderSaveFromDTO);
 
     /**
      * 用户修改订单
      * @param orderSaveDTO 订单信息
      * @return ResultVo
      */
-    ResultVo userUpdateOrder(Long id, OrderSaveFromDTO orderSaveDTO);
+    ResultVO userUpdateOrder(Long id, OrderSaveFromDTO orderSaveDTO);
 
     /**
      * 取消订单
      * @param id 订单号
+     * @param reason 取消原因
      * @return ResultVo
      */
-    ResultVo cancelOrder(Long id);
+    ResultVO cancelOrder(Long id, String reason);
 
     /**
      * 支付订单
      * @param id 订单号
      * @return ResultVo
      */
-    ResultVo paymentOrder(Long id);
+    ResultVO paymentOrder(Long id);
 
     /**
      * 根据订单号查询订单
      * @param id 订单号
      * @return ResultVo
      */
-    ResultVo queryOrderById(Long id);
+    ResultVO queryOrderById(Long id);
 
     /**
      * 查询全部订单
      * @return ResultVo
      */
-    ResultVo queryOrderAll();
+    ResultVO queryOrderAll();
 
     /**
      * 查询待付款订单
      * @return ResultVo
      */
-    ResultVo queryUnpaidOrder();
+    ResultVO queryUnpaidOrder();
 
     /**
      * 查询待发货订单
      * @return ResultVo
      */
-    ResultVo queryBeShippedOrder();
+    ResultVO queryBeShippedOrder();
 
     /**
      * 查询待收货订单
      * @return ResultVo
      */
-    ResultVo queryUndeliveredOrder();
+    ResultVO queryUndeliveredOrder();
 
     /**
      * 查询已完成订单
      * @return ResultVo
      */
-    ResultVo queryCompletedOrder();
+    ResultVO queryCompletedOrder();
 
     /**
      * 完成订单
      * @param id 订单号
      * @return ResultVo
      */
-    ResultVo completeOrder(Long id);
+    ResultVO completeOrder(Long id);
 
     /**
      * 删除订单
      * @param id 订单号
      * @return ResultVo
      */
-    ResultVo deleteOrder(Long id);
+    ResultVO deleteOrder(Long id);
 
     /**
      * 查询订单
@@ -94,13 +96,28 @@ public interface IOrderService extends IService<Order> {
      * @param orderQueryDTO 查询订单条件
      * @return ResultVo
      */
-    ResultVo queryOrder(Integer page, Integer size, OrderQueryDTO orderQueryDTO);
+    ResultVO queryOrder(Integer page, Integer size, OrderQueryDTO orderQueryDTO);
 
     /**
      * 修改订单
      * @param updateFromDTO 订单信息
      * @return ResultVo
      */
-    ResultVo updateOrder(OrderUpdateFromDTO updateFromDTO);
+    ResultVO updateOrder(OrderUpdateFromDTO updateFromDTO);
 
+    /**
+     * 今日新增订单
+     * 今日成交订单
+     * 今日营业额
+     *
+     * 流水
+     */
+
+    /**
+     * 订单统计
+     * @param startDate 起始时间
+     * @param endDate 返回时间
+     * @return ResultVO
+     */
+    ResultVO orderCount(Long startDate, Long endDate);
 }

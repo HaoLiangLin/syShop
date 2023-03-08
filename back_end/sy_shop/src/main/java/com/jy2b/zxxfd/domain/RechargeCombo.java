@@ -21,7 +21,7 @@ public class RechargeCombo {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     @TableField("points")
-    private Long points;
+    private Integer points;
 
     @TableField("discount")
     private Double discount;

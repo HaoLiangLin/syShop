@@ -1,8 +1,8 @@
 package com.jy2b.zxxfd.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jy2b.zxxfd.domain.dto.ResultVo;
 import com.jy2b.zxxfd.domain.GoodsCategory;
+import com.jy2b.zxxfd.domain.vo.ResultVO;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
@@ -13,45 +13,45 @@ public interface IGoodsCategoryService extends IService<GoodsCategory> {
      * @param size 每页数量
      * @return ResultVo
      */
-    ResultVo queryCategoryList(Integer page, Integer size);
+    ResultVO queryCategoryList(Integer page, Integer size);
 
     /**
      * 查询所有一级商品分类
      * @return ResultVo
      */
-    ResultVo queryCategoryByOne();
+    ResultVO queryCategoryByOne();
 
     /**
      * 查询商品分类的子分类
      * @param id 商品分类id
      * @return ResultVo
      */
-    ResultVo queryCategoryChild(Long id);
+    ResultVO queryCategoryChild(Long id);
 
     /**
      * 查询全部分类
      * @return ResultVo
      */
-    ResultVo findSelectCategory();
+    ResultVO findSelectCategory();
 
     /**
      * 新增商品分类
      * @param goodsCategory
      * @return ResultVo
      */
-    ResultVo saveCategory(GoodsCategory goodsCategory);
+    ResultVO saveCategory(GoodsCategory goodsCategory);
 
     /**
      * 删除商品分类
      * @param id 将要删除的商品分类id
      * @return ResultVo
      */
-    ResultVo deleteCategory(Long id);
+    ResultVO deleteCategory(Long id);
 
     /**
      * 修改商品分类
      * @param goodsCategory 商品分类信息
      * @return ResultVo
      */
-    ResultVo updateCategory(GoodsCategory goodsCategory);
+    ResultVO updateCategory(GoodsCategory goodsCategory);
 }

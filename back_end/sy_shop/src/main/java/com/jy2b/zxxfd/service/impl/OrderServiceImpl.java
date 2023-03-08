@@ -1,24 +1,34 @@
 package com.jy2b.zxxfd.service.impl;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jy2b.zxxfd.domain.dto.*;
 import com.jy2b.zxxfd.domain.*;
+import com.jy2b.zxxfd.domain.vo.BillStatusCode;
+import com.jy2b.zxxfd.domain.vo.BillType;
+import com.jy2b.zxxfd.domain.vo.ResultVO;
 import com.jy2b.zxxfd.mapper.*;
+import com.jy2b.zxxfd.service.IBillService;
 import com.jy2b.zxxfd.service.IOrderService;
-import com.jy2b.zxxfd.utils.BillUtils;
 import com.jy2b.zxxfd.utils.RedisIdWorker;
 import com.jy2b.zxxfd.utils.TimeUtils;
+import com.jy2b.zxxfd.utils.UserBillUtils;
 import com.jy2b.zxxfd.utils.UserHolder;
-import com.jy2b.zxxfd.contants.RedisConstants;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static com.jy2b.zxxfd.contants.RedisConstants.ORDER_KEY;
+import static com.jy2b.zxxfd.contants.SystemConstants.APPLICATION_NAME;
 
 @Service
 public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements IOrderService {
@@ -26,7 +36,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private StringRedisTemplate stringRedisTemplate;
 
     @Resource
-    private AddressMapper addressMapper;
+    private UserAddressMapper addressMapper;
 
     @Resource
     private GoodsItemMapper goodsItemMapper;
@@ -41,13 +51,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private OrderMapper orderMapper;
 
     @Resource
-    private AccountMapper accountMapper;
+    private UserWallerMapper userWallerMapper;
 
     @Resource
     private GoodsEvaluationMapper goodsEvaluationMapper;
 
+    @Resource
+    private UserBillUtils userBillUtils;
+
     @Override
-    public ResultVo submitOrder(OrderSaveFromDTO orderSaveFromDTO) {
+    public ResultVO submitOrder(OrderSaveFromDTO orderSaveFromDTO) {
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
 
@@ -57,7 +70,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         UserAddress address = addressMapper.selectById(addressId);
         // 判断收货地址是否为空
         if (address == null) {
-            return ResultVo.fail("收货地址不能为空");
+            return ResultVO.fail("收货地址不能为空");
         }
 
         // 获取收货人姓名
@@ -77,7 +90,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         String remarks = orderSaveFromDTO.getRemarks();
 
         // 生成订单号
-        long orderId = new RedisIdWorker(stringRedisTemplate).nextId(RedisConstants.ORDER_KEY);
+        long orderId = new RedisIdWorker(stringRedisTemplate).nextId(ORDER_KEY);
         // 订单金额
         double amount = 0D;
 
@@ -127,23 +140,23 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             Goods goods = goodsMapper.selectById(goodsId);
 
             if (goods.getStatus() != 1) {
-                return ResultVo.fail("商品：" + goods.getName() + "不存在");
+                return ResultVO.fail("商品：" + goods.getName() + "不存在");
             }
             // 判断商品属性是否上架
             if (item.getStatus() == 0) {
-                return ResultVo.fail("商品：" + goods.getName() + "已下架");
+                return ResultVO.fail("商品：" + goods.getName() + "已下架");
             }
             // 获取商品数量
             Integer quantity = orderSaveDTO.getQuantity();
             // 判断数量是否小于大于零
             if (quantity <= 0) {
-                return ResultVo.fail("购买数量不能等于小于零");
+                return ResultVO.fail("购买数量不能等于小于零");
             }
             // 获取商品属性库存
             Long stock = item.getStock();
             // 判断库存是否充盈
             if (quantity > stock) {
-                return ResultVo.fail("商品库存不足");
+                return ResultVO.fail("商品库存不足");
             }
 
             // 获取商品单价
@@ -192,11 +205,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
         // TODO 用户提交订单后，若在限定时间中没有进行支付，则删除该订单
 
-        return ResultVo.ok(String.valueOf(orderId), "提交订单成功");
+        return ResultVO.ok(String.valueOf(orderId), "提交订单成功");
     }
 
     @Override
-    public ResultVo userUpdateOrder(Long id, OrderSaveFromDTO orderSaveDTO) {
+    public ResultVO userUpdateOrder(Long id, OrderSaveFromDTO orderSaveDTO) {
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
         // 查询将要修改订单
@@ -204,18 +217,18 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
         // 判断订单是否存在
         if (beforeOrder == null) {
-            return ResultVo.fail("订单不存在");
+            return ResultVO.fail("订单不存在");
         }
 
         // 判断订单是否属于用户
         if (!beforeOrder.getUid().equals(userId)) {
-            return ResultVo.fail("订单不存在");
+            return ResultVO.fail("订单不存在");
         }
 
         // 判断订单是否已付款
         Integer isPay = beforeOrder.getIsPay();
         if (isPay > 0) {
-            return ResultVo.fail("订单已交易");
+            return ResultVO.fail("订单已交易");
         }
 
         Order order = new Order();
@@ -230,7 +243,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
             // 判断收货地址是否存在
             if (address == null) {
-                return ResultVo.fail("收货地址不存在");
+                return ResultVO.fail("收货地址不存在");
             }
 
             // 获取收货人姓名
@@ -279,33 +292,33 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             OrderDTO orderDTO = setQueryDTO(afterOrder);
 
             // 返回数据
-            return ResultVo.ok(orderDTO);
+            return ResultVO.ok(orderDTO, "修改成功");
         }
 
-        return ResultVo.fail("订单修改失败");
+        return ResultVO.fail("订单修改失败");
     }
 
     @Override
-    public ResultVo cancelOrder(Long id) {
+    public ResultVO cancelOrder(Long id, String reason) {
         // 查询订单
         Order order = getById(id);
 
         // 判断订单是否存在
         if (order == null) {
-            return ResultVo.fail("订单不存在");
+            return ResultVO.fail("订单不存在");
         }
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
         if (!order.getUid().equals(userId)) {
-            return ResultVo.fail("订单不存在");
+            return ResultVO.fail("订单不存在");
         }
         // 判断订单是否已完成
         if (order.getStatus() != 0) {
-            return ResultVo.fail("订单已完成");
+            return ResultVO.fail("订单已完成");
         }
         // 判断订单是否已发货
         if (order.getLogisticsStatus() > 0) {
-            return ResultVo.fail("订单已发货");
+            return ResultVO.fail("订单已发货");
         }
         // 判断订单是否已付款
         if (order.getIsPay() != 0) {
@@ -321,20 +334,25 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         if (!result) {
             throw new RuntimeException("取消订单失败");
         }
-        return ResultVo.ok(null,"取消订单成功");
+        // 取消订单登记
+        cancelOrder(ORDER_KEY, order, reason);
+        return ResultVO.ok(null,"取消订单成功");
     }
 
+    @Resource
+    private IBillService billService;
+
     @Override
-    public ResultVo paymentOrder(Long id) {
+    public ResultVO paymentOrder(Long id) {
         // 查询订单
         Order order = getById(id);
         // 判断订单是否存在
         if (order == null) {
-            return ResultVo.fail("订单不存在");
+            return ResultVO.fail("订单不存在");
         }
         // 判断订单是否已支付
         if (order.getIsPay() > 0) {
-            return ResultVo.fail("订单已支付");
+            return ResultVO.fail("订单已支付");
         }
 
         // 获取订单金额
@@ -343,74 +361,75 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
         // 获取用户钱包
-        UserAccount userAccount = accountMapper.selectById(userId);
+        UserWaller userWaller = userWallerMapper.selectById(userId);
 
         // 获取钱包余额
-        Double balance = userAccount.getBalance();
+        Double balance = userWaller.getBalance();
         // 判断用户钱包是否足够
         if (balance < price) {
-            return ResultVo.fail("钱包余额不足");
+            return ResultVO.fail("钱包余额不足");
         }
 
         // 获取钱包累计消费
-        Double spending = userAccount.getSpending();
+        Double spending = userWaller.getSpending();
 
         // 支付订单
-        userAccount.setBalance(balance - price);
-        userAccount.setSpending(spending + price);
-        int update = accountMapper.updateById(userAccount);
+        userWaller.setBalance(balance - price);
+        userWaller.setSpending(spending + price);
+        int update = userWallerMapper.updateById(userWaller);
         if (update < 1) {
-            return ResultVo.fail("支付失败");
+            return ResultVO.fail("支付失败");
         }
 
         // 支付成功
         order.setIsPay(1);
         order.setPaymentMethods(0);
+        order.setPaymentTime(new Date());
 
         boolean result = updateById(order);
         if (!result) {
             throw new RuntimeException("订单支付失败");
         }
 
-        // 生成账单
-        String amount = String.valueOf(price);
-        BillUtils billUtils = new BillUtils(stringRedisTemplate);
-        billUtils.saveBill(userId, "购物消费", amount);
+        // 保存用户账单
+        UserBill userBill = userBillUtils.saveUserBill(userId, price, null, "购物消费", APPLICATION_NAME, BillType.disburse, "钱包", BillStatusCode.rechargeSuccess, "订单号：" + id);
+        // 保存系统账单
+        billService.saveBill(userId, userBill, BillType.income);
 
-        return ResultVo.ok(null,"支付成功");
+        return ResultVO.ok(null,"支付成功");
     }
 
     @Override
-    public ResultVo queryOrderById(Long id) {
+    public ResultVO queryOrderById(Long id) {
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
         // 查询订单
         Order order = getById(id);
         if (order == null) {
-            return ResultVo.fail("订单不存在");
+            return ResultVO.fail("订单不存在");
         }
         // 判断是否下单用户本人
         if (!userId.equals(order.getUid())) {
-            return ResultVo.fail("订单不存在");
+            return ResultVO.fail("订单不存在");
         }
 
         OrderDTO orderDTO = setQueryDTO(order);
 
-        return ResultVo.ok(orderDTO);
+        return ResultVO.ok(orderDTO, "查询成功");
     }
 
     @Override
-    public ResultVo queryOrderAll() {
+    public ResultVO queryOrderAll() {
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
         // 查询全部订单
         List<Order> orders = list(new QueryWrapper<Order>().eq("uid", userId).orderByDesc("time").eq("isDel", 0));
         ArrayList<OrderDTO> orderDTOS = setQueryDTOS(orders);
-        return ResultVo.ok(orderDTOS);
+        return ResultVO.ok(orderDTOS, "查询成功");
     }
 
     @Override
-    public ResultVo queryUnpaidOrder() {
+    public ResultVO queryUnpaidOrder() {
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
 
@@ -422,11 +441,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 .eq("isDel", 0).list();
 
         ArrayList<OrderDTO> orderDTOS = setQueryDTOS(orderList);
-        return ResultVo.ok(orderDTOS);
+        return ResultVO.ok(orderDTOS, "查询成功");
     }
 
     @Override
-    public ResultVo queryBeShippedOrder() {
+    public ResultVO queryBeShippedOrder() {
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
 
@@ -439,11 +458,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 .eq("isDel", 0).list();
 
         ArrayList<OrderDTO> orderDTOS = setQueryDTOS(orderList);
-        return ResultVo.ok(orderDTOS);
+        return ResultVO.ok(orderDTOS, "查询成功");
     }
 
     @Override
-    public ResultVo queryUndeliveredOrder() {
+    public ResultVO queryUndeliveredOrder() {
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
 
@@ -455,11 +474,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 .eq("isDel", 0).list();
 
         ArrayList<OrderDTO> orderDTOS = setQueryDTOS(orderList);
-        return ResultVo.ok(orderDTOS);
+        return ResultVO.ok(orderDTOS, "查询成功");
     }
 
     @Override
-    public ResultVo queryCompletedOrder() {
+    public ResultVO queryCompletedOrder() {
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
 
@@ -472,11 +491,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 .orderByDesc("time").list();
 
         ArrayList<OrderDTO> orderDTOS = setQueryDTOS(orderList);
-        return ResultVo.ok(orderDTOS);
+        return ResultVO.ok(orderDTOS, "查询成功");
     }
 
     @Override
-    public ResultVo completeOrder(Long id) {
+    public ResultVO completeOrder(Long id) {
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
 
@@ -489,7 +508,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
         // 判断订单是否为空
         if (order == null) {
-            return ResultVo.fail("订单尚未送出或订单不存在，暂无法完成订单");
+            return ResultVO.fail("订单尚未送出或订单不存在，暂无法完成订单");
         }
 
         // 完成订单
@@ -498,35 +517,35 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
         boolean result = updateById(order);
 
-        return result ? ResultVo.ok(null, "订单完成，欢迎再次购买") : ResultVo.fail("订单暂无法完成，请重试");
+        return result ? ResultVO.ok(null, "订单完成，欢迎再次购买") : ResultVO.fail("订单暂无法完成，请重试");
     }
 
     @Override
-    public ResultVo deleteOrder(Long id) {
+    public ResultVO deleteOrder(Long id) {
         // 查询订单
         Order order = getById(id);
         if (order == null) {
-            return ResultVo.fail("订单不存在");
+            return ResultVO.fail("订单不存在");
         }
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
         // 判断订单是否属于用户
         if (!order.getUid().equals(userId)) {
-            return ResultVo.fail("订单不存在");
+            return ResultVO.fail("订单不存在");
         }
         // 判断订单是否已完成
         if (order.getStatus() < 1) {
-            return ResultVo.fail("订单未完成");
+            return ResultVO.fail("订单未完成");
         }
 
         // 删除订单
         boolean result = update().set("isDel", 1).eq("id", id).update();
 
-        return result ? ResultVo.ok("订单删除成功") : ResultVo.fail("订单删除失败");
+        return result ? ResultVO.ok("订单删除成功") : ResultVO.fail("订单删除失败");
     }
 
     @Override
-    public ResultVo queryOrder(Integer page, Integer size, OrderQueryDTO orderQueryDTO) {
+    public ResultVO queryOrder(Integer page, Integer size, OrderQueryDTO orderQueryDTO) {
         Page<Order> orderPage = new Page<>(page, size);
 
         QueryWrapper<Order> queryWrapper = new QueryWrapper<>();
@@ -584,18 +603,18 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
         orderMapper.selectPage(orderPage, queryWrapper);
 
-        return ResultVo.ok(orderPage);
+        return ResultVO.ok(orderPage, "查询成功");
     }
 
     @Override
-    public ResultVo updateOrder(OrderUpdateFromDTO updateFromDTO) {
+    public ResultVO updateOrder(OrderUpdateFromDTO updateFromDTO) {
         // 获取订单号
         Long orderId = updateFromDTO.getId();
         // 查询订单
         Order order = getById(orderId);
         // 判断订单是否存在
         if (order == null) {
-            return ResultVo.fail("订单不存在！");
+            return ResultVO.fail("订单不存在！");
         }
 
         // 获取修改收货人
@@ -674,7 +693,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                         // 退款
                         returnMoney(order, "订单退款失败");
                     } else {
-                        return ResultVo.fail("订单未退货，暂无法退款");
+                        return ResultVO.fail("订单未退货，暂无法退款");
                     }
                 }
             }
@@ -683,7 +702,145 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // 修改订单
         boolean result = updateById(order);
 
-        return result ? ResultVo.ok(null,"订单修改成功！") : ResultVo.fail("订单修改失败！");
+        return result ? ResultVO.ok(null,"订单修改成功！") : ResultVO.fail("订单修改失败！");
+    }
+
+    @Override
+    public ResultVO orderCount(Long startDate, Long endDate) {
+        // 获取起始时间
+        Date start = new Date(startDate);
+        // 获取截止时间
+        Date end = new Date(endDate);
+        // 判断截止时间是否早于起始时间
+        if (!start.equals(end)) {
+            if (start.after(end)) {
+                return ResultVO.fail("截止时间不得早于起始时间");
+            }
+        }
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String startDateTime = simpleDateFormat.format(start);
+        String endDateTime = simpleDateFormat.format(end);
+
+        // 查询指定时间内的全部已付款订单
+        List<Order> orderList = query().ge("time", startDateTime).le("time", endDateTime).orderByAsc("time").eq("isPay", 1).list();
+
+        // 获取指定时间段中全部日期
+        List<Date> dumDateList = TimeUtils.getDumDateList(startDate, endDate);
+        List<Map<String, Object>> resultMap = new ArrayList<>();
+
+        for (Date date : dumDateList) {
+            SimpleDateFormat simpleDate = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat simpleDate1 = new SimpleDateFormat("yyyy:MM:dd");
+            Map<String, Object> listMap = new HashMap<>();
+            Map<String, Object> childMap = new HashMap<>();
+
+            String nowDate = simpleDate.format(date);
+            // 获取当日新增订单
+            String addedOrder = stringRedisTemplate.opsForValue().get("icr:" + ORDER_KEY + simpleDate1.format(date));
+            if (StrUtil.isNotBlank(addedOrder) && addedOrder != null) {
+                Map<String, Object> map1 = new HashMap<>();
+                map1.put("quantity", Integer.valueOf(addedOrder));
+                map1.put("data", Collections.emptyList());
+                childMap.put("addedOrder", map1);
+            }
+
+            // 获取当日支付订单
+            List<Order> paymentOrderList = orderList.stream().filter(order -> {
+                simpleDate.setTimeZone(TimeZone.getTimeZone("GTM+8"));
+                if (order.getPaymentTime() == null) {
+                    return false;
+                }
+                String format = simpleDate.format(order.getPaymentTime());
+                return nowDate.equals(format);
+            }).filter(order -> order.getIsPay().equals(1)).collect(Collectors.toList());
+            Map<String, Object> map2 = new HashMap<>();
+            map2.put("quantity", paymentOrderList.size());
+            map2.put("data", paymentOrderList);
+            childMap.put("paymentOrder", map2);
+
+            // 获取当日退款订单
+            List<Order> returnOrderList = orderList.stream().filter(order -> {
+                simpleDate.setTimeZone(TimeZone.getTimeZone("GTM+8"));
+                if (order.getReturnTime() == null) {
+                    return false;
+                }
+                String format = simpleDate.format(order.getReturnTime());
+                return nowDate.equals(format);
+            }).filter(order -> order.getStatus().equals(3)).collect(Collectors.toList());
+            Map<String, Object> map3 = new HashMap<>();
+            map3.put("quantity", returnOrderList.size());
+            map3.put("data", returnOrderList);
+            childMap.put("returnOrder", map3);
+
+            // 获取当日已完成订单
+            List<Order> completedOrderList = orderList.stream().filter(order -> {
+                simpleDate.setTimeZone(TimeZone.getTimeZone("GTM+8"));
+                if (order.getTime() == null) {
+                    return false;
+                }
+                String format = simpleDate.format(order.getTime());
+                return nowDate.equals(format);
+            }).filter(order -> order.getStatus().equals(1)).collect(Collectors.toList());
+            Map<String, Object> map4 = new HashMap<>();
+            map4.put("quantity", completedOrderList.size());
+            map4.put("data", completedOrderList);
+            childMap.put("completedOrder", map4);
+
+            // 获取当日取消订单
+            Map<Object, Object> cancelOrder = stringRedisTemplate.opsForHash().entries("cancel:" + ORDER_KEY + simpleDate1.format(date));
+            Map<String, Object> map5 = new HashMap<>();
+            map5.put("quantity", cancelOrder.size());
+            map5.put("data", cancelOrder);
+            childMap.put("cancelOrder", map5);
+
+            // 获得当日成交额
+            double turnover = 0d;
+            for (Order order : paymentOrderList) {
+                turnover += order.getPrice();
+            }
+            childMap.put("turnover", turnover);
+
+            // 获得当日退款额
+            double deficit = 0d;
+            for (Order order : returnOrderList) {
+                deficit += order.getPrice();
+            }
+            childMap.put("deficit", deficit);
+
+            // 获取当日总盈利
+            double income = turnover - deficit;
+            BigDecimal bigDecimal = new BigDecimal(income);
+            // 将保留后两位数，并进行四舍五入
+            income = bigDecimal.setScale(2, RoundingMode.HALF_UP).doubleValue();
+            childMap.put("income", income);
+
+            listMap.put("time", nowDate);
+            listMap.put("data", childMap);
+
+            resultMap.add(listMap);
+        }
+
+        return ResultVO.ok(resultMap, "查询成功");
+    }
+
+    /**
+     * 取消订单
+     * @param keyPrefix key前缀
+     * @param order 订单信息
+     * @param reason 取消原因
+     */
+    public void cancelOrder(String keyPrefix, Order order, String reason) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy:MM:dd");
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GTM+8"));
+        String date = simpleDateFormat.format(order.getTime());
+        Map<String, Object> hashMap = new HashMap<>();
+
+        hashMap.put("orderInfo", JSONUtil.toJsonStr(order)); // 订单信息
+        hashMap.put("reason", reason); // 取消原因
+        hashMap.put("time", TimeUtils.nowLocalDateTime()); // 取消时间
+
+        // 2.2. 订单量自减少
+        stringRedisTemplate.opsForHash().put("cancel:" + keyPrefix + date, order.getId().toString(), hashMap);
     }
 
     private ArrayList<OrderDTO> setQueryDTOS(List<Order> orderList) {
@@ -860,29 +1017,28 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         return orderDTO;
     }
 
-
     private void returnMoney(Order order, String errMsg) {
         // 获取用户id
         Long userId = order.getUid();
         // 获取用户钱包
-        UserAccount userAccount = accountMapper.selectById(userId);
+        UserWaller userWaller = userWallerMapper.selectById(userId);
 
         // 获取用户余额
-        Double balance = userAccount.getBalance();
+        Double balance = userWaller.getBalance();
         // 退还付款
-        userAccount.setBalance(balance + order.getPrice());
+        userWaller.setBalance(balance + order.getPrice());
 
-        int update = accountMapper.updateById(userAccount);
+        int update = userWallerMapper.updateById(userWaller);
 
         if (update < 1) {
             throw new RuntimeException(errMsg);
         }
 
-        String price = String.valueOf(order.getPrice());
-
         // 新增账单
-        BillUtils billUtils = new BillUtils(stringRedisTemplate);
-        billUtils.saveBill(userId, "退款", price);
+        UserBill userBill = userBillUtils.saveUserBill(userId, order.getPrice(), null, "退款", APPLICATION_NAME, BillType.income, null, BillStatusCode.rechargeSuccess, "订单号：" + order.getId());
+        // 保存系统账单
+        billService.saveBill(userId, userBill, BillType.disburse);
+
     }
 
     private void returnGoods(Long orderId, String errMsg) {

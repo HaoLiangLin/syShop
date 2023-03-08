@@ -6,13 +6,12 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jy2b.zxxfd.domain.Events;
 import com.jy2b.zxxfd.domain.dto.EventsDTO;
-import com.jy2b.zxxfd.domain.dto.ResultVo;
+import com.jy2b.zxxfd.domain.vo.ResultVO;
 import com.jy2b.zxxfd.mapper.EventsMapper;
 import com.jy2b.zxxfd.service.IEventsService;
 import com.jy2b.zxxfd.utils.UploadUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -26,16 +25,16 @@ public class EventsServiceImpl extends ServiceImpl<EventsMapper, Events> impleme
     private StringRedisTemplate stringRedisTemplate;
 
     @Override
-    public ResultVo saveEvents(EventsDTO saveDTO) {
+    public ResultVO saveEvents(EventsDTO saveDTO) {
         // 获取活动名称
         String name = saveDTO.getName();
         if (StrUtil.isBlank(name)) {
-            return ResultVo.fail("活动名称不能为空");
+            return ResultVO.fail("活动名称不能为空");
         }
         // 获取活动图片
         String icon = saveDTO.getIcon();
         if (StrUtil.isBlank(icon)) {
-            return ResultVo.fail("活动图片不能为空");
+            return ResultVO.fail("活动图片不能为空");
         }
 
         // 获取活动期限
@@ -44,13 +43,13 @@ public class EventsServiceImpl extends ServiceImpl<EventsMapper, Events> impleme
             deadline = 1;
         }
         if (deadline < -1 || deadline == 0) {
-            return ResultVo.fail("活动期限不得小于-1或等于0");
+            return ResultVO.fail("活动期限不得小于-1或等于0");
         }
 
         // 获取活动期限
         if (deadline <= 1) {
             if (endTimeIsBeforeNow(saveDTO.getStartTime(), deadline)) {
-                return ResultVo.fail("活动结束时间不得早于当前时间");
+                return ResultVO.fail("活动结束时间不得早于当前时间");
             }
         }
 
@@ -63,15 +62,15 @@ public class EventsServiceImpl extends ServiceImpl<EventsMapper, Events> impleme
             String image = events.getIcon();
             UploadUtils.deleteFile(image);
         }
-        return result ? ResultVo.ok(null,"新增活动成功") : ResultVo.fail("新增活动失败");
+        return result ? ResultVO.ok(null,"新增活动成功") : ResultVO.fail("新增活动失败");
     }
 
     @Override
-    public ResultVo delEvents(Long id) {
+    public ResultVO delEvents(Long id) {
         // 查询活动
         Events events = getById(id);
         if (events == null) {
-            return ResultVo.fail("活动不存在");
+            return ResultVO.fail("活动不存在");
         }
 
         // 获取图片
@@ -85,32 +84,32 @@ public class EventsServiceImpl extends ServiceImpl<EventsMapper, Events> impleme
             }
             saveEventsCache();
         }
-        return result ? ResultVo.ok(null,"删除活动成功") : ResultVo.fail("删除活动失败");
+        return result ? ResultVO.ok(null,"删除活动成功") : ResultVO.fail("删除活动失败");
     }
 
     @Override
-    public ResultVo updateEvents(Long id, EventsDTO updateDTO) {
+    public ResultVO updateEvents(Long id, EventsDTO updateDTO) {
         // 查询活动
         Events events = getById(id);
         if (events == null) {
-            return ResultVo.fail("活动不存在");
+            return ResultVO.fail("活动不存在");
         }
 
         Integer deadline = updateDTO.getDeadline();
         if (deadline != null) {
             if (deadline < -1 || deadline == 0) {
-                return ResultVo.fail("活动期限不得小于-1或等于0");
+                return ResultVO.fail("活动期限不得小于-1或等于0");
             }
         }
 
         if (updateDTO.getStartTime() != null) {
             if (deadline == null) {
                 if (endTimeIsBeforeNow(updateDTO.getStartTime(), events.getDeadline())) {
-                    return ResultVo.fail("活动结束时间不得早于当前时间");
+                    return ResultVO.fail("活动结束时间不得早于当前时间");
                 }
             } else {
                 if (endTimeIsBeforeNow(updateDTO.getStartTime(), deadline)) {
-                    return ResultVo.fail("活动结束时间不得早于当前时间");
+                    return ResultVO.fail("活动结束时间不得早于当前时间");
                 }
             }
         }
@@ -122,17 +121,17 @@ public class EventsServiceImpl extends ServiceImpl<EventsMapper, Events> impleme
         if (result) {
             saveEventsCache();
         }
-        return result ? ResultVo.ok(null,"修改活动成功") : ResultVo.fail("修改活动失败");
+        return result ? ResultVO.ok(null,"修改活动成功") : ResultVO.fail("修改活动失败");
     }
 
     @Override
-    public ResultVo queryEvents() {
+    public ResultVO queryEvents() {
         // 查询Redis
         String result = stringRedisTemplate.opsForValue().get(EVENTS_KEY);
         if (StrUtil.isNotBlank(result)) {
             List<Events> events = JSONUtil.toList(result, Events.class);
             events = delEndTimeEvents(events);
-            return ResultVo.ok(events);
+            return ResultVO.ok(events, "查询成功");
         }
 
         List<Events> events = list();
@@ -142,7 +141,7 @@ public class EventsServiceImpl extends ServiceImpl<EventsMapper, Events> impleme
             // 存入redis
             stringRedisTemplate.opsForValue().set(EVENTS_KEY, jsonStr);
         }
-        return ResultVo.ok(events);
+        return ResultVO.ok(events, "查询成功");
     }
 
     /**

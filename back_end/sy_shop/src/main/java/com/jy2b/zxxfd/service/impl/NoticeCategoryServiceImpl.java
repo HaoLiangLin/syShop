@@ -5,11 +5,10 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jy2b.zxxfd.domain.GoodsCategory;
 import com.jy2b.zxxfd.domain.Notice;
 import com.jy2b.zxxfd.domain.NoticeCategory;
 import com.jy2b.zxxfd.domain.dto.CategoryDTO;
-import com.jy2b.zxxfd.domain.dto.ResultVo;
+import com.jy2b.zxxfd.domain.vo.ResultVO;
 import com.jy2b.zxxfd.mapper.NoticeCategoryMapper;
 import com.jy2b.zxxfd.mapper.NoticeMapper;
 import com.jy2b.zxxfd.service.INoticeCategoryService;
@@ -34,16 +33,16 @@ public class NoticeCategoryServiceImpl extends ServiceImpl<NoticeCategoryMapper,
     private NoticeCategoryMapper noticeCategoryMapper;
 
     @Override
-    public ResultVo saveCategory(NoticeCategory noticeCategory) {
+    public ResultVO saveCategory(NoticeCategory noticeCategory) {
         // 判断分类名称是否存在
         if (StrUtil.isBlank(noticeCategory.getName())) {
-            return ResultVo.fail("公告类型名称不能为空");
+            return ResultVO.fail("公告类型名称不能为空");
         }
 
         // 判断分类是否存在
         Integer count = query().eq("name", noticeCategory.getName()).count();
         if (count > 0) {
-            return ResultVo.fail("该公告类型已存在");
+            return ResultVO.fail("该公告类型已存在");
         }
 
         // 判断是否新增子分类
@@ -51,7 +50,7 @@ public class NoticeCategoryServiceImpl extends ServiceImpl<NoticeCategoryMapper,
             // 查询父分类是否存在
             NoticeCategory category = getById(noticeCategory.getFid());
             if (category == null) {
-                return ResultVo.fail("公告类型父类不存在，无法新增公告类型子类");
+                return ResultVO.fail("公告类型父类不存在，无法新增公告类型子类");
             }
         }
 
@@ -64,23 +63,23 @@ public class NoticeCategoryServiceImpl extends ServiceImpl<NoticeCategoryMapper,
         if (noticeCategory.getFid() == null) {
             saveFirstCategory();
         }
-        return result ? ResultVo.ok(null,"新增公告类型成功") : ResultVo.fail("新增公告类型失败");
+        return result ? ResultVO.ok(null,"新增公告类型成功") : ResultVO.fail("新增公告类型失败");
     }
 
     @Override
-    public ResultVo deleteCategory(Long id) {
-        // 查询商品分类
+    public ResultVO deleteCategory(Long id) {
+        // 查询公告类型
         NoticeCategory noticeCategory = getById(id);
 
-        // 判断商品分类是否存在
+        // 判断公告类型是否存在
         if (noticeCategory == null) {
-            return ResultVo.fail("公告类型不存在");
+            return ResultVO.fail("公告类型不存在");
         }
 
-        // 判断商品分类是否已经被使用
+        // 判断公告类型是否已经被使用
         Integer noticeCount = noticeMapper.selectCount(new QueryWrapper<Notice>().eq("cid", id));
         if (noticeCount > 0) {
-            return ResultVo.fail("公告类型已经被使用，暂无法删除");
+            return ResultVO.fail("公告类型已经被使用，暂无法删除");
         }
 
         // 删除分类
@@ -94,11 +93,11 @@ public class NoticeCategoryServiceImpl extends ServiceImpl<NoticeCategoryMapper,
             saveFirstCategory();
         }
 
-        return ResultVo.ok(null,"删除公告类型成功");
+        return ResultVO.ok(null,"删除公告类型成功");
     }
 
     @Override
-    public ResultVo updateCategory(NoticeCategory noticeCategory) {
+    public ResultVO updateCategory(NoticeCategory noticeCategory) {
         // 获取修改的公告类型id
         Long categoryId = noticeCategory.getId();
 
@@ -107,13 +106,13 @@ public class NoticeCategoryServiceImpl extends ServiceImpl<NoticeCategoryMapper,
 
         // 判断公告类型是否存在
         if (category == null) {
-            return ResultVo.fail("公告类型不存在");
+            return ResultVO.fail("公告类型不存在");
         }
 
         // 判断公告类型名称是否存在
         Integer count = query().eq("name", noticeCategory.getName()).ne("id", categoryId).count();
         if (count > 0) {
-            return ResultVo.fail("公告类型已存在");
+            return ResultVO.fail("公告类型已存在");
         }
 
         // 判断是否为子类
@@ -121,11 +120,11 @@ public class NoticeCategoryServiceImpl extends ServiceImpl<NoticeCategoryMapper,
             // 查询父类是否存在
             NoticeCategory fCategory = getById(noticeCategory.getFid());
             if (fCategory == null) {
-                return ResultVo.fail("父公告类型不存在，修改公告类型失败");
+                return ResultVO.fail("父公告类型不存在，修改公告类型失败");
             }
         }
 
-        // 修改商品分类
+        // 修改公告类型
         boolean result = updateById(noticeCategory);
 
         if (result) {
@@ -135,23 +134,25 @@ public class NoticeCategoryServiceImpl extends ServiceImpl<NoticeCategoryMapper,
             }
         }
 
-        return result ? ResultVo.ok(null,"修改公告类型成功") : ResultVo.fail("修改公告类型失败");
+        return result ? ResultVO.ok(null,"修改公告类型成功") : ResultVO.fail("修改公告类型失败");
     }
 
     @Override
-    public ResultVo queryCategoryList(Integer page, Integer size) {
+    public ResultVO queryCategoryList(Integer page, Integer size) {
         Page<NoticeCategory> noticeCategoryPage = new Page<>(page, size);
-        noticeCategoryMapper.selectPage(noticeCategoryPage, new QueryWrapper<NoticeCategory>().isNull("fid"));
-        return ResultVo.ok(noticeCategoryPage);
+
+        noticeCategoryMapper.selectPage(noticeCategoryPage, null);
+
+        return ResultVO.ok(noticeCategoryPage, "查询成功");
     }
 
     @Override
-    public ResultVo queryCategoryByOne() {
+    public ResultVO queryCategoryByOne() {
         String result = stringRedisTemplate.opsForValue().get(NOTICE_CATEGORY_FIRST);
         if (StrUtil.isNotBlank(result)) {
             List<NoticeCategory> noticeCategories = JSONUtil.toList(result, NoticeCategory.class);
             if (!noticeCategories.isEmpty()) {
-                return ResultVo.ok(noticeCategories);
+                return ResultVO.ok(noticeCategories, "查询成功");
             }
         }
 
@@ -162,22 +163,22 @@ public class NoticeCategoryServiceImpl extends ServiceImpl<NoticeCategoryMapper,
             stringRedisTemplate.opsForValue().set(NOTICE_CATEGORY_FIRST, jsonStr);
         }
 
-        return ResultVo.ok(list);
+        return ResultVO.ok(list, "查询成功");
     }
 
     @Override
-    public ResultVo queryCategoryChild(Long id) {
+    public ResultVO queryCategoryChild(Long id) {
         List<NoticeCategory> categories = query().eq("fid", id).list();
-        return ResultVo.ok(categories, "查询公告类型成功");
+        return ResultVO.ok(categories, "查询公告类型成功");
     }
 
     @Override
-    public ResultVo findSelectCategory() {
+    public ResultVO findSelectCategory() {
         List<NoticeCategory> noticeCategories = query().isNull("fid").list();
 
         List<CategoryDTO> categoryDTOS = setSelectCategory(noticeCategories);
 
-        return ResultVo.ok(categoryDTOS);
+        return ResultVO.ok(categoryDTOS, "查询成功");
     }
 
     private List<CategoryDTO> setSelectCategory(List<NoticeCategory> noticeCategories) {

@@ -1,18 +1,14 @@
 package com.jy2b.zxxfd.controller;
 
-import com.jy2b.zxxfd.domain.User;
+import com.jy2b.zxxfd.domain.vo.ResultVO;
 import com.jy2b.zxxfd.service.IUserService;
-import com.jy2b.zxxfd.utils.UserHolder;
 import com.jy2b.zxxfd.domain.dto.*;
-import com.jy2b.zxxfd.utils.UploadUtils;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
 
 @RestController
 @CrossOrigin
@@ -21,179 +17,169 @@ import java.util.HashMap;
 public class UserController {
     @Resource
     private IUserService userService;
-
-    @GetMapping("/register/code")
-    @ApiOperation(value = "注册：发送验证码")
-    public ResultVo registerCode(@RequestParam("phone") String phone) {
-        return userService.registerCode(phone);
+    
+    @GetMapping("/registerCode/{phone}")
+    public ResultVO sendCodeByRegister(@PathVariable("phone") String phone) {
+        return userService.sendCodeByRegister(phone);
     }
 
     @PostMapping("/register")
-    @ApiOperation(value = "用户注册")
-    public ResultVo register(@RequestBody RegisterFromDTO register) {
-        return userService.register(register);
+    public ResultVO register(@RequestBody RegisterDTO registerDTO) {
+        return userService.register(registerDTO);
     }
 
-    @GetMapping("/code")
-    @ApiOperation(value = "登录：发送验证码")
-    public ResultVo sendCode(@RequestParam("phone") String phone) {
-        return userService.sendCode(phone);
+    @GetMapping("/loginCode/{phone}")
+    public ResultVO sendCodeByLogin(@PathVariable("phone") String phone) {
+        return userService.sendCodeByLogin(phone);
     }
 
     @PostMapping("/login")
-    @ApiOperation(value = "用户登录", notes = "登录类型（loginType）：0是账号密码登录，1是手机号验证码登录")
-    public ResultVo login(@RequestBody LoginFormDTO loginFormDTO) {
-        return userService.login(loginFormDTO, null);
+    public ResultVO login(@RequestHeader("User-Agent") String userAgent, @RequestBody LoginDTO loginDTO) {
+        return userService.login(userAgent, loginDTO, null);
     }
 
-    @PostMapping("/loginEnd/{userType}")
-    @ApiOperation(value = "后台登录")
-    public ResultVo loginEnd(@RequestBody LoginFormDTO loginFormDTO, @PathVariable("userType") Integer userType) {
-        return userService.login(loginFormDTO, userType);
+    @PostMapping("/loginToken")
+    public ResultVO loginToken(@RequestParam("username") String username, @RequestParam("password") String password) {
+        return userService.loginToken(username, password);
     }
 
-    @GetMapping("/me")
-    @ApiOperation(value = "获取登录用户信息")
-    @PreAuthorize("hasAnyAuthority('user:query')")
-    public ResultVo me() {
-        UserDTO user = UserHolder.getUser();
-        return ResultVo.ok(user);
-    }
-
-    @PutMapping("/setPassword")
-    @ApiOperation(
-            value = "设置/修改密码",
-            notes = "当新用户未设置密码，则新密码(newPassword)作为密码；当用户已经设置密码，则需要旧密码(oldPassword)和新密码(newPassword)才能修改密码"
-    )
-    @PreAuthorize("hasAnyAuthority('user:update')")
-    public ResultVo setPassword(@RequestBody PwdFormDTO pwdFormDTO) {
-        return userService.setPassword(pwdFormDTO);
-    }
-
-    @PostMapping("/uploadIcon")
-    @ApiOperation(value = "上传用户头像", notes = "上传成功，返回头像存放路径")
-    @PreAuthorize("hasAnyAuthority('user:update')")
-    public ResultVo uploadIcon(@RequestPart("file") MultipartFile file) {
-        // 保存文件
-        return UploadUtils.saveFile(file, "/user/icon");
-    }
-
-    @PutMapping("/updateIcon")
-    @ApiOperation(value = "修改用户头像")
-    @PreAuthorize("hasAnyAuthority('user:update')")
-    public ResultVo updateIcon(@RequestBody UserDTO user, @RequestHeader("authorization") String jwt) {
-        return userService.updateIcon(jwt, user.getIcon());
-    }
-
-    @PutMapping("/updateNickName")
-    @ApiOperation(value = "修改用户昵称")
-    @PreAuthorize("hasAnyAuthority('user:update')")
-    public ResultVo updateNickName(@RequestBody UserDTO user, @RequestHeader("authorization") String jwt) {
-        return userService.updateNickName(jwt, user.getNickname());
-    }
-
-    @GetMapping("/isNotUpdateUsername")
-    @ApiOperation(value = "查看用户是否未修改过账号")
-    @PreAuthorize("hasAnyAuthority('user:update')")
-    public ResultVo isNotUpdateUsername() {
-        return userService.isNotUpdateUsername();
-    }
-
-    @PutMapping("/updateUsername")
-    @ApiOperation(value = "修改用户账号", notes = "仅未修改过账号的用户可修改一次账号")
-    @PreAuthorize("hasAnyAuthority('user:update')")
-    public ResultVo updateUsername(@RequestBody UserDTO user) {
-        return userService.updateUsername(user.getUsername());
-    }
-
-    @GetMapping("/codePhone")
-    @ApiOperation(value = "修改手机号：发送验证码")
-    @PreAuthorize("hasAnyAuthority('user:update')")
-    public ResultVo codePhone(@RequestParam("phone") String phone) {
-        return userService.codePhone(phone);
-    }
-
-    @PutMapping("/updatePhone/{phone}/{code}")
-    @ApiOperation(value = "修改手机号")
-    @PreAuthorize("hasAnyAuthority('user:update')")
-    public ResultVo updatePhone(@RequestHeader("authorization") String jwt, @PathVariable("phone") String phone, @PathVariable("code") String code) {
-        return userService.updatePhone(jwt, phone, code);
+    @PostMapping("/adminLogin/{adminKey}")
+    public ResultVO adminLogin(@RequestHeader("User-Agent") String userAgent, @RequestBody LoginDTO loginDTO, @PathVariable("adminKey") Integer userType) {
+        return userService.login(userAgent, loginDTO, userType);
     }
 
     @DeleteMapping("/logout")
-    @ApiOperation(value = "退出登录")
-    public ResultVo logOut(@RequestHeader("authorization") String token) {
+    public ResultVO logOut(@RequestHeader("authorization") String token) {
         return userService.logOut(token);
     }
 
-    @GetMapping("/codePassword")
-    @ApiOperation(value = "忘记密码：发送验证码")
-    public ResultVo codePassword(@RequestParam("phone") String phone) {
-        return userService.codePassword(phone);
+    @GetMapping("/me")
+    @PreAuthorize("hasAnyAuthority('user:query')")
+    public ResultVO me(@RequestHeader("authorization") String token) {
+        return userService.me(token);
     }
 
-    @GetMapping("/check/codePassword")
-    @ApiOperation(value = "忘记密码：验证验证码")
-    public ResultVo checkCodePassword(@RequestParam("phone") String phone, @RequestParam("code") String code) {
-        return userService.checkCodePassword(phone, code);
+    @GetMapping("/forgetCode/{username}/{phone}")
+    public ResultVO sendCodeByForgetPassword(@PathVariable("username") String username, @PathVariable("phone") String phone) {
+        return userService.sendCodeByForgetPassword(username, phone);
+    }
+
+    @PostMapping("/forgetCode/check")
+    public ResultVO checkForgetPasswordCode(@RequestBody ForgetPasswordDTO forgetPasswordDTO) {
+        return userService.checkForgetPasswordCode(forgetPasswordDTO);
+    }
+
+    @PutMapping("/forgetPassword")
+    public ResultVO updatePasswordByForgetPassword(@RequestBody ForgetPasswordDTO forgetPasswordDTO) {
+        return  userService.updatePasswordByForgetPassword(forgetPasswordDTO);
+    }
+
+    @PutMapping("/updateUsername/{username}")
+    @PreAuthorize("hasAnyAuthority('user:update')")
+    public ResultVO updateUsername(@PathVariable("username") String username) {
+        return userService.updateUsername(username);
+    }
+
+    @GetMapping("/updatePhoneCode/{phone}")
+    @PreAuthorize("hasAnyAuthority('user:update')")
+    public ResultVO sendCodeByUpdatePhone(@PathVariable("phone") String phone) {
+        return userService.sendCodeByUpdatePhone(phone);
+    }
+
+    @PutMapping("/updatePhone/{phone}/{code}")
+    @PreAuthorize("hasAnyAuthority('user:update')")
+    public ResultVO updatePhone(@RequestHeader("authorization") String token, @PathVariable("phone") String phone, @PathVariable("code") String code) {
+        return userService.updatePhone(token, phone, code);
     }
 
     @PutMapping("/updatePassword")
-    @ApiOperation(value = "忘记密码：修改密码", notes = "需要手机号(phone)与新密码(newPassword)")
-    public ResultVo updatePassword(@RequestBody PwdFormDTO pwdFormDTO) {
-        return userService.updatePassword(pwdFormDTO);
+    @PreAuthorize("hasAnyAuthority('user:update')")
+    public ResultVO updatePassword(@RequestHeader("authorization") String token, @RequestBody UpdatePasswordDTO updatePasswordDTO) {
+        return userService.updatePassword(token, updatePasswordDTO);
     }
 
-    @PostMapping("/query")
-    @ApiOperation(value = "根据条件查询用户")
-    @PreAuthorize("hasAnyAuthority('user:delete')")
-    public ResultVo queryUser(@RequestBody UserQueryFromDTO userQueryFromDTO) {
-        return userService.queryUser(userQueryFromDTO);
+    @PutMapping("/update/icon")
+    @PreAuthorize("hasAnyAuthority('user:info:update')")
+    public ResultVO updateUserIcon(@RequestHeader("authorization") String token, @RequestPart("file") MultipartFile file) {
+        return userService.updateUserIcon(token, file);
     }
 
-    @PostMapping("/list/{page}/{size}")
-    @ApiOperation(value = "根据条件分页查询用户", notes = "page：页码，size：每页数量")
-    @PreAuthorize("hasAnyAuthority('user:delete')")
-    public ResultVo queryUserList(@PathVariable("page") Integer page, @PathVariable("size") Integer size, @RequestBody(required = false) UserQueryFromDTO userQueryFromDTO) {
-        return userService.queryUserList(page, size, userQueryFromDTO);
-    }
-
-    @PutMapping("/update")
-    @ApiOperation(value = "修改用户")
-    @PreAuthorize("hasAnyAuthority('user:delete')")
-    public ResultVo updateUser(@RequestBody User user) {
-        return userService.updateUser(user);
-    }
-
-    @DeleteMapping("/delete/{id}")
-    @ApiOperation(value = "删除用户", notes = "根据用户id删除用户")
-    @PreAuthorize("hasAnyAuthority('user:delete')")
-    public ResultVo deleteUser(@PathVariable("id") Long id) {
-        return userService.deleteUser(id);
-    }
-
-    @DeleteMapping("deletes")
-    @ApiOperation(value = "批量删除用户", notes = "根据ids批量删除用户")
-    @PreAuthorize("hasAnyAuthority('user:delete')")
-    public ResultVo bulkDeleteUser(@RequestBody UserQueryFromDTO userQueryFromDTO) {
-        return userService.bulkDeleteUser(userQueryFromDTO.getIds());
+    @PutMapping("/updateNickName")
+    @PreAuthorize("hasAnyAuthority('user:update')")
+    public ResultVO updateNickName(@RequestBody UserDTO user, @RequestHeader("authorization") String jwt) {
+        return userService.updateNickName(jwt, user.getNickname());
     }
 
     @PostMapping("/signIn")
     @PreAuthorize("hasAnyAuthority('user:query')")
-    public ResultVo signIn() {
+    public ResultVO signIn() {
         return userService.signIn();
     }
 
     @GetMapping("/signIn/today")
     @PreAuthorize("hasAnyAuthority('user:query')")
-    public ResultVo querySignIn() {
+    public ResultVO querySignIn() {
         return userService.querySignIn();
     }
 
     @GetMapping("/signIn/count")
     @PreAuthorize("hasAnyAuthority('user:query')")
-    public ResultVo queryContinuityDay() {
+    public ResultVO queryContinuityDay() {
         return userService.queryContinuityDay();
     }
+
+    @PostMapping("/find/{page}/{size}")
+    @PreAuthorize("hasAnyAuthority('user:save','user:delete')")
+    public ResultVO findUser(@PathVariable("page") Integer page, @PathVariable("size") Integer size, @RequestBody(required = false) UserManagerDTO userManagerDTO) {
+        return userService.findUser(page, size, userManagerDTO);
+    }
+
+    @PostMapping("/findSystem/{page}/{size}")
+    @PreAuthorize("hasAnyAuthority('admin:all')")
+    public ResultVO findSystemUser(@PathVariable("page") Integer page, @PathVariable("size") Integer size, @RequestBody(required = false) UserManagerDTO userManagerDTO) {
+        return userService.findSystemUser(page, size, userManagerDTO);
+    }
+
+    @PutMapping("/update")
+    @PreAuthorize("hasAnyAuthority('user:save','user:delete')")
+    public ResultVO updateUser(@RequestBody UpdateUserDTO updateUserDTO) {
+        return userService.updateUser(updateUserDTO, "user");
+    }
+
+    @PutMapping("/updateSystem")
+    @PreAuthorize("hasAnyAuthority('admin:all')")
+    public ResultVO updateSystemUser( @RequestBody UpdateUserDTO updateUserDTO) {
+        return userService.updateUser(updateUserDTO, "admin");
+    }
+
+    @PostMapping("/coerceLogout")
+    @PreAuthorize("hasAnyAuthority('admin:all')")
+    public ResultVO coerceLogout(@RequestHeader("authorization") String mainToken, @RequestBody CoerceLogoutDTO coerceLogoutDTO) {
+        return userService.coerceLogout(mainToken, coerceLogoutDTO);
+    }
+
+    @PostMapping("/blockUp/{userId}/{blockUpTime}")
+    @PreAuthorize("hasAnyAuthority('admin:all')")
+    public ResultVO blockUpUser(@PathVariable("userId") Long userId, @PathVariable("blockUpTime") Long blockUpTime) {
+        return userService.blockUpUser(userId, blockUpTime);
+    }
+
+    @PostMapping("/blockUp/cancel/{userId}")
+    @PreAuthorize("hasAnyAuthority('admin:all')")
+    public ResultVO cancelBlockUp(@PathVariable("userId") Long userId) {
+        return userService.cancelBlockUp(userId);
+    }
+
+    @GetMapping("/registerCount/{startDate}/{endDate}")
+    @PreAuthorize("hasAnyAuthority('end:query')")
+    public ResultVO registerUserCount(@PathVariable("startDate") Long startDate, @PathVariable("endDate") Long endDate) {
+        return userService.registerUserCount(startDate, endDate);
+    }
+
+    @GetMapping("/pvCount/{startDate}/{endDate}")
+    @PreAuthorize("hasAnyAuthority('end:query')")
+    public ResultVO userPVCount(@PathVariable("startDate") Long startDate, @PathVariable("endDate") Long endDate) {
+        return userService.userPVCount(startDate, endDate);
+    }
+
 }

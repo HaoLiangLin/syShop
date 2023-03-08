@@ -37,10 +37,30 @@ public class RedisConstants {
     public static final String USER_ADDRESS_KEY = "user:address:";
     // 用户默认收货地址key
     public static final String USER_DEFAULT_ADDRESS_KEY = "user:address:default:";
+    // 用户钱包Key
+    public static final String USER_WALLER_KEY = "user:waller";
     // 用户账单key
-    public static final String BILL_KEY = "bill:";
+    public static final String USER_BILL_KEY = "user:bill:";
     // 用户足迹key
     public static final String USER_FOOTPRINT_KEY = "footprint:";
+
+    // 权限标签缓存key
+    public static final String AUTH_LABEL_KEY = "auth:label";
+    // 角色标签缓存key
+    public static final String ROLE_LABEL_KEY = "role:label";
+
+    // 回收站缓存key
+    public static final String RECYCLE_BIN_KEY = "recycleBin:";
+    // 回收站默认保存期限 14天
+    public static final Long RECYCLE_BIN_TTL = 14L;
+    // 登录注册
+    public static final String LOGIN_REGISTER_KEY = "loginRegister:";
+    // 登录注册保存期限
+    public static final Long LOGIN_REGISTER_TTL = 35L;
+    // 禁用用户
+    public static final String BLOCK_UP_USER_KEY = "blockUp:";
+    // 用户访问登记
+    public static final String USER_PV_KEY = "userPV:";
 
     // 商品一级分类key
     public static final String GOODS_CATEGORY_FIRST = "goods:category:first";
@@ -64,6 +84,4 @@ public class RedisConstants {
 
     // 缓存工具类
     public static final Long CACHE_NULL_TTL = 2L;
-
-    public static final String LOCK_SHOP_KEY = "lock:shop:";
 }

@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jy2b.zxxfd.domain.UserInfo;
 import com.jy2b.zxxfd.domain.dto.*;
 import com.jy2b.zxxfd.domain.User;
+import com.jy2b.zxxfd.domain.vo.ResultVO;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -15,159 +17,201 @@ public interface IUserService extends IService<User> {
      * @param phone 手机号
      * @return ResultVo
      */
-    ResultVo registerCode(String phone);
+    ResultVO sendCodeByRegister(String phone);
 
     /**
      * 用户注册
-     * @param register 用户注册信息
+     * @param registerDTO 用户注册信息
      * @return ResultVo
      */
-    ResultVo register(RegisterFromDTO register);
+    ResultVO register(RegisterDTO registerDTO);
 
     /**
      * 用户登录：发送验证码
      * @param phone 手机号
      * @return ResultVo
      */
-    ResultVo sendCode(String phone);
+    ResultVO sendCodeByLogin(String phone);
 
     /**
      * 用户登录
-     * @param loginFormDTO 登录信息
+     * @param loginDTO 登录信息
      * @return ResultVo
      */
-    ResultVo login(LoginFormDTO loginFormDTO, Integer userType);
+    ResultVO login(String userAgent, LoginDTO loginDTO, Integer userType);
 
     /**
-     * 用户：修改密码
-     * @param pwdFormDTO 修改密码信息
-     * @return ResultVo
+     * 获取登录令牌
+     * @param username 用户名
+     * @param password 密码
+     * @return ResultVO
      */
-    ResultVo setPassword(PwdFormDTO pwdFormDTO);
+    ResultVO loginToken(String username, String password);
 
-    /**
-     * 用户：修改用户头像
-     * @param icon 头像地址
-     * @return ResultVo
-     */
-    ResultVo updateIcon(String jwt, String icon);
-
-    /**
-     * 用户：查看用户是否未修改过账号
-     * @return ResultVo
-     */
-    ResultVo isNotUpdateUsername();
-
-    /**
-     * 用户：修改用户账号
-     * @param account 账号
-     * @return ResultVo
-     */
-    ResultVo updateUsername(String account);
-
-    /**
-     * 用户：修改用户昵称
-     * @param nickname 昵称
-     * @return ResultVo
-     */
-    ResultVo updateNickName(String jwt, String nickname);
-
-    /**
-     * 修改手机号：验证手机号
-     * @param phone 手机号
-     * @return ResultVo
-     */
-    ResultVo codePhone(String phone);
-
-    /**
-     * 用户：修改手机号
-     * @param phone 手机号
-     * @param code 验证码
-     * @return ResultVo
-     */
-    ResultVo updatePhone(String jwt, String phone, String code);
 
     /**
      * 用户登出
      * @param token token
      * @return ResultVo
      */
-    ResultVo logOut(String token);
+    ResultVO logOut(String token);
 
     /**
-     * 用户：忘记密码：发送验证码
-     * @param phone 手机号
-     * @return ResultVo
-     */
-    ResultVo codePassword(String phone);
-
-    /**
-     * 用户：忘记密码：验证验证码
-     * @param phone 手机号
-     * @param code 验证码
-     * @return ResultVo
-     */
-    ResultVo checkCodePassword(String phone, String code);
-
-    /**
-     * 用户：忘记密码：修改密码
-     * @param pwdFormDTO 密码信息
-     * @return ResultVo
-     */
-    ResultVo updatePassword(PwdFormDTO pwdFormDTO);
-
-    /**
-     * 管理员：查询用户
-     * @param user 查询条件
-     * @return ResultVo
-     */
-    ResultVo queryUser(UserQueryFromDTO user);
-
-    /**
-     * 管理员：查询多个用户
-     * @param page 页数
-     * @param size 数量
-     * @param userQueryFromDTO 查询条件
+     * 获取用户信息
      * @return ResultVO
      */
-    ResultVo queryUserList(Integer page, Integer size, UserQueryFromDTO userQueryFromDTO);
+    ResultVO me(String token);
 
     /**
-     * 管理员：修改用户
-     * @param user 用户信息
-     * @return ResultVo
+     * 忘记密码：发送验证码
+     * @param username  用户名
+     * @param phone 手机号
+     * @return ResultVO
      */
-    ResultVo updateUser(User user);
+    ResultVO sendCodeByForgetPassword(String username, String phone);
 
     /**
-     * 管理员：删除用户
-     * @param id 用户id
-     * @return ResultVo
+     * 忘记密码：验证验证码
+     * @param forgetPasswordDTO 忘记密码信息
+     * @return ResultVO
      */
-    ResultVo deleteUser(Long id);
+    ResultVO checkForgetPasswordCode(ForgetPasswordDTO forgetPasswordDTO);
 
     /**
-     * 管理员：批量删除用户
-     * @param ids 用户id集合
+     * 忘记密码：修改密码
+     * @param forgetPasswordDTO 忘记密码信息
+     * @return ResultVO
+     */
+    ResultVO updatePasswordByForgetPassword(ForgetPasswordDTO forgetPasswordDTO);
+
+    /**
+     * 修改用户名
+     * @param username 新用户名
+     * @return ResultVO
+     */
+    ResultVO updateUsername(String username);
+
+    /**
+     * 修改手机号：发送验证码
+     * @param phone 手机号
+     * @return ResultVO
+     */
+    ResultVO sendCodeByUpdatePhone(String phone);
+
+    /**
+     * 修改手机号
+     * @param token 登录令牌
+     * @param phone 手机号
+     * @param code 验证码
+     * @return ResultVO
+     */
+    ResultVO updatePhone(String token, String phone, String code);
+
+    /**
+     * 修改密码
+     * @param token 登录令牌
+     * @param updatePasswordDTO 修改密码信息
+     * @return ResultVO
+     */
+    ResultVO updatePassword(String token, UpdatePasswordDTO updatePasswordDTO);
+
+
+    /**
+     * 修改用户头像
+     * @param file 图片文件
+     * @return ResultVO
+     */
+    ResultVO updateUserIcon(String token, MultipartFile file);
+
+    /**
+     * 用户：修改用户昵称
+     * @param nickname 昵称
      * @return ResultVo
      */
-    ResultVo bulkDeleteUser(List<Long> ids);
+    ResultVO updateNickName(String jwt, String nickname);
 
     /**
      * 签到
      * @return ResultVo
      */
-    ResultVo signIn();
+    ResultVO signIn();
 
     /**
      * 查询签到记录
      * @return ResultVo
      */
-    ResultVo querySignIn();
+    ResultVO querySignIn();
 
     /**
      * 获取本月连续签到天数
      * @return ResultVo
      */
-    ResultVo queryContinuityDay();
+    ResultVO queryContinuityDay();
+
+    /*管理员相关接口*/
+
+    /**
+     * 查询用户（多条件）
+     * @param page 页码
+     * @param size 数量
+     * @param userManagerDTO 查询条件
+     * @return ResultVO
+     */
+    ResultVO findUser(Integer page, Integer size, UserManagerDTO userManagerDTO);
+
+    /**
+     * 查询系统用户（多条件）
+     * @param page 页码
+     * @param size 数量
+     * @param userManagerDTO 查询条件
+     * @return ResultVO
+     */
+    ResultVO findSystemUser(Integer page, Integer size, UserManagerDTO userManagerDTO);
+
+    /**
+     * 修改用户
+     * @param updateUserDTO 修改用户信息
+     * @param level 修改等级
+     * @return ResultVO
+     */
+    ResultVO updateUser(UpdateUserDTO updateUserDTO, String level);
+
+    /**
+     * 强制下线
+     * @param mainToken 主人登录令牌
+     * @param coerceLogoutDTO 强制下线条件
+     * @return ResultVO
+     */
+    ResultVO coerceLogout(String mainToken, CoerceLogoutDTO coerceLogoutDTO);
+
+    /**
+     * 停用用户
+     * @param userId 用户Id
+     * @param blockUpTime 停用时长（单位：分）
+     * @return ResultVO
+     */
+    ResultVO blockUpUser(Long userId, Long blockUpTime);
+
+    /**
+     * 取消停用用户
+     * @param userId 用户Id
+     * @return ResultVO
+     */
+    ResultVO cancelBlockUp(Long userId);
+
+    /**
+     * 新注册用户统计
+     * @param startDate 起始时间
+     * @param endDate 截止时间
+     * @return ResultVO
+     */
+    ResultVO registerUserCount(Long startDate, Long endDate);
+
+    /**
+     * 用户访问量统计
+     * @param startDate 起始时间
+     * @param endDate 截止时间
+     * @return ResultVO
+     */
+    ResultVO userPVCount(Long startDate, Long endDate);
 }

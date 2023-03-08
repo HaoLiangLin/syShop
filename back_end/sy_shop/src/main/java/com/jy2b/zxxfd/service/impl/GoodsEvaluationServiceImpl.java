@@ -5,9 +5,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jy2b.zxxfd.domain.dto.GoodsEvaluationDTO;
 import com.jy2b.zxxfd.domain.dto.GoodsEvaluationSaveDTO;
-import com.jy2b.zxxfd.domain.dto.ResultVo;
 import com.jy2b.zxxfd.domain.*;
 import com.jy2b.zxxfd.domain.dto.UserDTO;
+import com.jy2b.zxxfd.domain.vo.ResultVO;
 import com.jy2b.zxxfd.service.IGoodsEvaluationService;
 import com.jy2b.zxxfd.utils.TimeUtils;
 import com.jy2b.zxxfd.utils.UploadUtils;
@@ -51,12 +51,12 @@ public class GoodsEvaluationServiceImpl extends ServiceImpl<GoodsEvaluationMappe
     private EvaluationCommentMapper commentMapper;
 
     @Override
-    public ResultVo uploadImages(MultipartFile[] files, Long orderItemId) {
+    public ResultVO uploadImages(MultipartFile[] files, Long orderItemId) {
         // 查询订单属性
         OrderItem orderItem = orderItemMapper.selectById(orderItemId);
         // 判断订单属性是否存在
         if (orderItem == null) {
-            return ResultVo.fail("订单不存在");
+            return ResultVO.fail("订单不存在");
         }
 
         // 获取订单id
@@ -66,18 +66,18 @@ public class GoodsEvaluationServiceImpl extends ServiceImpl<GoodsEvaluationMappe
 
         // 判断订单是否完成
         if (order.getStatus() != 1) {
-            return ResultVo.fail("订单未完成");
+            return ResultVO.fail("订单未完成");
         }
 
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
         // 判断是否本人上传
         if (!userId.equals(order.getUid())) {
-            return ResultVo.fail("订单不存在");
+            return ResultVO.fail("订单不存在");
         }
 
         if (files.length > SystemConstants.COMMENT_IMAGES_LENGTH) {
-            return ResultVo.fail("上传图片不能超过" + SystemConstants.COMMENT_IMAGES_LENGTH + "张");
+            return ResultVO.fail("上传图片不能超过" + SystemConstants.COMMENT_IMAGES_LENGTH + "张");
         }
 
         MultipartFile[] multipartFiles = new MultipartFile[SystemConstants.COMMENT_IMAGES_LENGTH];
@@ -97,25 +97,25 @@ public class GoodsEvaluationServiceImpl extends ServiceImpl<GoodsEvaluationMappe
     }
 
     @Override
-    public ResultVo saveEvaluation(GoodsEvaluationSaveDTO commentSaveDTO) {
+    public ResultVO saveEvaluation(GoodsEvaluationSaveDTO commentSaveDTO) {
         // 获取评价内容
         String content = commentSaveDTO.getContent();
         if (StrUtil.isBlank(content)) {
-            return ResultVo.fail("评价内容不能为空");
+            return ResultVO.fail("评价内容不能为空");
         }
 
         // 获取订单属性id
         Long orderItemId = commentSaveDTO.getOrderItemId();
         // 判断订单属性id是否为空
         if (orderItemId == null) {
-            return ResultVo.fail("订单数据错误");
+            return ResultVO.fail("订单数据错误");
         }
 
         // 查询订单属性
         OrderItem orderItem = orderItemMapper.selectById(orderItemId);
         // 判断订单属性是否存在
         if (orderItem == null) {
-            return ResultVo.fail("订单不存在");
+            return ResultVO.fail("订单不存在");
         }
 
         // 获取订单号
@@ -126,11 +126,11 @@ public class GoodsEvaluationServiceImpl extends ServiceImpl<GoodsEvaluationMappe
         Order order = orderMapper.selectById(orderId);
         // 判断订单是否属于评价用户
         if (!order.getUid().equals(userId)) {
-            return ResultVo.fail("订单不存在");
+            return ResultVO.fail("订单不存在");
         }
         // 判断订单是否已完成
         if (order.getStatus() != 1) {
-            return ResultVo.fail("订单未完成");
+            return ResultVO.fail("订单未完成");
         }
 
         // 获取商品属性id
@@ -138,7 +138,7 @@ public class GoodsEvaluationServiceImpl extends ServiceImpl<GoodsEvaluationMappe
         // 查询是否评论
         Integer count = query().eq("order_id", orderId).eq("goodsItem_id", gid).count();
         if (count > 0) {
-            return ResultVo.fail("该订单已完成评价");
+            return ResultVO.fail("该订单已完成评价");
         }
 
         // 查询商品属性
@@ -184,22 +184,22 @@ public class GoodsEvaluationServiceImpl extends ServiceImpl<GoodsEvaluationMappe
         if (!result) {
             UploadUtils.deleteFiles(images);
         }
-        return result ? ResultVo.ok(null,"评价成功") : ResultVo.fail("评价失败");
+        return result ? ResultVO.ok(null,"评价成功") : ResultVO.fail("评价失败");
     }
 
     @Override
-    public ResultVo deleteEvaluation(Long id) {
+    public ResultVO deleteEvaluation(Long id) {
         // 查询评价是否存在
         GoodsEvaluation comment = getById(id);
         if (comment == null) {
-            return ResultVo.fail("评价不存在");
+            return ResultVO.fail("评价不存在");
         }
 
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
 
         if (!userId.equals(comment.getUid())) {
-            return ResultVo.fail("评价不存在");
+            return ResultVO.fail("评价不存在");
         }
 
         QueryWrapper<EvaluationComment> queryWrapper = new QueryWrapper<>();
@@ -210,7 +210,7 @@ public class GoodsEvaluationServiceImpl extends ServiceImpl<GoodsEvaluationMappe
             int delete = commentMapper.delete(queryWrapper);
 
             if (delete < 1) {
-                return ResultVo.fail("删除评价失败");
+                return ResultVO.fail("删除评价失败");
             }
 
             for (EvaluationComment evaluationComment : commentList) {
@@ -236,30 +236,30 @@ public class GoodsEvaluationServiceImpl extends ServiceImpl<GoodsEvaluationMappe
             UploadUtils.deleteFiles(images);
         }
 
-        return result ? ResultVo.ok(null,"删除评价成功") : ResultVo.fail("删除评价失败");
+        return result ? ResultVO.ok(null,"删除评价成功") : ResultVO.fail("删除评价失败");
     }
 
     @Override
-    public ResultVo queryEvaluationById(Long id) {
+    public ResultVO queryEvaluationById(Long id) {
         // 查询订单评价
         GoodsEvaluation comment = getById(id);
 
         if (comment == null) {
-            return ResultVo.fail("评价不存在");
+            return ResultVO.fail("评价不存在");
         }
 
         GoodsEvaluationDTO goodsEvaluationDTO = setEvaluationDTO(comment);
 
-        return ResultVo.ok(goodsEvaluationDTO);
+        return ResultVO.ok(goodsEvaluationDTO, "查询成功");
     }
 
     @Override
-    public ResultVo queryEvaluation(Long goodsId, Integer sort) {
+    public ResultVO queryEvaluation(Long goodsId, Integer sort) {
         // 根据商品id查询商品
         Goods goods = goodsMapper.selectById(goodsId);
         // 判断商品是否为空
         if (goods == null) {
-            return ResultVo.fail("商品不存在");
+            return ResultVO.fail("商品不存在");
         }
 
         // 根据商品id查询商品属性
@@ -269,7 +269,7 @@ public class GoodsEvaluationServiceImpl extends ServiceImpl<GoodsEvaluationMappe
 
         // 判断商品属性是否为空
         if (goodsItems.isEmpty()) {
-            return ResultVo.fail("商品不存在");
+            return ResultVO.fail("商品不存在");
         }
 
         // 判断排序是否为空
@@ -292,7 +292,7 @@ public class GoodsEvaluationServiceImpl extends ServiceImpl<GoodsEvaluationMappe
         List<GoodsEvaluation> commentList = list(commentQueryWrapper);
 
         if (commentList.isEmpty()) {
-            return ResultVo.fail("暂无评价");
+            return ResultVO.fail("暂无评价");
         }
 
         for (GoodsEvaluation goodsEvaluation : commentList) {
@@ -300,16 +300,16 @@ public class GoodsEvaluationServiceImpl extends ServiceImpl<GoodsEvaluationMappe
             goodsEvaluationDTOS.add(goodsEvaluationDTO);
         }
 
-        return ResultVo.ok(goodsEvaluationDTOS);
+        return ResultVO.ok(goodsEvaluationDTOS, "查询成功");
     }
 
     @Override
-    public ResultVo likedEvaluation(Long id) {
+    public ResultVO likedEvaluation(Long id) {
         // 查询订单评价
         GoodsEvaluation comment = getById(id);
         // 判断评价是否不存在
         if (comment == null) {
-            return ResultVo.fail("评价不存在");
+            return ResultVO.fail("评价不存在");
         }
 
         // 获取用户id
@@ -322,7 +322,7 @@ public class GoodsEvaluationServiceImpl extends ServiceImpl<GoodsEvaluationMappe
             if (result) {
                 stringRedisTemplate.opsForZSet().remove(EVALUATION_LIKED_KEY + id, userId.toString());
             }
-            return result ? ResultVo.ok("取消点赞成功") : ResultVo.fail("取消点赞失败");
+            return result ? ResultVO.ok("取消点赞成功") : ResultVO.fail("取消点赞失败");
         }
 
         // 获取现在时间
@@ -334,7 +334,7 @@ public class GoodsEvaluationServiceImpl extends ServiceImpl<GoodsEvaluationMappe
             stringRedisTemplate.opsForZSet().add(EVALUATION_LIKED_KEY + id, userId.toString(), Double.parseDouble(String.valueOf(time)));
         }
 
-        return result ? ResultVo.ok(null,"点赞成功") : ResultVo.fail("点赞失败");
+        return result ? ResultVO.ok(null,"点赞成功") : ResultVO.fail("点赞失败");
     }
 
     private GoodsEvaluationDTO setEvaluationDTO(GoodsEvaluation comment) {

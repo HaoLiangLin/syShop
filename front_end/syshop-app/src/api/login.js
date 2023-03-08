@@ -1,3 +1,4 @@
+// 引入自定义请求文件
 import request from '@/utils/request.js'
 
 // 用户注册：发送验证码

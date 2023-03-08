@@ -17,4 +17,6 @@ public class UserDTO {
     private Integer userType;
     private Date createTime;
     private Date updateTime;
+    private Date usernameUpdateTime; // 用户名修改时间
+    private Date lastLogin; // 最后登录时间
 }

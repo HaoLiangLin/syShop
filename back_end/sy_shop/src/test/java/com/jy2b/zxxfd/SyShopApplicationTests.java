@@ -3,6 +3,7 @@ package com.jy2b.zxxfd;
 import com.jy2b.zxxfd.utils.JwtUtils;
 import com.jy2b.zxxfd.utils.RedisIdWorker;
 import com.jy2b.zxxfd.utils.RegexUtils;
+import com.jy2b.zxxfd.utils.TimeUtils;
 import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,6 +12,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import javax.annotation.Resource;
 
 import java.io.File;
+import java.util.Date;
 import java.util.Objects;
 
 import static com.jy2b.zxxfd.contants.RedisConstants.ORDER_KEY;
@@ -69,5 +71,12 @@ class SyShopApplicationTests {
 
         String path = Objects.requireNonNull(this.getClass().getResource("")).getPath();
         System.out.println("path = " + path);
+    }
+
+    @Test
+    void test5() {
+        Date date = new Date();
+        String time = TimeUtils.dateToStringTime(date);
+        System.out.println("time = " + time);
     }
 }

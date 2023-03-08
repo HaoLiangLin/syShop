@@ -1,7 +1,7 @@
 package com.jy2b.zxxfd.controller;
 
-import com.jy2b.zxxfd.domain.dto.ResultVo;
 import com.jy2b.zxxfd.domain.UserInfo;
+import com.jy2b.zxxfd.domain.vo.ResultVO;
 import com.jy2b.zxxfd.service.IUserInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -21,35 +21,28 @@ public class UserInfoController {
     @GetMapping("/me")
     @ApiOperation(value = "查询个人信息")
     @PreAuthorize("hasAnyAuthority('userinfo:query')")
-    public ResultVo me() {
+    public ResultVO me() {
         return userInfoService.queryInfoMe();
     }
 
     @PutMapping("/update")
     @ApiOperation(value = "修改个人信息")
     @PreAuthorize("hasAnyAuthority('userinfo:update')")
-    public ResultVo updateInfo(@RequestBody UserInfo userInfo) {
+    public ResultVO updateInfo(@RequestBody UserInfo userInfo) {
         return userInfoService.updateInfo(userInfo);
     }
 
-    @PostMapping("/query")
+    @GetMapping("/query/{userId}")
     @ApiOperation(value = "查询用户信息")
     @PreAuthorize("hasAnyAuthority('userinfo:delete')")
-    public ResultVo queryInfo(@RequestBody UserInfo userInfo) {
-        return userInfoService.queryInfo(userInfo);
-    }
-
-    @PostMapping("/list/{page}/{size}")
-    @ApiOperation(value = "分页查询用户信息")
-    @PreAuthorize("hasAnyAuthority('userinfo:delete')")
-    public ResultVo queryList(@PathVariable("page") Integer page, @PathVariable("size") Integer size, @RequestBody(required = false) UserInfo userInfo) {
-        return userInfoService.queryInfoAll(page, size, userInfo);
+    public ResultVO queryInfo(@PathVariable("userId") Long userId) {
+        return userInfoService.queryUserInfoById(userId);
     }
 
     @PutMapping("/updates")
     @ApiOperation(value = "修改用户信息")
     @PreAuthorize("hasAnyAuthority('userinfo:delete')")
-    public ResultVo updateInfoAdmin(@RequestBody UserInfo userInfo) {
+    public ResultVO updateInfoAdmin(@RequestBody UserInfo userInfo) {
         return userInfoService.updateInfoAdmin(userInfo);
     }
 }

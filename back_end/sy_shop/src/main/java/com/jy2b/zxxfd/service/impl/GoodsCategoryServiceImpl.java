@@ -6,8 +6,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jy2b.zxxfd.domain.dto.CategoryDTO;
-import com.jy2b.zxxfd.domain.dto.ResultVo;
 import com.jy2b.zxxfd.domain.GoodsCategory;
+import com.jy2b.zxxfd.domain.vo.ResultVO;
 import com.jy2b.zxxfd.mapper.GoodsCategoryMapper;
 import com.jy2b.zxxfd.service.IGoodsCategoryService;
 import com.jy2b.zxxfd.service.IGoodsService;
@@ -33,21 +33,21 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
     private StringRedisTemplate stringRedisTemplate;
 
     @Override
-    public ResultVo queryCategoryList(Integer page, Integer size) {
+    public ResultVO queryCategoryList(Integer page, Integer size) {
         Page<GoodsCategory> goodsCategoryPage = new Page<>(page, size);
 
         // 查询一级分类
         goodsCategoryMapper.selectPage(goodsCategoryPage, new QueryWrapper<GoodsCategory>().isNull("fid"));
-        return ResultVo.ok(goodsCategoryPage);
+        return ResultVO.ok(goodsCategoryPage, "查询成功");
     }
 
     @Override
-    public ResultVo queryCategoryByOne() {
+    public ResultVO queryCategoryByOne() {
         String result = stringRedisTemplate.opsForValue().get(GOODS_CATEGORY_FIRST);
         if (StrUtil.isNotBlank(result)) {
             List<GoodsCategory> goodsCategories = JSONUtil.toList(result, GoodsCategory.class);
             if (!goodsCategories.isEmpty()) {
-                return ResultVo.ok(goodsCategories);
+                return ResultVO.ok(goodsCategories, "查询成功");
             }
         }
 
@@ -58,36 +58,36 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
             stringRedisTemplate.opsForValue().set(GOODS_CATEGORY_FIRST, jsonStr);
         }
 
-        return ResultVo.ok(list);
+        return ResultVO.ok(list, "查询成功");
     }
 
     @Override
-    public ResultVo queryCategoryChild(Long id) {
+    public ResultVO queryCategoryChild(Long id) {
         List<GoodsCategory> categories = query().eq("fid", id).list();
-        return ResultVo.ok(categories, "查询商品子分类成功");
+        return ResultVO.ok(categories, "查询商品子分类成功");
     }
 
     @Override
-    public ResultVo findSelectCategory() {
+    public ResultVO findSelectCategory() {
         // 查询所有一级分类
         List<GoodsCategory> goodsCategories = query().isNull("fid").list();
         // 设置分类选择
         List<CategoryDTO> categoryDTOS = setSelectCategory(goodsCategories);
 
-        return ResultVo.ok(categoryDTOS);
+        return ResultVO.ok(categoryDTOS, "查询成功");
     }
 
     @Override
-    public ResultVo saveCategory(GoodsCategory goodsCategory) {
+    public ResultVO saveCategory(GoodsCategory goodsCategory) {
         // 判断分类名称是否存在
         if (StrUtil.isBlank(goodsCategory.getName())) {
-            return ResultVo.fail("分类名称不能为空");
+            return ResultVO.fail("分类名称不能为空");
         }
 
         // 判断分类是否存在
         Integer count = query().eq("name", goodsCategory.getName()).count();
         if (count > 0) {
-            return ResultVo.fail("该分类已存在");
+            return ResultVO.fail("该分类已存在");
         }
 
         // 判断是否新增子分类
@@ -95,7 +95,7 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
             // 查询父分类是否存在
             GoodsCategory category = getById(goodsCategory.getFid());
             if (category == null) {
-                return ResultVo.fail("父分类不存在，无法新增子分类");
+                return ResultVO.fail("父分类不存在，无法新增子分类");
             }
         }
 
@@ -108,23 +108,23 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
         if (goodsCategory.getFid() == null) {
             saveFirstCategory();
         }
-        return result ? ResultVo.ok(null,"新增分类成功") : ResultVo.fail("新增分类失败");
+        return result ? ResultVO.ok(goodsCategory,"新增分类成功") : ResultVO.fail("新增分类失败");
     }
 
     @Override
-    public ResultVo deleteCategory(Long id) {
+    public ResultVO deleteCategory(Long id) {
         // 查询商品分类
         GoodsCategory goodsCategory = getById(id);
 
         // 判断商品分类是否存在
         if (goodsCategory == null) {
-            return ResultVo.fail("商品分类不存在");
+            return ResultVO.fail("商品分类不存在");
         }
 
         // 判断商品分类是否已经被使用
         Integer goodsCount = goodsService.query().eq("cid", id).count();
         if (goodsCount > 0) {
-            return ResultVo.fail("商品分类已经被使用，暂无法删除");
+            return ResultVO.fail("商品分类已经被使用，暂无法删除");
         }
 
         // 获取分类图标
@@ -145,11 +145,11 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
             UploadUtils.deleteFile(icon);
         }
 
-        return ResultVo.ok(null,"删除商品分类成功");
+        return ResultVO.ok(null,"删除商品分类成功");
     }
 
     @Override
-    public ResultVo updateCategory(GoodsCategory goodsCategory) {
+    public ResultVO updateCategory(GoodsCategory goodsCategory) {
         // 获取修改的商品分类id
         Long categoryId = goodsCategory.getId();
 
@@ -158,7 +158,7 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
 
         // 判断商品分类是否存在
         if (category == null) {
-            return ResultVo.fail("商品分类不存在");
+            return ResultVO.fail("商品分类不存在");
         }
 
         // 获取分类图标
@@ -169,7 +169,7 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
         if (name != null) {
             Integer count = query().eq("name", goodsCategory.getName()).ne("id", categoryId).count();
             if (count > 0) {
-                return ResultVo.fail("商品分类已存在");
+                return ResultVO.fail("商品分类已存在");
             }
         }
 
@@ -178,7 +178,7 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
             // 查询父分类是否存在
             GoodsCategory fCategory = getById(goodsCategory.getFid());
             if (fCategory == null) {
-                return ResultVo.fail("父分类不存在，修改商品分类失败");
+                return ResultVO.fail("父分类不存在，修改商品分类失败");
             }
         }
 
@@ -195,7 +195,7 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
             }
         }
 
-        return result ? ResultVo.ok(null,"修改商品分类成功") : ResultVo.fail("修改商品分类失败");
+        return result ? ResultVO.ok(null,"修改商品分类成功") : ResultVO.fail("修改商品分类失败");
     }
 
     /**

@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @SpringBootTest
 public class IUserServiceTest {
@@ -21,5 +23,13 @@ public class IUserServiceTest {
         user.setNickname("最高管理员");
         user.setUserType(0);
         userService.save(user);
+    }
+
+    @Test
+    void timeTest() {
+        Date date = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String format = simpleDateFormat.format(date);
+        System.out.println("format = " + format);
     }
 }

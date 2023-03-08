@@ -37,6 +37,10 @@ public class User {
     private Date createTime;
     @TableField("update_time")
     private Date updateTime;
+    @TableField("username_update_time")
+    private Date usernameUpdateTime; // 用户名修改时间
+    @TableField("last_login")
+    private Date lastLogin; // 最后登录时间
     @TableLogic
     @TableField("isDel")
     private Integer isDel;

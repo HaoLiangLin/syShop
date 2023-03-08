@@ -3,10 +3,10 @@ package com.jy2b.zxxfd.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jy2b.zxxfd.domain.dto.CollectionDTO;
-import com.jy2b.zxxfd.domain.dto.ResultVo;
 import com.jy2b.zxxfd.domain.GoodsItem;
 import com.jy2b.zxxfd.domain.UserCollection;
 import com.jy2b.zxxfd.domain.Goods;
+import com.jy2b.zxxfd.domain.vo.ResultVO;
 import com.jy2b.zxxfd.mapper.GoodsItemMapper;
 import com.jy2b.zxxfd.mapper.UserCollectionMapper;
 import com.jy2b.zxxfd.mapper.GoodsMapper;
@@ -27,27 +27,27 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
     private GoodsItemMapper itemMapper;
 
     @Override
-    public ResultVo saveCollection(Long gid) {
+    public ResultVO saveCollection(Long gid) {
         // 获取商品
         Goods goods = goodsMapper.selectById(gid);
         // 判断商品是否存在
         if (goods == null) {
-            return ResultVo.fail("商品不存在");
+            return ResultVO.fail("商品不存在");
         }
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
         // 查询收藏
         UserCollection collection = query().eq("uid", userId).eq("gid", gid).one();
         if (collection != null) {
-            return ResultVo.fail("商品已收藏");
+            return ResultVO.fail("商品已收藏");
         }
         // 新增收藏
         boolean result = save(new UserCollection(userId, gid));
-        return result ? ResultVo.ok(null,"收藏成功") : ResultVo.fail("收藏失败");
+        return result ? ResultVO.ok(null,"收藏成功") : ResultVO.fail("收藏失败");
     }
 
     @Override
-    public ResultVo delCollection(Long gid) {
+    public ResultVO delCollection(Long gid) {
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
 
@@ -56,30 +56,30 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
 
         // 判断用户id是否与收藏用户id一致
         if (count < 1) {
-            return ResultVo.fail("收藏不存在");
+            return ResultVO.fail("收藏不存在");
         }
 
         UserCollection collection = query().eq("uid", userId).eq("gid", gid).one();
         if (collection == null) {
-            return ResultVo.fail("商品未收藏");
+            return ResultVO.fail("商品未收藏");
         }
 
         QueryWrapper<UserCollection> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("uid", userId).eq("gid", gid);
 
         boolean result = remove(queryWrapper);
-        return result ? ResultVo.ok(null,"取消收藏成功") : ResultVo.fail("取消收藏失败");
+        return result ? ResultVO.ok(null,"取消收藏成功") : ResultVO.fail("取消收藏失败");
     }
 
     @Override
-    public ResultVo queryCollection() {
+    public ResultVO queryCollection() {
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
         // 获取收藏
         List<UserCollection> userCollectionList = query().eq("uid", userId).list();
 
         if (userCollectionList.isEmpty()) {
-            return ResultVo.ok(userCollectionList);
+            return ResultVO.ok(userCollectionList, "查询成功");
         }
 
         ArrayList<CollectionDTO> dtoArrayList = new ArrayList<>();
@@ -107,22 +107,22 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
             }
         }
 
-        return ResultVo.ok(dtoArrayList);
+        return ResultVO.ok(dtoArrayList, "查询成功");
     }
 
     @Override
-    public ResultVo queryCollectionByGid(Long gid) {
+    public ResultVO queryCollectionByGid(Long gid) {
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
         // 获取商品信息
         Goods goods = goodsMapper.selectById(gid);
         // 判断商品是否不存在
         if (goods == null) {
-            return ResultVo.fail("商品不存在");
+            return ResultVO.fail("商品不存在");
         }
         // 查询收藏
         Integer count = query().eq("uid", userId).eq("gid", gid).count();
 
-        return count > 0 ? ResultVo.ok(count, "商品已收藏") : ResultVo.fail("商品未收藏");
+        return count > 0 ? ResultVO.ok(count, "商品已收藏") : ResultVO.fail("商品未收藏");
     }
 }

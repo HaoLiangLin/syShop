@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jy2b.zxxfd.domain.Notice;
 import com.jy2b.zxxfd.domain.dto.NoticeDTO;
 import com.jy2b.zxxfd.domain.dto.NoticeQueryDTO;
-import com.jy2b.zxxfd.domain.dto.ResultVo;
+import com.jy2b.zxxfd.domain.vo.ResultVO;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
@@ -14,14 +14,14 @@ public interface INoticeService extends IService<Notice> {
      * @param noticeDTO 公告信息
      * @return ResultVo
      */
-    ResultVo saveNotice(NoticeDTO noticeDTO);
+    ResultVO saveNotice(NoticeDTO noticeDTO);
 
     /**
      * 删除公告
      * @param id 公告id
      * @return ResultVo
      */
-    ResultVo delNotice(Long id);
+    ResultVO delNotice(Long id);
 
     /**
      * 修改公告
@@ -29,14 +29,14 @@ public interface INoticeService extends IService<Notice> {
      * @param noticeDTO 公告信息
      * @return ResultVo
      */
-    ResultVo updateNotice(Long id, NoticeDTO noticeDTO);
+    ResultVO updateNotice(Long id, NoticeDTO noticeDTO);
 
     /**
      * 查询公告
      * @param queryDTO 公告查询条件
      * @return ResultVo
      */
-    ResultVo queryNotice(NoticeQueryDTO queryDTO);
+    ResultVO queryNotice(NoticeQueryDTO queryDTO);
 
     /**
      * 分页查询公告
@@ -45,5 +45,5 @@ public interface INoticeService extends IService<Notice> {
      * @param queryDTO 查询条件
      * @return ResultVo
      */
-    ResultVo queryNoticePage(Integer page, Integer size, NoticeQueryDTO queryDTO);
+    ResultVO queryNoticePage(Integer page, Integer size, NoticeQueryDTO queryDTO);
 }

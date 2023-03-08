@@ -10,5 +10,5 @@ public class NoticeQueryDTO {
 
     private Long noticeCategoryId;
 
-    private String timeSort; // 销量排序  升序:Asc、降序:Des
+    private String timeSort; // 时间排序  升序:Asc、降序:Des
 }

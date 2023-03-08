@@ -1,7 +1,7 @@
 package com.jy2b.zxxfd.headle;
 
 import cn.hutool.json.JSONUtil;
-import com.jy2b.zxxfd.domain.dto.ResultVo;
+import com.jy2b.zxxfd.domain.vo.ResultVO;
 import com.jy2b.zxxfd.utils.WebUtils;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -16,7 +16,7 @@ import java.io.IOException;
 public class AccessDeniedHandleImpl implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
-        ResultVo resultVo = ResultVo.fail("权限未获得，暂无法访问");
+        ResultVO resultVo = ResultVO.fail("对不起，您无权访问");
         String result = JSONUtil.toJsonStr(resultVo);
         WebUtils.renderString(response, result);
     }

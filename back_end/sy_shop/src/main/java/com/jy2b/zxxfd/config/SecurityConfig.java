@@ -90,14 +90,17 @@ public class SecurityConfig {
             .and()
             .authorizeRequests()
             .antMatchers(
-                    "/users/login",
-                    "/users/loginEnd/**",
-                    "/users/code",
+                    "/users/registerCode/**",
                     "/users/register/**",
-                    "/users/codePassword",
-                    "/users/check/codePassword",
-                    "/users/updatePassword").anonymous() // 只有未登录的才能访问
+                    "/users/loginCode/**",
+                    "/users/login",
+                    "/users/adminLogin/**",
+                    "/users/forgetCode/**",
+                    "/users/forgetPassword").anonymous() // 只有未登录的才能访问
             .antMatchers(
+                    "/users/loginToken",
+                    "/rechargeCombo/all",
+                    "/province/**",
                     "/goodsCategory/query/**",
                     "/goodsCategory/select",
                     "/goods/query/**",

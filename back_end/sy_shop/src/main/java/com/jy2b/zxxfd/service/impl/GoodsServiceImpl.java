@@ -9,6 +9,7 @@ import com.jy2b.zxxfd.domain.dto.*;
 import com.jy2b.zxxfd.domain.Goods;
 import com.jy2b.zxxfd.domain.GoodsCategory;
 import com.jy2b.zxxfd.domain.GoodsItem;
+import com.jy2b.zxxfd.domain.vo.ResultVO;
 import com.jy2b.zxxfd.mapper.GoodsCategoryMapper;
 import com.jy2b.zxxfd.mapper.GoodsItemMapper;
 import com.jy2b.zxxfd.mapper.GoodsMapper;
@@ -34,9 +35,9 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
     private GoodsItemMapper itemMapper;
 
     @Override
-    public ResultVo uploadImage(MultipartFile[] files) {
+    public ResultVO uploadImage(MultipartFile[] files) {
         if (files.length > SystemConstants.GOODS_IMAGES_LENGTH) {
-            return ResultVo.fail("上传图片不能超过" + SystemConstants.GOODS_IMAGES_LENGTH + "张");
+            return ResultVO.fail("上传图片不能超过" + SystemConstants.GOODS_IMAGES_LENGTH + "张");
         }
 
         MultipartFile[] multipartFiles = new MultipartFile[SystemConstants.GOODS_IMAGES_LENGTH];
@@ -46,20 +47,20 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
     }
 
     @Override
-    public ResultVo saveGoods(GoodsSaveFromDTO goodsSaveFromDTO) {
+    public ResultVO saveGoods(GoodsSaveFromDTO goodsSaveFromDTO) {
         // 1. 判断商品名称是否为空
         if (StrUtil.isBlank(goodsSaveFromDTO.getName())) {
-            return ResultVo.fail("商品名称不能为空");
+            return ResultVO.fail("商品名称不能为空");
         }
 
         // 2. 判断是否选择分类
         if (goodsSaveFromDTO.getCid() == null) {
-            return ResultVo.fail("商品分类不能为空");
+            return ResultVO.fail("商品分类不能为空");
         }
 
         // 3. 判断发货地址是否为空
         if (StrUtil.isBlank(goodsSaveFromDTO.getProvince()) && StrUtil.isBlank(goodsSaveFromDTO.getCity()) && StrUtil.isBlank(goodsSaveFromDTO.getDistrict()) && StrUtil.isBlank(goodsSaveFromDTO.getAddress())) {
-            return ResultVo.fail("发货地址不能未空");
+            return ResultVO.fail("发货地址不能未空");
         }
 
         // 4. 判断商品分类是否存在
@@ -67,7 +68,7 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         queryWrapper.eq("id", goodsSaveFromDTO.getCid());
         Integer categoryCount = goodsCategoryMapper.selectCount(queryWrapper);
         if (categoryCount <= 0) {
-            return ResultVo.fail("商品分类不存在");
+            return ResultVO.fail("商品分类不存在");
         }
 
         // 5. 类型转换
@@ -80,24 +81,24 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
             String images = goods.getImages();
             UploadUtils.deleteFiles(images);
         }
-        return result ? ResultVo.ok(null,"新增商品成功") : ResultVo.fail("新增商品失败");
+        return result ? ResultVO.ok(null,"新增商品成功") : ResultVO.fail("新增商品失败");
     }
 
     @Override
-    public ResultVo deleteGoods(Long id) {
+    public ResultVO deleteGoods(Long id) {
         Goods goods = getById(id);
 
         if (goods == null) {
-            return ResultVo.fail("商品已删除");
+            return ResultVO.fail("商品已删除");
         }
 
         if (goods.getStatus() == 1) {
-            return ResultVo.fail("上架商品暂无法删除");
+            return ResultVO.fail("上架商品暂无法删除");
         }
 
         if (goods.getSale() > 0) {
             boolean result = update().set("status", 2).eq("id", id).update();
-            return result ? ResultVo.ok(null, "商品下架成功") : ResultVo.fail("商品下架失败");
+            return result ? ResultVO.ok(null, "商品下架成功") : ResultVO.fail("商品下架失败");
         }
 
         String images = goods.getImages();
@@ -106,11 +107,11 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         if (result) {
             UploadUtils.deleteFiles(images);
         }
-        return result ? ResultVo.ok(null,"删除商品成功") : ResultVo.fail("删除商品失败");
+        return result ? ResultVO.ok(null,"删除商品成功") : ResultVO.fail("删除商品失败");
     }
 
     @Override
-    public ResultVo updateGoods(GoodsUpdateFromDTO updateFromDTO) {
+    public ResultVO updateGoods(GoodsUpdateFromDTO updateFromDTO) {
         // 获取修改的商品id
         Long id = updateFromDTO.getId();
         // 获取将要修改的商品
@@ -118,40 +119,40 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
 
         // 判断商品是否存在
         if (beforeGoods == null) {
-            return ResultVo.fail("商品不存在");
+            return ResultVO.fail("商品不存在");
         }
 
         // 判断将要修改的商品分类是否存在
         if (updateFromDTO.getCid() != null) {
             GoodsCategory category = goodsCategoryMapper.selectById(updateFromDTO.getCid());
             if (category == null) {
-                return ResultVo.fail("商品分类不存在");
+                return ResultVO.fail("商品分类不存在");
             }
         }
 
         if (updateFromDTO.getName() != null) {
             if (StrUtil.isBlank(updateFromDTO.getName())) {
-                return ResultVo.fail("商品名称不能为空");
+                return ResultVO.fail("商品名称不能为空");
             }
         }
         if (updateFromDTO.getProvince() != null) {
             if (StrUtil.isBlank(updateFromDTO.getProvince())) {
-                return ResultVo.fail("发货省份不能为空");
+                return ResultVO.fail("发货省份不能为空");
             }
         }
         if (updateFromDTO.getCity() != null) {
             if (StrUtil.isBlank(updateFromDTO.getCity())) {
-                return ResultVo.fail("发货城市不能为空");
+                return ResultVO.fail("发货城市不能为空");
             }
         }
         if (updateFromDTO.getDistrict() != null) {
             if (StrUtil.isBlank(updateFromDTO.getDistrict())) {
-                return ResultVo.fail("发货区县不能为空");
+                return ResultVO.fail("发货区县不能为空");
             }
         }
         if (updateFromDTO.getAddress() != null) {
             if (StrUtil.isBlank(updateFromDTO.getAddress())) {
-                return ResultVo.fail("发货详细地址不能为空");
+                return ResultVO.fail("发货详细地址不能为空");
             }
         }
         if (updateFromDTO.getRecommend() == null || updateFromDTO.getRecommend() > 1 || updateFromDTO.getRecommend() < 0) {
@@ -170,7 +171,7 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
                 queryWrapper.eq("gid", id).eq("status", 1);
                 Integer itemCount = itemMapper.selectCount(queryWrapper);
                 if (itemCount < 1) {
-                    return ResultVo.fail("商品上架失败，商品属性需满足至少一个已上架");
+                    return ResultVO.fail("商品上架失败，商品属性需满足至少一个已上架");
                 }
             }
 
@@ -184,11 +185,11 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
 
         // 修改商品
         boolean result = updateById(goods);
-        return result ? ResultVo.ok(null,"修改商品成功") : ResultVo.fail("修改商品失败");
+        return result ? ResultVO.ok(null,"修改商品成功") : ResultVO.fail("修改商品失败");
     }
 
     @Override
-    public ResultVo findGoodsById(Long id) {
+    public ResultVO findGoodsById(Long id) {
         Goods goods = getById(id);
         if (goods != null) {
             GoodsFindDTO goodsFindDTO = BeanUtil.copyProperties(goods, GoodsFindDTO.class);
@@ -197,13 +198,13 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
             String name = goodsCategoryMapper.selectById(cid).getName();
             goodsFindDTO.setCname(name);
 
-            return ResultVo.ok(goodsFindDTO);
+            return ResultVO.ok(goodsFindDTO, "查询成功");
         }
-        return ResultVo.fail("商品不存在");
+        return ResultVO.fail("商品不存在");
     }
 
     @Override
-    public ResultVo findGoodsList(Integer page, Integer size, Goods goods) {
+    public ResultVO findGoodsList(Integer page, Integer size, Goods goods) {
         Page<Goods> goodsPage = new Page<>();
         QueryWrapper<Goods> queryWrapper = new QueryWrapper<>();
         if (goods != null) {
@@ -278,19 +279,19 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         goodsFindDTOPage.setSearchCount(goodsPage.isSearchCount());
         goodsFindDTOPage.setOrders(goodsPage.getOrders());
 
-        return ResultVo.ok(goodsFindDTOPage);
+        return ResultVO.ok(goodsFindDTOPage, "查询成功");
     }
 
     @Override
-    public ResultVo queryGoodsById(Long id) {
+    public ResultVO queryGoodsById(Long id) {
         Goods goods = query().eq("id", id).eq("status", 1).one();
         GoodsItem goodsItem = itemMapper.selectList(new QueryWrapper<GoodsItem>().eq("gid", id).eq("status", 1)).get(0);
         GoodsDTO goodsDTO = new GoodsDTO(goods, goodsItem.getPrice(), goodsItem.getDiscount());
-        return goods != null ? ResultVo.ok(goodsDTO) : ResultVo.fail("商品不存在");
+        return goods != null ? ResultVO.ok(goodsDTO, "查询成功") : ResultVO.fail("商品不存在");
     }
 
     @Override
-    public ResultVo queryGoodsList(Integer page, Integer size, GoodsQueryFromDTO goodsFromDTO) {
+    public ResultVO queryGoodsList(Integer page, Integer size, GoodsQueryFromDTO goodsFromDTO) {
         Page<Goods> goodsPage = new Page<>(page, size);
         QueryWrapper<Goods> queryWrapper = new QueryWrapper<>();
         if (goodsFromDTO != null) {
@@ -388,10 +389,10 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
             goodsDTOPage.setSearchCount(goodsPage.isSearchCount());
             goodsDTOPage.setOrders(goodsPage.getOrders());
 
-            return ResultVo.ok(goodsDTOPage);
+            return ResultVO.ok(goodsDTOPage, "查询成功");
         }
 
-        return ResultVo.ok(goodsPage);
+        return ResultVO.ok(goodsPage, "查询成功");
     }
 
     private List<Long> getSunCid(Long cid) {

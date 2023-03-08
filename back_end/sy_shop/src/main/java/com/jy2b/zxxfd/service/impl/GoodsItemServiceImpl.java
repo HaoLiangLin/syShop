@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jy2b.zxxfd.domain.dto.*;
 import com.jy2b.zxxfd.domain.Goods;
 import com.jy2b.zxxfd.domain.GoodsItem;
+import com.jy2b.zxxfd.domain.vo.ResultVO;
 import com.jy2b.zxxfd.mapper.GoodsItemMapper;
 import com.jy2b.zxxfd.mapper.GoodsMapper;
 import com.jy2b.zxxfd.service.IGoodsItemService;
@@ -28,22 +29,22 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
     private GoodsItemMapper itemMapper;
 
     @Override
-    public ResultVo saveItem(GoodsItemSaveFromDTO itemFromDTO) {
+    public ResultVO saveItem(GoodsItemSaveFromDTO itemFromDTO) {
         // 判断商品是否存在
         Long gid = itemFromDTO.getGid();
         if (gid == null) {
-            return ResultVo.fail("请指定添加属性的商品");
+            return ResultVO.fail("请指定添加属性的商品");
         }
         Goods goods = goodsMapper.selectById(gid);
         if (goods == null) {
-            return ResultVo.fail("商品不存在");
+            return ResultVO.fail("商品不存在");
         }
 
         // 获取属性颜色
         String color = itemFromDTO.getColor();
         // 判断属性颜色是否不为空
         if (StrUtil.isBlank(color)) {
-            return ResultVo.fail("添加商品属性失败，颜色不能为空");
+            return ResultVO.fail("添加商品属性失败，颜色不能为空");
         }
 
         List<GoodsItem> list = query().eq("color", color).eq("gid", gid).list();
@@ -51,7 +52,7 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
         // 判断属性图片是否不为空
         if (list.isEmpty()) {
             if (StrUtil.isBlank(itemFromDTO.getIcon())) {
-                return ResultVo.fail("添加商品属性失败，图片不能为空！");
+                return ResultVO.fail("添加商品属性失败，图片不能为空！");
             }
         } else {
             if (StrUtil.isNotBlank(itemFromDTO.getIcon())) {
@@ -84,12 +85,12 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
         // 查询是否有重复项
         int colorCount = count(queryWrapper);
         if (colorCount > 0) {
-            return ResultVo.fail("商品属性已存在");
+            return ResultVO.fail("商品属性已存在");
         }
 
         // 判断属性价格是否不为空，且大于零
         if (itemFromDTO.getPrice() == null || itemFromDTO.getPrice() <= 0) {
-            return ResultVo.fail("添加商品属性价格不能为空或小于等于零");
+            return ResultVO.fail("添加商品属性价格不能为空或小于等于零");
         }
         // 判断属性折扣是否不为空，且大于零
         if (itemFromDTO.getDiscount() == null || itemFromDTO.getDiscount() <= 0) {
@@ -97,7 +98,7 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
         }
         // 判断属性库存是否不为空，且大于零
         if (itemFromDTO.getStock() == null || itemFromDTO.getStock() <= 0) {
-            return ResultVo.fail("添加商品属性库存不能为空或小于等于零");
+            return ResultVO.fail("添加商品属性库存不能为空或小于等于零");
         }
         // 添加商品属性
         GoodsItem goodsItem = BeanUtil.copyProperties(itemFromDTO, GoodsItem.class);
@@ -106,23 +107,23 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
             String icon = goodsItem.getIcon();
             UploadUtils.deleteFile(icon);
         }
-        return result ? ResultVo.ok(null,"添加商品属性成功") : ResultVo.fail("添加商品属性失败");
+        return result ? ResultVO.ok(null,"添加商品属性成功") : ResultVO.fail("添加商品属性失败");
     }
 
     @Override
-    public ResultVo deleteItem(Long id) {
+    public ResultVO deleteItem(Long id) {
         // 查询商品属性
         GoodsItem goodsItem = getById(id);
 
         if (goodsItem == null) {
-            return ResultVo.fail("商品属性不存在");
+            return ResultVO.fail("商品属性不存在");
         }
 
         // 获取商品属性销量
         Long sales = goodsItem.getSales();
         if (sales > 0) {
             boolean result = update().set("status", 0).eq("id", id).update();
-            return result ? ResultVo.ok(null, "下架商品属性成功") : ResultVo.fail("下架商品属性失败");
+            return result ? ResultVO.ok(null, "下架商品属性成功") : ResultVO.fail("下架商品属性失败");
         }
 
         // 获取商品属性颜色
@@ -142,15 +143,15 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
                 }
             }
         }
-        return result ? ResultVo.ok(null, "删除商品属性成功") : ResultVo.fail("删除商品属性失败");
+        return result ? ResultVO.ok(null, "删除商品属性成功") : ResultVO.fail("删除商品属性失败");
     }
 
     @Override
-    public ResultVo updateItem(Long id, GoodsItemSaveFromDTO itemFromDTO) {
+    public ResultVO updateItem(Long id, GoodsItemSaveFromDTO itemFromDTO) {
         // 判断商品属性是否存在
         GoodsItem item = getById(id);
         if (item == null) {
-            return ResultVo.fail("商品属性不存在");
+            return ResultVO.fail("商品属性不存在");
         }
         // 获取商品属性归属商品id
         Long gid = itemFromDTO.getGid();
@@ -158,7 +159,7 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
             // 判断商品是否存在
             Goods goods = goodsMapper.selectById(gid);
             if (goods == null) {
-                return ResultVo.fail("商品不存在");
+                return ResultVO.fail("商品不存在");
             }
         } else {
             gid = item.getGid();
@@ -168,12 +169,12 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
         String color = itemFromDTO.getColor();
         if (color != null) {
             if (StrUtil.isBlank(color)) {
-                return ResultVo.fail("修改商品属性失败，颜色不能为空");
+                return ResultVO.fail("修改商品属性失败，颜色不能为空");
             } else {
                 List<GoodsItem> list = query().eq("color", color).eq("gid", gid).list();
                 // 判断属性图片是否不为空
                 if (list.isEmpty()) {
-                    return ResultVo.fail("颜色不存在");
+                    return ResultVO.fail("颜色不存在");
                 }
             }
         } else {
@@ -183,14 +184,14 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
         // 判断属性图片是否不为空
         if (itemFromDTO.getIcon() != null) {
             if (StrUtil.isBlank(itemFromDTO.getIcon())) {
-                return ResultVo.fail("修改商品属性图片不能为空");
+                return ResultVO.fail("修改商品属性图片不能为空");
             }
         }
 
         // 判断属性价格是否不为空，且大于零
         if (itemFromDTO.getPrice() != null) {
             if (itemFromDTO.getPrice() <= 0) {
-                return ResultVo.fail("修改商品属性价格不能为空或小于等于零");
+                return ResultVO.fail("修改商品属性价格不能为空或小于等于零");
             }
         }
         // 判断属性折扣是否不为空，且大于零
@@ -202,13 +203,13 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
         // 判断属性库存是否不为空，且大于零
         if (itemFromDTO.getStock() != null) {
             if (itemFromDTO.getStock() <= 0) {
-                return ResultVo.fail("修改商品属性库存不能为空或小于等于零");
+                return ResultVO.fail("修改商品属性库存不能为空或小于等于零");
             }
         }
         // 判断属性状态是否不为空
         if (itemFromDTO.getStatus() != null) {
             if (itemFromDTO.getStatus() < 0 || itemFromDTO.getStatus() > 1) {
-                return ResultVo.fail("修改商品属性状态不存在");
+                return ResultVO.fail("修改商品属性状态不存在");
             }
         }
         // 修改商品属性
@@ -224,16 +225,16 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
                 }
             }
         }
-        return result ? ResultVo.ok(null,"修改商品属性成功") : ResultVo.fail("修改商品属性失败");
+        return result ? ResultVO.ok(null,"修改商品属性成功") : ResultVO.fail("修改商品属性失败");
     }
 
     @Override
-    public ResultVo queryItemList(Long id, GoodsItemQueryFromDTO itemFromDTO) {
+    public ResultVO queryItemList(Long id, GoodsItemQueryFromDTO itemFromDTO) {
         // 查询商品
         Goods goods = goodsMapper.selectById(id);
         // 判断商品是否存在
         if (goods == null) {
-            return ResultVo.fail("商品不存在");
+            return ResultVO.fail("商品不存在");
         }
 
         QueryWrapper<GoodsItem> queryWrapper = new QueryWrapper<>();
@@ -303,13 +304,13 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
         }
         List<GoodsItem> itemList = list(queryWrapper);
 
-        return ResultVo.ok(itemList);
+        return ResultVO.ok(itemList, "查询成功");
     }
 
     @Override
-    public ResultVo queryItemListPage(Integer page, Integer size, GoodsItemQueryFromDTO itemFromDTO) {
+    public ResultVO queryItemListPage(Integer page, Integer size, GoodsItemQueryFromDTO itemFromDTO) {
         if (itemFromDTO == null) {
-            return ResultVo.fail("商品不存在");
+            return ResultVO.fail("商品不存在");
         }
         // 获取商品id
         Long gid = itemFromDTO.getGid();
@@ -317,7 +318,7 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
         Goods goods = goodsMapper.selectById(gid);
         // 判断商品是否存在
         if (goods == null) {
-            return ResultVo.fail("商品不存在");
+            return ResultVO.fail("商品不存在");
         }
         // 分页
         Page<GoodsItem> goodsItemPage = new Page<>(page, size);
@@ -386,23 +387,23 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
         }
         itemMapper.selectPage(goodsItemPage, queryWrapper);
 
-        return ResultVo.ok(goodsItemPage);
+        return ResultVO.ok(goodsItemPage, "查询成功");
     }
 
     @Override
-    public ResultVo queryItemByGid(Long gid) {
+    public ResultVO queryItemByGid(Long gid) {
         // 查询商品
         Goods goods = goodsMapper.selectById(gid);
         // 判断商品是否为空
         if (goods == null) {
-            return ResultVo.fail("商品不存在");
+            return ResultVO.fail("商品不存在");
         }
 
         // 根据商品id查询商品属性
         List<GoodsItem> goodsItems = query().eq("gid", gid).eq("status", 1).list();
 
         if (goodsItems.isEmpty()) {
-            return ResultVo.fail("该商品暂无商品属性");
+            return ResultVO.fail("该商品暂无商品属性");
         }
 
         // 获取第一个商品属性为默认选中
@@ -416,7 +417,7 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
                 }
             }
             if (goodsItem.getStock() < 1) {
-                return ResultVo.fail("商品已售罄");
+                return ResultVO.fail("商品已售罄");
             }
         }
 
@@ -434,16 +435,16 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
         // 设置颜色与图片可选项
         itemDTO.setColorAndIcon(colorAndIcon);
 
-        return ResultVo.ok(itemDTO);
+        return ResultVO.ok(itemDTO, "查询成功");
     }
 
     @Override
-    public ResultVo queryItem(GoodsItemFromDTO itemFromDTO) {
+    public ResultVO queryItem(GoodsItemFromDTO itemFromDTO) {
         // 获取商品属性颜色
         String color = itemFromDTO.getColor();
         // 判断颜色是否为空
         if (StrUtil.isBlank(color)) {
-            return ResultVo.fail("属性颜色不能为空");
+            return ResultVO.fail("属性颜色不能为空");
         }
 
         GoodsItemDTO goodsItemDTO = setItemDTO(itemFromDTO);
@@ -478,7 +479,7 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
         ArrayList<HashMap<String, String>> colorAndIcon = setColorAndIcon(itemFromDTO.getGid(), itemFromDTO.getColor());
         goodsItemDTO.setColorAndIcon(colorAndIcon);
 
-        return ResultVo.ok(goodsItemDTO);
+        return ResultVO.ok(goodsItemDTO, "查询成功");
 
     }
 

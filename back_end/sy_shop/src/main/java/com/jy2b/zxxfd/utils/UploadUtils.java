@@ -2,8 +2,8 @@ package com.jy2b.zxxfd.utils;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
-import com.jy2b.zxxfd.domain.dto.ResultVo;
 import com.jy2b.zxxfd.contants.SystemConstants;
+import com.jy2b.zxxfd.domain.vo.ResultVO;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -15,13 +15,13 @@ public class UploadUtils {
      * 保存文件
      * @param file 文件
      * @param savePath 保存路径
-     * @return ResultVo
+     * @return ResultVO
      */
-    public static ResultVo saveFile(MultipartFile file, String savePath) {
+    public static ResultVO saveFile(MultipartFile file, String savePath) {
         try {
             // 判断文件是否为空
             if (file.isEmpty()) {
-                return ResultVo.fail("文件未上传");
+                return ResultVO.fail("文件未上传");
             }
 
             // 获取文件原始名称以及后缀名
@@ -31,17 +31,17 @@ public class UploadUtils {
             // 保存文件
             file.transferTo(new File(SystemConstants.UPLOAD_IMAGE_PATH, fileName));
             // 返回文件保存路径
-            return ResultVo.ok(fileName);
+            return ResultVO.ok(fileName);
         } catch (IOException e) {
             e.printStackTrace();
             // 失败，返回错误信息
-            return ResultVo.fail("文件上传失败");
+            return ResultVO.fail("文件上传失败");
         }
     }
 
-    public static ResultVo saveFiles(MultipartFile[] files, String savePath) {
+    public static ResultVO saveFiles(MultipartFile[] files, String savePath) {
         if (files.length == 0) {
-            return ResultVo.fail("上传文件不能为空");
+            return ResultVO.fail("上传文件不能为空");
         }
         String fileNames = "";
         try {
@@ -61,15 +61,15 @@ public class UploadUtils {
         } catch (IOException e) {
             e.printStackTrace();
             // 失败，返回错误信息
-            return ResultVo.fail("文件上传失败");
+            return ResultVO.fail("文件上传失败");
         }
 
         if (StrUtil.isBlank(fileNames)) {
-            return ResultVo.fail("文件上传失败");
+            return ResultVO.fail("文件上传失败");
         }
 
         fileNames = fileNames.substring(1);
-        return ResultVo.ok(fileNames);
+        return ResultVO.ok(fileNames, "文件上传成功");
     }
 
     /**
