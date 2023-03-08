@@ -145,7 +145,7 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
             UploadUtils.deleteFile(icon);
         }
 
-        return ResultVO.ok(null,"删除商品分类成功");
+        return ResultVO.ok(goodsCategory,"删除商品分类成功");
     }
 
     @Override

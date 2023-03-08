@@ -47,6 +47,7 @@ public class EventsGoodsServiceImpl extends ServiceImpl<EventsGoodsMapper, Event
         }
 
         int success = 0;
+        List<Goods> goodsList = new ArrayList<>();
         for (Long id : ids) {
             Goods goods = goodsMapper.selectById(id);
             if (goods != null && goods.getStatus() > 0) {
@@ -54,12 +55,13 @@ public class EventsGoodsServiceImpl extends ServiceImpl<EventsGoodsMapper, Event
                 if (one == null) {
                     boolean result = save(new EventsGoods(eventsId, id));
                     if (result) {
+                        goodsList.add(goods);
                         success++;
                     }
                 }
             }
         }
-        return success > 0 ? ResultVO.ok(null,"新增活动商品：" + success) : ResultVO.fail("新增活动商品失败");
+        return success > 0 ? ResultVO.ok(goodsList,"新增活动商品：" + success) : ResultVO.fail("新增活动商品失败");
     }
 
     @Override
@@ -70,7 +72,7 @@ public class EventsGoodsServiceImpl extends ServiceImpl<EventsGoodsMapper, Event
         }
         // 删除活动商品
         boolean result = remove(new QueryWrapper<EventsGoods>().eq("events_id", eventsId).eq("goods_id", goodsId));
-        return result ? ResultVO.ok(null,"删除活动商品成功") : ResultVO.fail("删除活动商品失败");
+        return result ? ResultVO.ok(one,"删除活动商品成功") : ResultVO.fail("删除活动商品失败");
     }
 
     @Override

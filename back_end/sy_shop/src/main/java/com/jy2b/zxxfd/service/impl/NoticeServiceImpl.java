@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.List;
 
+import static com.jy2b.zxxfd.contants.RedisConstants.INDEX_NOTICE_KEY;
 import static com.jy2b.zxxfd.contants.RedisConstants.NOTICE_KEY;
 
 @Service
@@ -180,6 +181,33 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
 
         noticeMapper.selectPage(noticePage, queryWrapper);
         return ResultVO.ok(noticePage, "查询成功");
+    }
+
+    @Override
+    public ResultVO indexNotice() {
+        // 获取首要公告ID
+        String noticeId = stringRedisTemplate.opsForValue().get(INDEX_NOTICE_KEY);
+
+        Notice notice = getById(noticeId);
+
+        if (notice == null) {
+            notice = query().orderByDesc("create_time").last("limit 1").one();
+            return ResultVO.ok(notice, "查询成功");
+        }
+
+        return ResultVO.ok(notice, "查询成功");
+    }
+
+    @Override
+    public ResultVO setIndexNoticeId(Long id) {
+        // 查询公告是否存在
+        Notice notice = getById(id);
+        if (notice == null) {
+            return ResultVO.fail("公告不存在");
+        }
+
+        stringRedisTemplate.opsForValue().set(INDEX_NOTICE_KEY, id.toString());
+        return ResultVO.ok(notice, "已推送为首要公告");
     }
 
     private Notice saveNoticeCache(Notice notice) {

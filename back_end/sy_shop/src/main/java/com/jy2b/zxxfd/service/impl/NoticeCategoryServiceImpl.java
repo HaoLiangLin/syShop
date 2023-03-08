@@ -63,7 +63,7 @@ public class NoticeCategoryServiceImpl extends ServiceImpl<NoticeCategoryMapper,
         if (noticeCategory.getFid() == null) {
             saveFirstCategory();
         }
-        return result ? ResultVO.ok(null,"新增公告类型成功") : ResultVO.fail("新增公告类型失败");
+        return result ? ResultVO.ok(noticeCategory,"新增公告类型成功") : ResultVO.fail("新增公告类型失败");
     }
 
     @Override
@@ -93,7 +93,7 @@ public class NoticeCategoryServiceImpl extends ServiceImpl<NoticeCategoryMapper,
             saveFirstCategory();
         }
 
-        return ResultVO.ok(null,"删除公告类型成功");
+        return ResultVO.ok(noticeCategory,"删除公告类型成功");
     }
 
     @Override

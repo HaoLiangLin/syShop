@@ -82,6 +82,9 @@ public class RedisConstants {
     // 公告Key
     public static final String NOTICE_KEY = "notice:";
 
+    // 首要公告
+    public static final String INDEX_NOTICE_KEY = "indexNotice";
+
     // 缓存工具类
     public static final Long CACHE_NULL_TTL = 2L;
 }

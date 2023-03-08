@@ -81,7 +81,7 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
             String images = goods.getImages();
             UploadUtils.deleteFiles(images);
         }
-        return result ? ResultVO.ok(null,"新增商品成功") : ResultVO.fail("新增商品失败");
+        return result ? ResultVO.ok(goods,"新增商品成功") : ResultVO.fail("新增商品失败");
     }
 
     @Override
@@ -107,7 +107,7 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         if (result) {
             UploadUtils.deleteFiles(images);
         }
-        return result ? ResultVO.ok(null,"删除商品成功") : ResultVO.fail("删除商品失败");
+        return result ? ResultVO.ok(goods,"删除商品成功") : ResultVO.fail("删除商品失败");
     }
 
     @Override

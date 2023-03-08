@@ -112,6 +112,7 @@ public class SecurityConfig {
                     "/noticeCategory/query/**",
                     "/noticeCategory/select",
                     "/notices/query/**",
+                    "/notices/index",
                     "/resources/image/**",
                     "/swagger-resources/**",
                     "/webjars/**",

@@ -62,7 +62,7 @@ public class EventsServiceImpl extends ServiceImpl<EventsMapper, Events> impleme
             String image = events.getIcon();
             UploadUtils.deleteFile(image);
         }
-        return result ? ResultVO.ok(null,"新增活动成功") : ResultVO.fail("新增活动失败");
+        return result ? ResultVO.ok(events,"新增活动成功") : ResultVO.fail("新增活动失败");
     }
 
     @Override
@@ -84,7 +84,7 @@ public class EventsServiceImpl extends ServiceImpl<EventsMapper, Events> impleme
             }
             saveEventsCache();
         }
-        return result ? ResultVO.ok(null,"删除活动成功") : ResultVO.fail("删除活动失败");
+        return result ? ResultVO.ok(events,"删除活动成功") : ResultVO.fail("删除活动失败");
     }
 
     @Override

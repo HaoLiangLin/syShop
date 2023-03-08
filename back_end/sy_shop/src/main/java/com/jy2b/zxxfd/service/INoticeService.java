@@ -46,4 +46,17 @@ public interface INoticeService extends IService<Notice> {
      * @return ResultVo
      */
     ResultVO queryNoticePage(Integer page, Integer size, NoticeQueryDTO queryDTO);
+
+    /**
+     * 首要公告
+     * @return ResultVO
+     */
+    ResultVO indexNotice();
+
+    /**
+     * 设置首要公告Id
+     * @param id 公告Id
+     * @return ResultVO
+     */
+    ResultVO setIndexNoticeId(Long id);
 }

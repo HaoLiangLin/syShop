@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,4 +21,7 @@ public class UserCollection {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     @TableField("gid")
     private Long gid;
+
+    @TableField("create_time")
+    private Date createTime;
 }

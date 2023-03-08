@@ -184,7 +184,7 @@ public class GoodsEvaluationServiceImpl extends ServiceImpl<GoodsEvaluationMappe
         if (!result) {
             UploadUtils.deleteFiles(images);
         }
-        return result ? ResultVO.ok(null,"评价成功") : ResultVO.fail("评价失败");
+        return result ? ResultVO.ok(goodsEvaluation,"评价成功") : ResultVO.fail("评价失败");
     }
 
     @Override
@@ -236,7 +236,7 @@ public class GoodsEvaluationServiceImpl extends ServiceImpl<GoodsEvaluationMappe
             UploadUtils.deleteFiles(images);
         }
 
-        return result ? ResultVO.ok(null,"删除评价成功") : ResultVO.fail("删除评价失败");
+        return result ? ResultVO.ok(comment,"删除评价成功") : ResultVO.fail("删除评价失败");
     }
 
     @Override

@@ -45,4 +45,15 @@ public class NoticeController {
     public ResultVO queryNoticePage(@PathVariable("page") Integer page, @PathVariable("size") Integer size, @RequestBody(required = false) NoticeQueryDTO queryDTO) {
         return noticeService.queryNoticePage(page, size, queryDTO);
     }
+
+    @GetMapping("/index")
+    public ResultVO indexNotice() {
+        return noticeService.indexNotice();
+    }
+
+    @PutMapping("/index/{noticeId}")
+    @PreAuthorize("hasAnyAuthority('notice:update')")
+    public ResultVO setIndexNoticeId(@PathVariable("noticeId") Long id) {
+        return noticeService.setIndexNoticeId(id);
+    }
 }

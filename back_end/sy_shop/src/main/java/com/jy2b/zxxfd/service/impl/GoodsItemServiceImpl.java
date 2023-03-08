@@ -107,7 +107,7 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
             String icon = goodsItem.getIcon();
             UploadUtils.deleteFile(icon);
         }
-        return result ? ResultVO.ok(null,"添加商品属性成功") : ResultVO.fail("添加商品属性失败");
+        return result ? ResultVO.ok(goodsItem,"添加商品属性成功") : ResultVO.fail("添加商品属性失败");
     }
 
     @Override
@@ -123,7 +123,7 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
         Long sales = goodsItem.getSales();
         if (sales > 0) {
             boolean result = update().set("status", 0).eq("id", id).update();
-            return result ? ResultVO.ok(null, "下架商品属性成功") : ResultVO.fail("下架商品属性失败");
+            return result ? ResultVO.ok(goodsItem, "下架商品属性成功") : ResultVO.fail("下架商品属性失败");
         }
 
         // 获取商品属性颜色
@@ -143,7 +143,7 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
                 }
             }
         }
-        return result ? ResultVO.ok(null, "删除商品属性成功") : ResultVO.fail("删除商品属性失败");
+        return result ? ResultVO.ok(goodsItem, "删除商品属性成功") : ResultVO.fail("删除商品属性失败");
     }
 
     @Override

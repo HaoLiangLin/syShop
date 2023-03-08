@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -42,7 +43,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
             return ResultVO.fail("商品已收藏");
         }
         // 新增收藏
-        boolean result = save(new UserCollection(userId, gid));
+        boolean result = save(new UserCollection(userId, gid, null));
         return result ? ResultVO.ok(null,"收藏成功") : ResultVO.fail("收藏失败");
     }
 
@@ -76,7 +77,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
         // 获取收藏
-        List<UserCollection> userCollectionList = query().eq("uid", userId).list();
+        List<UserCollection> userCollectionList = query().eq("uid", userId).orderByDesc("create_time").list();
 
         if (userCollectionList.isEmpty()) {
             return ResultVO.ok(userCollectionList, "查询成功");

@@ -62,7 +62,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
         shoppingCart.setQuantity(quantity);
 
         boolean result = save(shoppingCart);
-        return result ? ResultVO.ok(null,"新增购物车成功") : ResultVO.fail("新增购物车失败");
+        return result ? ResultVO.ok(shoppingCart,"新增购物车成功") : ResultVO.fail("新增购物车失败");
     }
 
     @Override
@@ -84,7 +84,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
         // 删除购物车
         boolean result = removeById(id);
 
-        return result ? ResultVO.ok(null,"删除购物车成功") : ResultVO.fail("删除购物车失败");
+        return result ? ResultVO.ok(shoppingCart,"删除购物车成功") : ResultVO.fail("删除购物车失败");
     }
 
     @Override
