@@ -38,15 +38,6 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
     private StringRedisTemplate stringRedisTemplate;
 
     @Override
-    public ResultVO queryCategoryList(Integer page, Integer size) {
-        Page<GoodsCategory> goodsCategoryPage = new Page<>(page, size);
-
-        // 查询一级分类
-        goodsCategoryMapper.selectPage(goodsCategoryPage, new QueryWrapper<GoodsCategory>().isNull("fid"));
-        return ResultVO.ok(goodsCategoryPage, "查询成功");
-    }
-
-    @Override
     public ResultVO queryCategoryByOne() {
         String result = stringRedisTemplate.opsForValue().get(GOODS_CATEGORY_FIRST);
         if (StrUtil.isNotBlank(result)) {
@@ -259,6 +250,8 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
         categoryDTO.setId(goodsCategory.getId());
         categoryDTO.setName(goodsCategory.getName());
         categoryDTO.setIcon(goodsCategory.getIcon());
+        categoryDTO.setFid(goodsCategory.getFid());
+        categoryDTO.setRemark(goodsCategory.getRemark());
         // 判断分类是否存在子分类
         List<GoodsCategory> sGoodsCategories = query().eq("fid", goodsCategory.getId()).list();
         if (!sGoodsCategories.isEmpty()) {

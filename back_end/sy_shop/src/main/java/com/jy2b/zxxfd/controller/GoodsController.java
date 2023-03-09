@@ -53,10 +53,10 @@ public class GoodsController {
         return goodsService.uploadOrUpdateGoodsImages(id, files);
     }
 
-    @GetMapping("/find")
+    @GetMapping("/find/{id}")
     @PreAuthorize("hasAnyAuthority('goods:update')")
     @ApiOperation(value = "管理员：根据id查询商品")
-    public ResultVO findGoodsById(@RequestParam("id") Long id) {
+    public ResultVO findGoodsById(@PathVariable("id") Long id) {
         return goodsService.findGoodsById(id);
     }
 

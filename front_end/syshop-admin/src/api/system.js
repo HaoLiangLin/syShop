@@ -61,17 +61,17 @@ export function queryEvents() {
   return request.get('/events/query')
 }
 
-// 上传活动图片
-export function uploadEventsIcon(file) {
-  return request.post('/events/uploadIcon', {
+// 上传或修改活动图片
+export function uploadOrUpdateEventsIcon(id, file) {
+  return request.post(`/events/uploadOrUpdateIcon/${id}`, {
     file
   })
 }
 
 // 新增活动
-export function saveEvents(name, icon, startTime, deadline, remark) {
+export function saveEvents(name, startTime, deadline, remark) {
   return request.post('/events/save', {
-    name, icon, startTime, deadline, remark
+    name, startTime, deadline, remark
   })
 }
 
@@ -81,9 +81,9 @@ export function deleteEvents(id) {
 }
 
 // 修改活动
-export function updateEvents(id, name, icon, startTime, deadline, remark) {
+export function updateEvents(id, name, startTime, deadline, remark) {
   return request.put(`/events/update/${id}`, {
-    name, icon, startTime, deadline, remark
+    name, startTime, deadline, remark
   })
 }
 
@@ -112,28 +112,9 @@ export function deleteEventsGoods(eventsId, goodsId) {
   return request.delete(`/eventsGoods/delete/${eventsId}/${goodsId}`)
 }
 
-// 查询充值套餐
-export function queryRechargeCombo() {
-  return request.get('/rechargeCombo/query')
-}
-
-// 新增充值套餐
-export function saveRechargeCombo(name, price, points, discount) {
-  return request.post('/rechargeCombo/save', {
-    name, price, points, discount
-  })
-}
-
-// 删除充值套餐
-export function deleteRechargeCombo(id) {
-  return request.delete(`/rechargeCombo/delete/${id}`)
-}
-
-// 修改充值套餐
-export function updateRechargeCombo(id, name, price, points, discount) {
-  return request.put('/rechargeCombo/update', {
-    id, name, price, points, discount
-  })
+// 账单统计
+export function billCount(startDate, endDate) {
+  return request.get(`/bill/count/${startDate}/${endDate}`)
 }
 
 export default {
@@ -146,13 +127,11 @@ export default {
   saveNotice,
   deleteNotice,
   queryEvents,
-  uploadEventsIcon,
+  uploadOrUpdateEventsIcon,
   saveEvents,
   deleteEvents,
   updateEvents,
   queryEventsGoods,
   saveEventsGoods,
-  deleteEventsGoods,
-  queryRechargeCombo,
-  saveRechargeCombo
+  deleteEventsGoods
 }

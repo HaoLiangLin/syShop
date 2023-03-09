@@ -24,13 +24,6 @@ public class GoodsCategoryController {
     @Resource
     private IGoodsCategoryService goodsCategoryService;
 
-    @GetMapping("/list/{page}/{size}")
-    @PreAuthorize("hasAnyAuthority('goods:category:update')")
-    @ApiOperation(value = "分页查询分类信息")
-    public ResultVO queryCategoryList(@PathVariable("page") Integer page, @PathVariable("size") Integer size) {
-        return goodsCategoryService.queryCategoryList(page, size);
-    }
-
     @GetMapping("/query/one")
     @ApiOperation(value = "查询所有一级分类")
     public ResultVO queryCategoryByOne() {

@@ -17,5 +17,10 @@ public class CategoryDTO {
 
     private String icon;
 
+    private String remark;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private Long fid;
+
     private List<CategoryDTO> children;
 }

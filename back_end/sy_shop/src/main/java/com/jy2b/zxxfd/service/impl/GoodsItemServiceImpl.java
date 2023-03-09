@@ -21,6 +21,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author 林武泰
@@ -332,7 +333,98 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
         }
         List<GoodsItem> itemList = list(queryWrapper);
 
-        return ResultVO.ok(itemList, "查询成功");
+        List<String> colorList = new ArrayList<>();
+        List<String> sizeList = new ArrayList<>();
+        List<String> comboList = new ArrayList<>();
+        List<String> editionList = new ArrayList<>();
+
+        for (GoodsItem goodsItem : itemList) {
+            String color = goodsItem.getColor();
+            String size1 = goodsItem.getSize();
+            String combo = goodsItem.getCombo();
+            String edition = goodsItem.getEdition();
+
+            // 判断颜色是否不为空
+            if (StrUtil.isNotBlank(color)) {
+                // 判断选项集合是否为空
+                if (colorList.isEmpty()) {
+                    // 将选项直接存入
+                    colorList.add(color);
+                }
+                // 过滤统计是否有相同值
+                long count = colorList.stream().filter(c -> c.equals(color)).count();
+                // 每页相同值
+                if (count == 0) {
+                    // 将选项存入
+                    colorList.add(color);
+                }
+            }
+
+            // 判断大小是否不为空
+            if (StrUtil.isNotBlank(size1)) {
+                // 判断选项集合是否为空
+                if (sizeList.isEmpty()) {
+                    // 将选项直接存入
+                    sizeList.add(size1);
+                }
+                // 过滤统计是否有相同值
+                long count = sizeList.stream().filter(s -> s.equals(size1)).count();
+                // 每页相同值
+                if (count == 0) {
+                    // 将选项存入
+                    sizeList.add(size1);
+                }
+            }
+
+            // 判断套餐是否不为空
+            if (StrUtil.isNotBlank(combo)) {
+                // 判断选项集合是否为空
+                if (comboList.isEmpty()) {
+                    // 将选项直接存入
+                    comboList.add(combo);
+                }
+                // 过滤统计是否有相同值
+                long count = comboList.stream().filter(c -> c.equals(combo)).count();
+                // 每页相同值
+                if (count == 0) {
+                    // 将选项存入
+                    comboList.add(combo);
+                }
+            }
+
+            // 判断版本是否不为空
+            if (StrUtil.isNotBlank(edition)) {
+                // 判断选项集合是否为空
+                if (editionList.isEmpty()) {
+                    // 将选项直接存入
+                    editionList.add(edition);
+                }
+                // 过滤统计是否有相同值
+                long count = editionList.stream().filter(e -> e.equals(edition)).count();
+                // 每页相同值
+                if (count == 0) {
+                    // 将选项存入
+                    editionList.add(edition);
+                }
+            }
+        }
+
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("data", itemList);
+        if (!colorList.isEmpty()) {
+            resultMap.put("colorOption", colorList);
+        }
+        if (!sizeList.isEmpty()) {
+            resultMap.put("sizeOption", sizeList);
+        }
+        if (!comboList.isEmpty()) {
+            resultMap.put("comboOption", comboList);
+        }
+        if (!editionList.isEmpty()) {
+            resultMap.put("editionOption", editionList);
+        }
+
+        return ResultVO.ok(resultMap, "查询成功");
     }
 
     @Override
@@ -415,7 +507,100 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
         }
         itemMapper.selectPage(goodsItemPage, queryWrapper);
 
-        return ResultVO.ok(goodsItemPage, "查询成功");
+        List<GoodsItem> records = goodsItemPage.getRecords();
+
+        List<String> colorList = new ArrayList<>();
+        List<String> sizeList = new ArrayList<>();
+        List<String> comboList = new ArrayList<>();
+        List<String> editionList = new ArrayList<>();
+
+        for (GoodsItem goodsItem : records) {
+            String color = goodsItem.getColor();
+            String size1 = goodsItem.getSize();
+            String combo = goodsItem.getCombo();
+            String edition = goodsItem.getEdition();
+
+            // 判断颜色是否不为空
+            if (StrUtil.isNotBlank(color)) {
+                // 判断选项集合是否为空
+                if (colorList.isEmpty()) {
+                    // 将选项直接存入
+                    colorList.add(color);
+                }
+                // 过滤统计是否有相同值
+                long count = colorList.stream().filter(c -> c.equals(color)).count();
+                // 每页相同值
+                if (count == 0) {
+                    // 将选项存入
+                    colorList.add(color);
+                }
+            }
+
+            // 判断大小是否不为空
+            if (StrUtil.isNotBlank(size1)) {
+                // 判断选项集合是否为空
+                if (sizeList.isEmpty()) {
+                    // 将选项直接存入
+                    sizeList.add(size1);
+                }
+                // 过滤统计是否有相同值
+                long count = sizeList.stream().filter(s -> s.equals(size1)).count();
+                // 每页相同值
+                if (count == 0) {
+                    // 将选项存入
+                    sizeList.add(size1);
+                }
+            }
+
+            // 判断套餐是否不为空
+            if (StrUtil.isNotBlank(combo)) {
+                // 判断选项集合是否为空
+                if (comboList.isEmpty()) {
+                    // 将选项直接存入
+                    comboList.add(combo);
+                }
+                // 过滤统计是否有相同值
+                long count = comboList.stream().filter(c -> c.equals(combo)).count();
+                // 每页相同值
+                if (count == 0) {
+                    // 将选项存入
+                    comboList.add(combo);
+                }
+            }
+
+            // 判断版本是否不为空
+            if (StrUtil.isNotBlank(edition)) {
+                // 判断选项集合是否为空
+                if (editionList.isEmpty()) {
+                    // 将选项直接存入
+                    editionList.add(edition);
+                }
+                // 过滤统计是否有相同值
+                long count = editionList.stream().filter(e -> e.equals(edition)).count();
+                // 每页相同值
+                if (count == 0) {
+                    // 将选项存入
+                    editionList.add(edition);
+                }
+            }
+        }
+
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("data", goodsItemPage);
+        if (!colorList.isEmpty()) {
+            resultMap.put("colorOption", colorList);
+        }
+        if (!sizeList.isEmpty()) {
+            resultMap.put("sizeOption", sizeList);
+        }
+        if (!comboList.isEmpty()) {
+            resultMap.put("comboOption", comboList);
+        }
+        if (!editionList.isEmpty()) {
+            resultMap.put("editionOption", editionList);
+        }
+
+        return ResultVO.ok(resultMap, "查询成功");
     }
 
     @Override

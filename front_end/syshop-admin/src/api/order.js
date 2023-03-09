@@ -14,7 +14,13 @@ export function updateOrder(id, logisticsStatus, status, remarks, name, phone, p
   })
 }
 
+// 订单统计
+export function orderCount(startDate, endDate) {
+  return request.get(`/orders/count/${startDate}/${endDate}`)
+}
+
 export default {
   queryOrder,
-  updateOrder
+  updateOrder,
+  orderCount
 }

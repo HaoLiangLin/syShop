@@ -13,14 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Transactional
 public interface IGoodsCategoryService extends IService<GoodsCategory> {
     /**
-     * 分页查询商品分类
-     * @param page 页数
-     * @param size 每页数量
-     * @return ResultVo
-     */
-    ResultVO queryCategoryList(Integer page, Integer size);
-
-    /**
      * 查询所有一级商品分类
      * @return ResultVo
      */
