@@ -8,6 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * @author 林武泰
+ * 用户收货地址业务接口
+ */
 @Transactional
 public interface IUserAddressService extends IService<UserAddress> {
     /**

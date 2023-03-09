@@ -14,6 +14,7 @@ import javax.annotation.Resource;
 import java.util.Objects;
 
 /**
+ * @author 林武泰
  * 账号密码认证器
  */
 @Component

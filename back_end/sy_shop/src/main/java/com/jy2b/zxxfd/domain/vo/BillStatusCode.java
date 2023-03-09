@@ -2,6 +2,9 @@ package com.jy2b.zxxfd.domain.vo;
 
 import lombok.Getter;
 
+/**
+ * @author 林武泰
+ */
 @Getter
 public enum BillStatusCode {
     paymentFailed(0, "支付失败"),

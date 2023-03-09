@@ -6,7 +6,10 @@ import com.jy2b.zxxfd.domain.Order;
 import com.jy2b.zxxfd.domain.vo.ResultVO;
 import org.springframework.transaction.annotation.Transactional;
 
-
+/**
+ * @author 林武泰
+ * 订单业务接口
+ */
 @Transactional
 public interface IOrderService extends IService<Order> {
     /**
@@ -34,9 +37,10 @@ public interface IOrderService extends IService<Order> {
     /**
      * 支付订单
      * @param id 订单号
+     * @param points 抵扣积分
      * @return ResultVo
      */
-    ResultVO paymentOrder(Long id);
+    ResultVO paymentOrder(Long id, Long points);
 
     /**
      * 根据订单号查询订单
@@ -104,14 +108,6 @@ public interface IOrderService extends IService<Order> {
      * @return ResultVo
      */
     ResultVO updateOrder(OrderUpdateFromDTO updateFromDTO);
-
-    /**
-     * 今日新增订单
-     * 今日成交订单
-     * 今日营业额
-     *
-     * 流水
-     */
 
     /**
      * 订单统计

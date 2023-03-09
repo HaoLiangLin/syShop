@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.List;
 
+/**
+ * @author 林武泰
+ * 用户收货地址接口
+ */
 @RestController
 @CrossOrigin
 @RequestMapping("/address")

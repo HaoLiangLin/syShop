@@ -7,6 +7,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * @author 林武泰
+ * 中国行政区业务接口
+ */
 @Transactional
 public interface IProvinceService extends IService<Province> {
     /**
@@ -35,7 +39,5 @@ public interface IProvinceService extends IService<Province> {
      * @return List<Province>
      */
     List<Province> selectAllAreaByProvinceAndCity(String province, String city);
-
-
 
 }

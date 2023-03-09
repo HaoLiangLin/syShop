@@ -1,12 +1,13 @@
 package com.jy2b.zxxfd.domain.dto;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.util.Date;
 
+/**
+ * @author 林武泰
+ */
 @Data
 public class GoodsFindDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING)

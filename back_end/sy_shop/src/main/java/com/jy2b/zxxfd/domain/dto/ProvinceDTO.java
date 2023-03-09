@@ -5,6 +5,9 @@ import lombok.Data;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author 林武泰
+ */
 @Data
 public class ProvinceDTO {
     private String provinceName; // 省名称

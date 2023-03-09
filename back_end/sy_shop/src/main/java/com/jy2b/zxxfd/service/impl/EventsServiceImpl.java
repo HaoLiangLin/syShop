@@ -7,11 +7,13 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jy2b.zxxfd.domain.Events;
 import com.jy2b.zxxfd.domain.dto.EventsDTO;
 import com.jy2b.zxxfd.domain.vo.ResultVO;
+import com.jy2b.zxxfd.domain.vo.StatusCode;
 import com.jy2b.zxxfd.mapper.EventsMapper;
 import com.jy2b.zxxfd.service.IEventsService;
 import com.jy2b.zxxfd.utils.UploadUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -19,6 +21,9 @@ import java.util.List;
 
 import static com.jy2b.zxxfd.contants.RedisConstants.EVENTS_KEY;
 
+/**
+ * @author 林武泰
+ */
 @Service
 public class EventsServiceImpl extends ServiceImpl<EventsMapper, Events> implements IEventsService {
     @Resource
@@ -30,11 +35,6 @@ public class EventsServiceImpl extends ServiceImpl<EventsMapper, Events> impleme
         String name = saveDTO.getName();
         if (StrUtil.isBlank(name)) {
             return ResultVO.fail("活动名称不能为空");
-        }
-        // 获取活动图片
-        String icon = saveDTO.getIcon();
-        if (StrUtil.isBlank(icon)) {
-            return ResultVO.fail("活动图片不能为空");
         }
 
         // 获取活动期限
@@ -122,6 +122,41 @@ public class EventsServiceImpl extends ServiceImpl<EventsMapper, Events> impleme
             saveEventsCache();
         }
         return result ? ResultVO.ok(null,"修改活动成功") : ResultVO.fail("修改活动失败");
+    }
+
+    @Override
+    public ResultVO uploadOrUpdateEventsIcon(Long id, MultipartFile file) {
+        // 获取活动
+        Events events = getById(id);
+        // 判断活动是否存在
+        if (events == null) {
+            return ResultVO.fail("活动不存在");
+        }
+
+        // 获取旧图片
+        String icon = events.getIcon();
+        // 保存图标
+        ResultVO resultVO = UploadUtils.saveFile(file, "/events/icon");
+        if (resultVO.getCode().equals(StatusCode.FAIL)) {
+            return resultVO;
+        }
+
+        String fileName = resultVO.getData().toString();
+        // 修改活动图片
+        boolean updateResult = update().set("icon", fileName).eq("id", id).update();
+
+        if (updateResult) {
+            // 删除旧图片
+            if (StrUtil.isNotBlank(icon)) {
+                UploadUtils.deleteFile(icon);
+            }
+        } else {
+            // 删除新图片
+            UploadUtils.deleteFile(fileName);
+            return ResultVO.fail("修改活动图片失败");
+        }
+
+        return ResultVO.ok(fileName, "修改活动图片成功");
     }
 
     @Override

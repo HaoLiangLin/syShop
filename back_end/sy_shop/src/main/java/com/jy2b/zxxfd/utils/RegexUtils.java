@@ -2,6 +2,10 @@ package com.jy2b.zxxfd.utils;
 
 import cn.hutool.core.util.StrUtil;
 
+/**
+ * @author 林武泰
+ * 正则校验工具类
+ */
 public class RegexUtils {
     /**
      * 是否非负浮点数

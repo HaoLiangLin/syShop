@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
+/**
+ * @author 林武泰
+ * 角色接口
+ */
 @RestController
 @CrossOrigin
 @RequestMapping("/roles")

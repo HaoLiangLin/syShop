@@ -18,6 +18,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
 /**
+ * @author 林武泰
  * 手机验证码登录过滤器
  */
 public class MyAuthenticationFilter extends AbstractAuthenticationProcessingFilter {

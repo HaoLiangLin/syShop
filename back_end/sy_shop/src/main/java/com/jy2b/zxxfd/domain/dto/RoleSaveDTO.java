@@ -2,6 +2,9 @@ package com.jy2b.zxxfd.domain.dto;
 
 import lombok.Data;
 
+/**
+ * @author 林武泰
+ */
 @Data
 public class RoleSaveDTO {
     private String name; // 角色名称

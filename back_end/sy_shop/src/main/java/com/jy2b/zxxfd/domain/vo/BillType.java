@@ -2,6 +2,9 @@ package com.jy2b.zxxfd.domain.vo;
 
 import lombok.Getter;
 
+/**
+ * @author 林武泰
+ */
 @Getter
 public enum BillType {
     disburse(0, "支出"),

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 
 /**
+ * @author 林武泰
  * 手机验证码认证器
  */
 @Component

@@ -7,6 +7,10 @@ import com.jy2b.zxxfd.domain.vo.ResultVO;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * @author 林武泰
+ * 商品评价业务接口
+ */
 @Transactional
 public interface IGoodsEvaluationService extends IService<GoodsEvaluation> {
     /**

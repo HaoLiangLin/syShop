@@ -3,6 +3,9 @@ package com.jy2b.zxxfd.domain.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
+/**
+ * @author 林武泰
+ */
 // 钱包充值DTO
 @Data
 public class RechargeFromDTO {

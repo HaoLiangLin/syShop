@@ -12,6 +12,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * @author 林武泰
+ * 授权认证错误处理器
+ */
 @Component
 public class AccessDeniedHandleImpl implements AccessDeniedHandler {
     @Override

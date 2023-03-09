@@ -7,6 +7,10 @@ import com.jy2b.zxxfd.domain.dto.NoticeQueryDTO;
 import com.jy2b.zxxfd.domain.vo.ResultVO;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * @author 林武泰
+ * 公告业务接口
+ */
 @Transactional
 public interface INoticeService extends IService<Notice> {
     /**

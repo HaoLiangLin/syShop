@@ -5,7 +5,12 @@ import com.jy2b.zxxfd.domain.Events;
 import com.jy2b.zxxfd.domain.dto.EventsDTO;
 import com.jy2b.zxxfd.domain.vo.ResultVO;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * @author 林武泰
+ * 活动业务接口
+ */
 @Transactional
 public interface IEventsService extends IService<Events> {
     /**
@@ -29,6 +34,14 @@ public interface IEventsService extends IService<Events> {
      * @return ResultVo
      */
     ResultVO updateEvents(Long id, EventsDTO updateDTO);
+
+    /**
+     * 上传或修改活动图标
+     * @param id 活动ID
+     * @param file 活动图片文件
+     * @return ResultVO
+     */
+    ResultVO uploadOrUpdateEventsIcon(Long id, MultipartFile file);
 
     /**
      * 查询活动

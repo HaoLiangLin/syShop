@@ -22,6 +22,9 @@ import java.util.List;
 import static com.jy2b.zxxfd.contants.RedisConstants.INDEX_NOTICE_KEY;
 import static com.jy2b.zxxfd.contants.RedisConstants.NOTICE_KEY;
 
+/**
+ * @author 林武泰
+ */
 @Service
 public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> implements INoticeService {
     @Resource

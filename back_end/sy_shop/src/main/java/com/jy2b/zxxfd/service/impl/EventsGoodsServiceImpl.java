@@ -20,6 +20,9 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author 林武泰
+ */
 @Service
 public class EventsGoodsServiceImpl extends ServiceImpl<EventsGoodsMapper, EventsGoods> implements IEventsGoodsService {
     @Resource

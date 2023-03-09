@@ -25,6 +25,9 @@ import java.util.List;
 
 import static com.jy2b.zxxfd.contants.RedisConstants.COMMENT_LIKED_KEY;
 
+/**
+ * @author 林武泰
+ */
 @Service
 public class EvaluationCommentServiceImpl extends ServiceImpl<EvaluationCommentMapper, EvaluationComment> implements IEvaluationCommentService {
     @Resource

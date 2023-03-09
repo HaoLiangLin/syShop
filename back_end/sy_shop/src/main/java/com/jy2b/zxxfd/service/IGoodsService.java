@@ -9,15 +9,12 @@ import com.jy2b.zxxfd.domain.vo.ResultVO;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * @author 林武泰
+ * 商品业务接口
+ */
 @Transactional
 public interface IGoodsService extends IService<Goods> {
-    /**
-     * 上传商品封面
-     * @param files 上传图片
-     * @return ResultVo
-     */
-    ResultVO uploadImage(MultipartFile[] files);
-
     /**
      * 新增商品
      * @param goodsSaveFromDTO 商品信息
@@ -38,6 +35,14 @@ public interface IGoodsService extends IService<Goods> {
      * @return ResultVO
      */
     ResultVO updateGoods(GoodsUpdateFromDTO updateFromDTO);
+
+    /**
+     * 上传或修改商品封面
+     * @param id 商品Id
+     * @param files 封面图片文件
+     * @return ResultVO
+     */
+    ResultVO uploadOrUpdateGoodsImages(Long id, MultipartFile[] files);
 
     /**
      * 管理员：根据id查询商品

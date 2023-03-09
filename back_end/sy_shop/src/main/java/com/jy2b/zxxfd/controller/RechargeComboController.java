@@ -1,6 +1,5 @@
 package com.jy2b.zxxfd.controller;
 
-import cn.hutool.json.JSONUtil;
 import com.jy2b.zxxfd.domain.RechargeCombo;
 import com.jy2b.zxxfd.domain.dto.RechargeComboManageDTO;
 import com.jy2b.zxxfd.domain.vo.ResultVO;
@@ -13,7 +12,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.List;
 
-
+/**
+ * @author 林武泰
+ * 充值套餐接口
+ */
 @RestController
 @CrossOrigin
 @RequestMapping("/rechargeCombo")

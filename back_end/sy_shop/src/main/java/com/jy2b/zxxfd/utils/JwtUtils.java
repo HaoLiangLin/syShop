@@ -12,6 +12,10 @@ import javax.crypto.SecretKey;
 
 import java.util.Date;
 
+/**
+ * @author 林武泰
+ * JWT工具类
+ */
 public class JwtUtils {
     // 设置字符串密钥
     private static final String JWT_KEY =

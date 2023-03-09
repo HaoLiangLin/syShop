@@ -6,6 +6,10 @@ import com.jy2b.zxxfd.domain.dto.EvaluationCommentSaveDTO;
 import com.jy2b.zxxfd.domain.vo.ResultVO;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * @author 林武泰
+ * 评价评论业务接口
+ */
 @Transactional
 public interface IEvaluationCommentService extends IService<EvaluationComment> {
     /**

@@ -6,6 +6,10 @@ import com.jy2b.zxxfd.domain.dto.RechargeDTO;
 import com.jy2b.zxxfd.domain.vo.ResultVO;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * @author 林武泰
+ * 用户钱包业务接口
+ */
 @Transactional
 public interface IUserWallerService extends IService<UserWaller> {
     /**

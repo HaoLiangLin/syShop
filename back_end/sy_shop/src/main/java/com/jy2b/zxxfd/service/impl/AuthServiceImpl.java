@@ -26,6 +26,9 @@ import java.util.concurrent.TimeUnit;
 
 import static com.jy2b.zxxfd.contants.RedisConstants.AUTH_LABEL_KEY;
 
+/**
+ * @author 林武泰
+ */
 @Service
 public class AuthServiceImpl extends ServiceImpl<AuthMapper, Auth> implements IAuthService {
     @Resource

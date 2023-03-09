@@ -3,6 +3,9 @@ package com.jy2b.zxxfd.domain.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
+/**
+ * @author 林武泰
+ */
 // 新增商品DTO
 @Data
 public class GoodsSaveFromDTO {

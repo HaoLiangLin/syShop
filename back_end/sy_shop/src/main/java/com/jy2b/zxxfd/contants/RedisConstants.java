@@ -1,5 +1,9 @@
 package com.jy2b.zxxfd.contants;
 
+/**
+ * @author 林武泰
+ * 缓存静态常量
+ */
 public class RedisConstants {
     // 用户注册验证码
     public static final String REGISTER_CODE_KEY = "register:code:";

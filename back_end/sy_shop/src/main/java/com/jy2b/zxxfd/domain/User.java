@@ -9,6 +9,9 @@ import lombok.Data;
 
 import java.util.Date;
 
+/**
+ * @author 林武泰
+ */
 @Data
 @TableName("tb_user")
 public class User {

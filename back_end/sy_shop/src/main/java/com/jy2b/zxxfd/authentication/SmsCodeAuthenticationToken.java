@@ -8,6 +8,7 @@ import org.springframework.util.Assert;
 import java.util.Collection;
 
 /**
+ * @author 林武泰
  * 手机验证码登录认证
  */
 public class SmsCodeAuthenticationToken extends AbstractAuthenticationToken {

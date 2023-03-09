@@ -15,6 +15,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
+ * @author 林武泰
  * 自定义逻辑控制认证
  * 根据唯一性的用户名查询登录用户信息和用户角色权限信息
  */

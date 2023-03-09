@@ -8,6 +8,10 @@ import com.jy2b.zxxfd.domain.dto.RoleUpdateDTO;
 import com.jy2b.zxxfd.domain.vo.ResultVO;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * @author 林武泰
+ * 角色业务接口
+ */
 @Transactional
 public interface IRoleService extends IService<Role> {
 

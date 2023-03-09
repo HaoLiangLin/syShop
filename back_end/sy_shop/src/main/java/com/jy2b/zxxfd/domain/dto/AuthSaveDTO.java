@@ -2,6 +2,9 @@ package com.jy2b.zxxfd.domain.dto;
 
 import lombok.Data;
 
+/**
+ * @author 林武泰
+ */
 @Data
 public class AuthSaveDTO {
     private String name; // 权限名称

@@ -3,6 +3,9 @@ package com.jy2b.zxxfd.domain.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
+/**
+ * @author 林武泰
+ */
 @Data
 public class GoodsItemSaveFromDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
@@ -24,8 +27,6 @@ public class GoodsItemSaveFromDTO {
     private Long stock; // 库存
 
     private Integer status;
-
-    private String icon; // 图片
 
     private String remark; // 备注
 }

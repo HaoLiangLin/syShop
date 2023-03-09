@@ -11,6 +11,7 @@ import com.jy2b.zxxfd.domain.Goods;
 import com.jy2b.zxxfd.domain.GoodsCategory;
 import com.jy2b.zxxfd.domain.GoodsItem;
 import com.jy2b.zxxfd.domain.vo.ResultVO;
+import com.jy2b.zxxfd.domain.vo.StatusCode;
 import com.jy2b.zxxfd.mapper.GoodsCategoryMapper;
 import com.jy2b.zxxfd.mapper.GoodsItemMapper;
 import com.jy2b.zxxfd.mapper.GoodsMapper;
@@ -26,6 +27,9 @@ import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * @author 林武泰
+ */
 @Service
 public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements IGoodsService {
     @Resource
@@ -39,18 +43,6 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
 
     @Resource
     private IProvinceService provinceService;
-
-    @Override
-    public ResultVO uploadImage(MultipartFile[] files) {
-        if (files.length > SystemConstants.GOODS_IMAGES_LENGTH) {
-            return ResultVO.fail("上传图片不能超过" + SystemConstants.GOODS_IMAGES_LENGTH + "张");
-        }
-
-        MultipartFile[] multipartFiles = new MultipartFile[SystemConstants.GOODS_IMAGES_LENGTH];
-        System.arraycopy(files, 0, multipartFiles, 0, files.length);
-
-        return UploadUtils.saveFiles(multipartFiles, "/goods/image");
-    }
 
     @Override
     public ResultVO saveGoods(GoodsSaveFromDTO goodsSaveFromDTO) {
@@ -68,7 +60,7 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         // 获取发货省份
         String province = goodsSaveFromDTO.getProvince();
         // 省份代码
-        String provinceCode = null;
+        String provinceCode;
         // 判断省份是否存在
         if (StrUtil.isNotBlank(province)) {
             List<Province> provinceList = provinceService.selectAllProvince();
@@ -130,6 +122,9 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         goods.setProvince(province);
         goods.setCity(city);
         goods.setDistrict(area);
+
+        // 不设置图片
+        goods.setImages(null);
 
         // 6. 新增商品
         boolean result = save(goods);
@@ -259,10 +254,6 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         if (updateFromDTO.getRecommend() == null || updateFromDTO.getRecommend() > 1 || updateFromDTO.getRecommend() < 0) {
             updateFromDTO.setRecommend(beforeGoods.getRecommend());
         }
-        if (StrUtil.isNotBlank(updateFromDTO.getImages())) {
-            String images = beforeGoods.getImages();
-            UploadUtils.deleteFiles(images);
-        }
 
         // 获取商品状态
         Integer status = updateFromDTO.getStatus();
@@ -273,6 +264,11 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
                 Integer itemCount = itemMapper.selectCount(queryWrapper);
                 if (itemCount < 1) {
                     return ResultVO.fail("商品上架失败，商品属性需满足至少一个已上架");
+                }
+
+                String images = beforeGoods.getImages();
+                if (StrUtil.isBlank(images)) {
+                    return ResultVO.fail("商品封面未上传");
                 }
             }
 
@@ -287,6 +283,47 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         // 修改商品
         boolean result = updateById(goods);
         return result ? ResultVO.ok(null,"修改商品成功") : ResultVO.fail("修改商品失败");
+    }
+
+    @Override
+    public ResultVO uploadOrUpdateGoodsImages(Long id, MultipartFile[] files) {
+        // 获得商品
+        Goods goods = getById(id);
+        // 判断商品是否存在
+        if (goods == null) {
+            return ResultVO.fail("商品不存在");
+        }
+
+        // 获取旧封面
+        String images = goods.getImages();
+
+        // 保存封面图片
+        if (files.length > SystemConstants.GOODS_IMAGES_LENGTH) {
+            return ResultVO.fail("上传商品图片不能超过" + SystemConstants.GOODS_IMAGES_LENGTH + "张");
+        }
+
+        MultipartFile[] multipartFiles = new MultipartFile[SystemConstants.GOODS_IMAGES_LENGTH];
+        System.arraycopy(files, 0, multipartFiles, 0, files.length);
+
+        String imageSavePath = "/goods/image";
+        ResultVO resultVO = UploadUtils.saveFiles(multipartFiles, imageSavePath);
+        if (resultVO.getCode().equals(StatusCode.FAIL)) {
+            return resultVO;
+        }
+        String fileNames = resultVO.getData().toString();
+
+        boolean updateResult = update().set("images", fileNames).eq("id", id).update();
+
+        if (updateResult) {
+            if (StrUtil.isNotBlank(images)) {
+                UploadUtils.deleteFiles(images);
+            }
+        } else {
+            UploadUtils.deleteFiles(fileNames);
+            return ResultVO.fail("修改失败");
+        }
+
+        return ResultVO.ok(fileNames, "修改成功");
     }
 
     @Override

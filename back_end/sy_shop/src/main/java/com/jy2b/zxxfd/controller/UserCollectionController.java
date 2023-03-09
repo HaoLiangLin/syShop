@@ -8,6 +8,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
+/**
+ * @author 林武泰
+ * 用户收藏接口
+ */
 @RestController
 @RequestMapping("/collection")
 @CrossOrigin

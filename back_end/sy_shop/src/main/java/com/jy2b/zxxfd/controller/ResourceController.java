@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.*;
 import java.io.File;
 import java.io.FileInputStream;
 
+/**
+ * @author 林武泰
+ * 静态资源接口
+ */
 @RestController
 @CrossOrigin
 @RequestMapping("/resources")

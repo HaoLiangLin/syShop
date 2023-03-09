@@ -5,6 +5,10 @@ import com.jy2b.zxxfd.domain.OrderItem;
 import com.jy2b.zxxfd.domain.vo.ResultVO;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * @author 林武泰
+ * 订单属性业务接口
+ */
 @Transactional
 public interface IOrderItemService extends IService<OrderItem> {
     /**

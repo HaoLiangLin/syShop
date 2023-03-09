@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
+/**
+ * @author 林武泰
+ * 公告类型接口
+ */
 @RestController
 @RequestMapping("/noticeCategory")
 @CrossOrigin

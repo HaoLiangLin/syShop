@@ -14,6 +14,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 
+/**
+ * @author 林武泰
+ * 商品接口
+ */
 @RestController
 @RequestMapping("/goods")
 @CrossOrigin
@@ -21,12 +25,6 @@ import javax.annotation.Resource;
 public class GoodsController {
     @Resource
     private IGoodsService goodsService;
-
-    @PostMapping("/uploadImages")
-    @PreAuthorize("hasAnyAuthority('goods:save')")
-    public ResultVO uploadImages(@RequestPart("files") MultipartFile[] files) {
-        return goodsService.uploadImage(files);
-    }
 
     @PostMapping("/save")
     @PreAuthorize("hasAnyAuthority('goods:save')")
@@ -47,6 +45,12 @@ public class GoodsController {
     @ApiOperation(value = "修改商品")
     public ResultVO updateGoods(@RequestBody GoodsUpdateFromDTO updateFromDTO) {
         return goodsService.updateGoods(updateFromDTO);
+    }
+
+    @PostMapping("/uploadOrUpdate/images/{id}")
+    @PreAuthorize("hasAnyAuthority('goods:update')")
+    public ResultVO updateGoodsImages(@PathVariable("id") Long id,@RequestPart("files") MultipartFile[] files) {
+        return goodsService.uploadOrUpdateGoodsImages(id, files);
     }
 
     @GetMapping("/find")

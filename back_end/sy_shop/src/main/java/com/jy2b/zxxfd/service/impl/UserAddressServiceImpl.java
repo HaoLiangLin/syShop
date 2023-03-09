@@ -25,6 +25,9 @@ import java.util.stream.Collectors;
 import static com.jy2b.zxxfd.contants.RedisConstants.USER_ADDRESS_KEY;
 import static com.jy2b.zxxfd.contants.RedisConstants.USER_DEFAULT_ADDRESS_KEY;
 
+/**
+ * @author 林武泰
+ */
 @Service
 public class UserAddressServiceImpl extends ServiceImpl<UserAddressMapper, UserAddress> implements IUserAddressService {
     @Resource

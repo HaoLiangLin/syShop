@@ -8,6 +8,9 @@ import lombok.Data;
 
 import java.util.Date;
 
+/**
+ * @author 林武泰
+ */
 @TableName("tb_auth")
 @Data
 public class Auth {

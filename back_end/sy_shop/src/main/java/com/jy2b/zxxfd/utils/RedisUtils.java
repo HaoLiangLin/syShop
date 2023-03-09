@@ -13,6 +13,10 @@ import java.util.function.Function;
 
 import static com.jy2b.zxxfd.contants.RedisConstants.*;
 
+/**
+ * @author 林武泰
+ * 缓存工具类
+ */
 @Component
 public class RedisUtils {
     @Resource

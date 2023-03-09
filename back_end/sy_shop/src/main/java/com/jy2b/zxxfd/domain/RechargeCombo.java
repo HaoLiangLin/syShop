@@ -6,6 +6,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
+/**
+ * @author 林武泰
+ */
 @Data
 @TableName("tb_recharge_combo")
 public class RechargeCombo {

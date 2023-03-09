@@ -28,6 +28,9 @@ import java.util.List;
 import static com.jy2b.zxxfd.contants.RedisConstants.USER_WALLER_KEY;
 import static com.jy2b.zxxfd.contants.SystemConstants.APPLICATION_NAME;
 
+/**
+ * @author 林武泰
+ */
 @Service
 public class UserWallerServiceImpl extends ServiceImpl<UserWallerMapper, UserWaller> implements IUserWallerService {
     @Resource

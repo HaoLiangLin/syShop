@@ -8,6 +8,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.List;
 
+/**
+ * @author 林武泰
+ * 中国行政区接口
+ */
 @RestController
 @CrossOrigin
 @RequestMapping("/province")

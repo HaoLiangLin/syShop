@@ -9,17 +9,22 @@ import com.jy2b.zxxfd.domain.dto.*;
 import com.jy2b.zxxfd.domain.Goods;
 import com.jy2b.zxxfd.domain.GoodsItem;
 import com.jy2b.zxxfd.domain.vo.ResultVO;
+import com.jy2b.zxxfd.domain.vo.StatusCode;
 import com.jy2b.zxxfd.mapper.GoodsItemMapper;
 import com.jy2b.zxxfd.mapper.GoodsMapper;
 import com.jy2b.zxxfd.service.IGoodsItemService;
 import com.jy2b.zxxfd.utils.UploadUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * @author 林武泰
+ */
 @Service
 public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem> implements IGoodsItemService {
     @Resource
@@ -45,20 +50,6 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
         // 判断属性颜色是否不为空
         if (StrUtil.isBlank(color)) {
             return ResultVO.fail("添加商品属性失败，颜色不能为空");
-        }
-
-        List<GoodsItem> list = query().eq("color", color).eq("gid", gid).list();
-
-        // 判断属性图片是否不为空
-        if (list.isEmpty()) {
-            if (StrUtil.isBlank(itemFromDTO.getIcon())) {
-                return ResultVO.fail("添加商品属性失败，图片不能为空！");
-            }
-        } else {
-            if (StrUtil.isNotBlank(itemFromDTO.getIcon())) {
-                UploadUtils.deleteFile(itemFromDTO.getIcon());
-            }
-            itemFromDTO.setIcon(list.get(0).getIcon());
         }
 
         QueryWrapper<GoodsItem> queryWrapper = new QueryWrapper<>();
@@ -102,6 +93,12 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
         }
         // 添加商品属性
         GoodsItem goodsItem = BeanUtil.copyProperties(itemFromDTO, GoodsItem.class);
+
+        Integer count = query().eq("color", goodsItem.getColor()).eq("combo", goodsItem.getCombo()).eq("size", goodsItem.getSize()).eq("edition", goodsItem.getEdition()).count();
+        if (count > 0) {
+            return ResultVO.fail("商品属性已存在");
+        }
+
         boolean result = save(goodsItem);
         if (!result) {
             String icon = goodsItem.getIcon();
@@ -163,6 +160,7 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
             }
         } else {
             gid = item.getGid();
+            itemFromDTO.setGid(gid);
         }
 
         // 判断属性颜色是否不为空
@@ -178,14 +176,7 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
                 }
             }
         } else {
-            color = item.getColor();
-        }
-
-        // 判断属性图片是否不为空
-        if (itemFromDTO.getIcon() != null) {
-            if (StrUtil.isBlank(itemFromDTO.getIcon())) {
-                return ResultVO.fail("修改商品属性图片不能为空");
-            }
+            itemFromDTO.setColor(item.getColor());
         }
 
         // 判断属性价格是否不为空，且大于零
@@ -211,21 +202,58 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
             if (itemFromDTO.getStatus() < 0 || itemFromDTO.getStatus() > 1) {
                 return ResultVO.fail("修改商品属性状态不存在");
             }
+            if (itemFromDTO.getStatus() == 0) {
+                String icon = item.getIcon();
+                if (StrUtil.isBlank(icon)) {
+                    return ResultVO.fail("商品属性图标未上传");
+                }
+            }
         }
         // 修改商品属性
         GoodsItem goodsItem = BeanUtil.toBean(itemFromDTO, GoodsItem.class);
         goodsItem.setId(id);
 
         boolean result = updateById(goodsItem);
-        if (result) {
-            if (StrUtil.isNotBlank(itemFromDTO.getIcon())) {
-                boolean update = update().set("icon", itemFromDTO.getIcon()).eq("color", color).eq("gid", gid).update();
-                if (!update) {
-                    throw new RuntimeException("修改商品属性失败");
+
+        return result ? ResultVO.ok(null,"修改商品属性成功") : ResultVO.fail("修改商品属性失败");
+    }
+
+    @Override
+    public ResultVO uploadOrUpdateItemIcon(Long id, MultipartFile file) {
+        // 查询商品属性
+        GoodsItem goodsItem = getById(id);
+        // 判断商品属性是否存在
+        if (goodsItem == null) {
+            return ResultVO.fail("商品属性不存在");
+        }
+
+        // 获取旧图标
+        String icon = goodsItem.getIcon();
+
+        // 保存图标
+        ResultVO resultVO = UploadUtils.saveFile(file, "/goods/item/icon");
+        if (resultVO.getCode().equals(StatusCode.FAIL)) {
+            return resultVO;
+        }
+        String fileName = resultVO.getData().toString();
+
+        // 修改图标
+        boolean updateResult = update().set("icon", fileName).eq("id", id).update();
+
+        if (updateResult) {
+            // 删除旧图标
+            Integer iconCount = query().eq("icon", icon).count();
+            if (iconCount < 1) {
+                if (StrUtil.isNotBlank(icon)) {
+                    UploadUtils.deleteFile(icon);
                 }
             }
+        } else {
+            // 删除新图标
+            UploadUtils.deleteFile(fileName);
         }
-        return result ? ResultVO.ok(null,"修改商品属性成功") : ResultVO.fail("修改商品属性失败");
+
+        return ResultVO.ok(fileName, "修改商品属性图标成功");
     }
 
     @Override

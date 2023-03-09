@@ -47,6 +47,9 @@ import static com.jy2b.zxxfd.contants.RedisConstants.*;
 import static com.jy2b.zxxfd.contants.SystemConstants.*;
 import static com.jy2b.zxxfd.domain.vo.StatusCode.INVALID_REQUEST;
 
+/**
+ * @author 林武泰
+ */
 @Slf4j
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {

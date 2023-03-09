@@ -10,6 +10,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 
+/**
+ * @author 林武泰
+ * 商品评价接口
+ */
 @RestController
 @CrossOrigin
 @RequestMapping("/evaluation")

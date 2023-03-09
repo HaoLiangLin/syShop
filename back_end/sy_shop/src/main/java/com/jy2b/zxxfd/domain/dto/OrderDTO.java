@@ -5,6 +5,9 @@ import lombok.Data;
 
 import java.util.ArrayList;
 
+/**
+ * @author 林武泰
+ */
 @Data
 public class OrderDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING)

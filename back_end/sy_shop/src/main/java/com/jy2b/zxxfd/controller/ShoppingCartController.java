@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.List;
 
+/**
+ * @author 林武泰
+ * 用户我的购物车接口
+ */
 @RestController
 @RequestMapping("/shoppingCart")
 @Api(tags = "购物车相关接口")

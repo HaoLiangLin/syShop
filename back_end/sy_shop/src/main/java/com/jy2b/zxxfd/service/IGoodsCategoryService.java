@@ -4,7 +4,12 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jy2b.zxxfd.domain.GoodsCategory;
 import com.jy2b.zxxfd.domain.vo.ResultVO;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * @author 林武泰
+ * 商品分类业务接口
+ */
 @Transactional
 public interface IGoodsCategoryService extends IService<GoodsCategory> {
     /**
@@ -54,4 +59,12 @@ public interface IGoodsCategoryService extends IService<GoodsCategory> {
      * @return ResultVo
      */
     ResultVO updateCategory(GoodsCategory goodsCategory);
+
+    /**
+     * 上传或修改商品分类图标
+     * @param id 商品分类ID
+     * @param file 图标文件
+     * @return ResultVO
+     */
+    ResultVO uploadOrUpdateCategoryIcon(Long id, MultipartFile file);
 }

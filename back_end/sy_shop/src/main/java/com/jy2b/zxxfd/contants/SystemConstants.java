@@ -1,5 +1,9 @@
 package com.jy2b.zxxfd.contants;
 
+/**
+ * @author 林武泰
+ * 系统静态常量
+ */
 public class SystemConstants {
     // 系统名称
     public static final String APPLICATION_NAME = "MyShop我的商城";
@@ -29,7 +33,7 @@ public class SystemConstants {
     public static final Double SIGN_IN_POINTS = 10D;
 
     // 商品封面数量
-    public static final int GOODS_IMAGES_LENGTH = 3;
+    public static final int GOODS_IMAGES_LENGTH = 10;
 
     // 评价图片数量
     public static final int COMMENT_IMAGES_LENGTH = 10;

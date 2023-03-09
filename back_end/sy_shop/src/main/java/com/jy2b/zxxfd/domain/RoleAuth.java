@@ -8,6 +8,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * @author 林武泰
+ */
 @Data
 @TableName("tb_role_auth")
 @NoArgsConstructor

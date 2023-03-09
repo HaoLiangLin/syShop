@@ -9,6 +9,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * @author 林武泰
+ * 用户我的购物车业务接口
+ */
 @Transactional
 public interface IShoppingCartService extends IService<ShoppingCart> {
     /**

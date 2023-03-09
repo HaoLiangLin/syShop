@@ -8,12 +8,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jy2b.zxxfd.domain.dto.CategoryDTO;
 import com.jy2b.zxxfd.domain.GoodsCategory;
 import com.jy2b.zxxfd.domain.vo.ResultVO;
+import com.jy2b.zxxfd.domain.vo.StatusCode;
 import com.jy2b.zxxfd.mapper.GoodsCategoryMapper;
 import com.jy2b.zxxfd.service.IGoodsCategoryService;
 import com.jy2b.zxxfd.service.IGoodsService;
 import com.jy2b.zxxfd.utils.UploadUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -21,6 +23,9 @@ import java.util.List;
 
 import static com.jy2b.zxxfd.contants.RedisConstants.GOODS_CATEGORY_FIRST;
 
+/**
+ * @author 林武泰
+ */
 @Service
 public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, GoodsCategory> implements IGoodsCategoryService {
     @Resource
@@ -100,6 +105,7 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
         }
 
         goodsCategory.setId(null);
+        goodsCategory.setIcon(null);
 
         // 新增分类
         boolean result = save(goodsCategory);
@@ -155,14 +161,13 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
 
         // 获取将要修改的商品分类
         GoodsCategory category = getById(categoryId);
-
         // 判断商品分类是否存在
         if (category == null) {
             return ResultVO.fail("商品分类不存在");
         }
 
-        // 获取分类图标
-        String icon = category.getIcon();
+        // 不修改分类图标
+        goodsCategory.setIcon(null);
 
         // 判断分类名称是否存在
         String name = goodsCategory.getName();
@@ -190,12 +195,41 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
             if (goodsCategory.getFid() == null) {
                 saveFirstCategory();
             }
-            if (StrUtil.isNotBlank(goodsCategory.getIcon())) {
-                UploadUtils.deleteFile(icon);
-            }
         }
 
         return result ? ResultVO.ok(null,"修改商品分类成功") : ResultVO.fail("修改商品分类失败");
+    }
+
+    @Override
+    public ResultVO uploadOrUpdateCategoryIcon(Long id, MultipartFile file) {
+        // 获取商品分类
+        GoodsCategory goodsCategory = getById(id);
+        // 判断商品分类是否存在
+        if (goodsCategory == null) {
+            return ResultVO.fail("商品分类不存在");
+        }
+
+        // 获取旧图标
+        String icon = goodsCategory.getIcon();
+
+        // 保存图标
+        ResultVO resultVO = UploadUtils.saveFile(file, "/goods/category/icon");
+        if (resultVO.getCode().equals(StatusCode.FAIL)) {
+            return resultVO;
+        }
+        String fileName = resultVO.getData().toString();
+
+        // 修改商品分类图标
+        boolean updateResult = update().set("icon", fileName).eq("id", id).update();
+        if (updateResult) {
+            // 删除旧图标
+            UploadUtils.deleteFile(icon);
+        } else {
+            // 删除新图标
+            UploadUtils.deleteFile(fileName);
+            return ResultVO.fail("上传或修改商品分类图标失败");
+        }
+        return ResultVO.ok(fileName, "上传或修改商品分类图标成功");
     }
 
     /**

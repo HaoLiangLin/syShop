@@ -9,6 +9,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
+/**
+ * @author 林武泰
+ */
 @Data
 @TableName("tb_user_info")
 public class UserInfo {

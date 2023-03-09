@@ -5,6 +5,9 @@ import lombok.Data;
 
 import java.util.Date;
 
+/**
+ * @author 林武泰
+ */
 // 返回用户信息
 @Data
 public class UserDTO {

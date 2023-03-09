@@ -3,6 +3,10 @@ package com.jy2b.zxxfd.utils;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * @author 林武泰
+ * Web工具类
+ */
 public class WebUtils {
     /**
      * 将字符串渲染到客户端

@@ -4,6 +4,10 @@ import com.jy2b.zxxfd.domain.vo.ResultVO;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+/**
+ * @author 林武泰
+ * 异常切面处理
+ */
 @RestControllerAdvice
 public class ProjectExceptionAdvice {
     @ExceptionHandler(RuntimeException.class)

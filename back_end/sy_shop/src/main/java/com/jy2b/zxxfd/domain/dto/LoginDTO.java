@@ -2,6 +2,9 @@ package com.jy2b.zxxfd.domain.dto;
 
 import lombok.Data;
 
+/**
+ * @author 林武泰
+ */
 @Data
 public class LoginDTO {
     private String username; // 用户名

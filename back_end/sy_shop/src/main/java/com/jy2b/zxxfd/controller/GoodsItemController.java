@@ -15,6 +15,10 @@ import javax.annotation.Resource;
 
 import static com.jy2b.zxxfd.utils.UploadUtils.saveFile;
 
+/**
+ * @author 林武泰
+ * 商品属性接口
+ */
 @RestController
 @RequestMapping("/goodsItem")
 @CrossOrigin
@@ -22,14 +26,6 @@ import static com.jy2b.zxxfd.utils.UploadUtils.saveFile;
 public class GoodsItemController {
     @Resource
     private IGoodsItemService itemService;
-
-    @PostMapping("/uploadIcon")
-    @ApiOperation(value = "上传商品属性图片", notes = "上传成功，返回存放路径")
-    @PreAuthorize("hasAnyAuthority('goods:item:save')")
-    public ResultVO uploadIcon(@RequestPart("file") MultipartFile file) {
-        // 保存文件
-        return saveFile(file, "/goods/item/icon");
-    }
 
     @PostMapping("/save")
     @PreAuthorize("hasAnyAuthority('goods:item:save')")
@@ -47,6 +43,12 @@ public class GoodsItemController {
     @PreAuthorize("hasAnyAuthority('goods:item:update')")
     public ResultVO updateItem(@PathVariable("id") Long id, @RequestBody GoodsItemSaveFromDTO itemSaveFromDTO) {
         return itemService.updateItem(id, itemSaveFromDTO);
+    }
+
+    @PostMapping("/uploadOrUpdate/icon/{id}")
+    @PreAuthorize("hasAnyAuthority('goods:item:update')")
+    public ResultVO updateItemIcon(@PathVariable("id") Long id, @RequestPart("file") MultipartFile file) {
+        return itemService.uploadOrUpdateItemIcon(id, file);
     }
 
     @PostMapping("/all/{id}")

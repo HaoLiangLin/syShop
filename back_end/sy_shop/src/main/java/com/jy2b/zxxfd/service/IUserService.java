@@ -10,6 +10,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+/**
+ * @author 林武泰
+ * 用户业务接口
+ */
 @Transactional
 public interface IUserService extends IService<User> {
     /**

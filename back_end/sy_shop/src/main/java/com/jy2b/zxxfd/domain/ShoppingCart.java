@@ -8,6 +8,9 @@ import lombok.Data;
 
 import java.util.Date;
 
+/**
+ * @author 林武泰
+ */
 @Data
 @TableName("tb_shopping_cart")
 public class ShoppingCart {

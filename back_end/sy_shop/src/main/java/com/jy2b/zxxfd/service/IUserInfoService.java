@@ -5,6 +5,10 @@ import com.jy2b.zxxfd.domain.UserInfo;
 import com.jy2b.zxxfd.domain.vo.ResultVO;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * @author 林武泰
+ * 用户信息业务接口
+ */
 @Transactional
 public interface IUserInfoService extends IService<UserInfo> {
     /**

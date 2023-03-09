@@ -7,6 +7,10 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * @author 林武泰
+ * 订单号生成器
+ */
 @Component
 public class RedisIdWorker {
     /**

@@ -22,6 +22,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import javax.annotation.Resource;
 import java.util.Arrays;
 
+/**
+ * @author 林武泰
+ * SpringSecurity配置类
+ */
 @Configuration
 @EnableWebSecurity
 // 开启权限控制注解

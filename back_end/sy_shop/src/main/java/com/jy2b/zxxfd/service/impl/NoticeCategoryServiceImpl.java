@@ -21,6 +21,9 @@ import java.util.List;
 
 import static com.jy2b.zxxfd.contants.RedisConstants.NOTICE_CATEGORY_FIRST;
 
+/**
+ * @author 林武泰
+ */
 @Service
 public class NoticeCategoryServiceImpl extends ServiceImpl<NoticeCategoryMapper, NoticeCategory> implements INoticeCategoryService {
     @Resource

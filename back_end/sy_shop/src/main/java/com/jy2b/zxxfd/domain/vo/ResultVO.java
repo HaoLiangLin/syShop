@@ -5,6 +5,9 @@ import lombok.Data;
 import static com.jy2b.zxxfd.domain.vo.StatusCode.FAIL;
 import static com.jy2b.zxxfd.domain.vo.StatusCode.SUCCEED;
 
+/**
+ * @author 林武泰
+ */
 @Data
 public class ResultVO {
     private Integer code; // 返回结果，成功：true/失败：false

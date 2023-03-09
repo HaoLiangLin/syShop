@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
+/**
+ * @author 林武泰
+ * 评价评论接口
+ */
 @RestController
 @RequestMapping("/comments")
 @CrossOrigin

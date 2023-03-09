@@ -5,6 +5,9 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * @author 林武泰
+ */
 @Data
 public class RoleAuthDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING)

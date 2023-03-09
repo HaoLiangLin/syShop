@@ -4,6 +4,10 @@ import com.jy2b.zxxfd.domain.vo.ResultVO;
 
 import java.util.function.Function;
 
+/**
+ * @author 林武泰
+ * 回收站业务接口
+ */
 public interface IRecycleBinService {
     /**
      * 查看回收站

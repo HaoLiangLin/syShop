@@ -6,6 +6,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
+/**
+ * @author 林武泰
+ */
 @Data
 public class UserBill {
     private String id; // 交易单号

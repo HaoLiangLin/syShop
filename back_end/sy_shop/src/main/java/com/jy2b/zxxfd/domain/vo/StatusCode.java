@@ -1,6 +1,7 @@
 package com.jy2b.zxxfd.domain.vo;
 
 /**
+ * @author 林武泰
  * 封装返回状态码
  * @author 林武泰
  * @version 1.0

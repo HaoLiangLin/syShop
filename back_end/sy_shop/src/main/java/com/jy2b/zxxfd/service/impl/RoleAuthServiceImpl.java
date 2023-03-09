@@ -18,6 +18,9 @@ import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * @author 林武泰
+ */
 @Service
 public class RoleAuthServiceImpl extends ServiceImpl<RoleAuthMapper, RoleAuth> implements IRoleAuthService {
     @Resource

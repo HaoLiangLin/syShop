@@ -6,6 +6,9 @@ import lombok.Data;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * @author 林武泰
+ */
 @Data
 public class GoodsItemDTO {
     private GoodsItem defaultOption; // 默认选择

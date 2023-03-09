@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
+/**
+ * @author 林武泰
+ * 订单接口
+ */
 @RestController
 @RequestMapping("/orders")
 @CrossOrigin
@@ -49,10 +53,10 @@ public class OrderController {
         return orderService.deleteOrder(id);
     }
 
-    @PutMapping("/payment/{id}")
+    @PostMapping("/payment/{id}")
     @PreAuthorize("hasAnyAuthority('order:submit')")
-    public ResultVO paymentOrder(@PathVariable("id") Long id) {
-        return orderService.paymentOrder(id);
+    public ResultVO paymentOrder(@PathVariable("id") Long id, @RequestParam(value = "points", required = false) Long points) {
+        return orderService.paymentOrder(id, points);
     }
 
     @GetMapping("/query/{id}")

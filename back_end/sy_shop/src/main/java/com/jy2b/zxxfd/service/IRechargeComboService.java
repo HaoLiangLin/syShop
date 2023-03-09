@@ -8,6 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * @author 林武泰
+ * 充值套餐业务接口
+ */
 @Transactional
 public interface IRechargeComboService extends IService<RechargeCombo> {
     /**

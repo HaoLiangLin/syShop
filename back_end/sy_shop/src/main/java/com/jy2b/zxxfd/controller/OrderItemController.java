@@ -8,6 +8,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
+/**
+ * @author 林武泰
+ * 订单属性接口
+ */
 @RestController
 @RequestMapping("/orderItem")
 @CrossOrigin

@@ -12,6 +12,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 
+/**
+ * @author 林武泰
+ * 商品分类接口
+ */
 @RestController
 @RequestMapping("/goodsCategory")
 @CrossOrigin
@@ -44,12 +48,11 @@ public class GoodsCategoryController {
         return goodsCategoryService.findSelectCategory();
     }
 
-    @PostMapping("/uploadIcon")
-    @ApiOperation(value = "上传分类图标", notes = "上传成功，返回存放路径")
-    @PreAuthorize("hasAnyAuthority('goods:category:save')")
-    public ResultVO uploadIcon(@RequestPart("file") MultipartFile file) {
-        // 保存文件
-        return UploadUtils.saveFile(file, "/goods/category/icon");
+    @PostMapping("/uploadOrUpdateIcon/{id}")
+    @ApiOperation(value = "上传或修改分类图标", notes = "上传成功，返回存放路径")
+    @PreAuthorize("hasAnyAuthority('goods:category:upadte')")
+    public ResultVO uploadIcon(@PathVariable("id") Long id, @RequestPart("file") MultipartFile file) {
+        return goodsCategoryService.uploadOrUpdateCategoryIcon(id, file);
     }
 
     @PostMapping("/save")

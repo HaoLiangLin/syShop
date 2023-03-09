@@ -5,6 +5,10 @@ import com.jy2b.zxxfd.domain.NoticeCategory;
 import com.jy2b.zxxfd.domain.vo.ResultVO;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * @author 林武泰
+ * 公告类型业务接口
+ */
 @Transactional
 public interface INoticeCategoryService extends IService<NoticeCategory> {
     /**

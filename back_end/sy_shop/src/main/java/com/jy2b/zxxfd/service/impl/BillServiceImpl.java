@@ -14,6 +14,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * @author 林武泰
+ */
 @Service
 public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IBillService {
     @Override

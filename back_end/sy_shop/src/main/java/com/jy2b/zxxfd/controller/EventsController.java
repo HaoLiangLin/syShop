@@ -11,6 +11,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 
+/**
+ * @author 林武泰
+ * 活动接口
+ */
 @RestController
 @RequestMapping("/events")
 @CrossOrigin
@@ -41,6 +45,12 @@ public class EventsController {
     @PreAuthorize("hasAnyAuthority('events:update')")
     public ResultVO updateEvents(@PathVariable("id") Long id, @RequestBody EventsDTO eventsDTO) {
         return eventsService.updateEvents(id, eventsDTO);
+    }
+
+    @PostMapping("/uploadOrUpdateIcon/{id}")
+    @PreAuthorize("hasAnyAuthority('events:update')")
+    public ResultVO updateEventsIcon(@PathVariable("id") Long id, @RequestPart("file") MultipartFile file) {
+        return eventsService.uploadOrUpdateEventsIcon(id, file);
     }
 
     @GetMapping("/query")

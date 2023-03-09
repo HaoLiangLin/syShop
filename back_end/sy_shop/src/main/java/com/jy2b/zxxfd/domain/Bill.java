@@ -7,6 +7,9 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+/**
+ * @author 林武泰
+ */
 @Data
 @TableName("tb_bill")
 public class Bill {

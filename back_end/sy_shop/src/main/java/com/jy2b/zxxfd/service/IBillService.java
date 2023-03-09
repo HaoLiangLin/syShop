@@ -7,6 +7,10 @@ import com.jy2b.zxxfd.domain.vo.BillType;
 import com.jy2b.zxxfd.domain.vo.ResultVO;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * @author 林武泰
+ * 账单业务接口
+ */
 @Transactional
 public interface IBillService extends IService<Bill> {
     /**

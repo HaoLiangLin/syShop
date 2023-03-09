@@ -10,6 +10,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
+/**
+ * @author 林武泰
+ * 文件操作工具类
+ */
 public class UploadUtils {
     /**
      * 保存文件

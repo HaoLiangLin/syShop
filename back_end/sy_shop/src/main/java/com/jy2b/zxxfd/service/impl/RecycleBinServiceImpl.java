@@ -9,6 +9,9 @@ import javax.annotation.Resource;
 import java.util.Set;
 import java.util.function.Function;
 
+/**
+ * @author 林武泰
+ */
 @Service
 public class RecycleBinServiceImpl implements IRecycleBinService {
     @Resource

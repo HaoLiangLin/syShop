@@ -23,6 +23,9 @@ import java.util.concurrent.TimeUnit;
 
 import static com.jy2b.zxxfd.contants.RedisConstants.*;
 
+/**
+ * @author 林武泰
+ */
 @Service
 public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> implements IUserInfoService {
 

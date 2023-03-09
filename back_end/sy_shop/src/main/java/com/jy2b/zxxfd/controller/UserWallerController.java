@@ -8,6 +8,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
+/**
+ * @author 林武泰
+ * 用户钱包接口
+ */
 @RestController
 @CrossOrigin
 @RequestMapping("/waller")

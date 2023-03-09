@@ -14,6 +14,10 @@ import java.util.*;
 
 import static com.jy2b.zxxfd.contants.RedisConstants.USER_BILL_KEY;
 
+/**
+ * @author 林武泰
+ * 用户账单工具类
+ */
 @Component
 public class UserBillUtils {
     @Resource

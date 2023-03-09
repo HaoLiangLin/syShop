@@ -10,6 +10,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 
+/**
+ * @author 林武泰
+ * 用户接口
+ */
 @RestController
 @CrossOrigin
 @RequestMapping("/users")

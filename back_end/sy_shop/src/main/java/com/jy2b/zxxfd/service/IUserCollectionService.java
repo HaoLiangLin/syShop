@@ -5,6 +5,10 @@ import com.jy2b.zxxfd.domain.UserCollection;
 import com.jy2b.zxxfd.domain.vo.ResultVO;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * @author 林武泰
+ * 用户收藏业务接口
+ */
 @Transactional
 public interface IUserCollectionService extends IService<UserCollection> {
     /**

@@ -31,6 +31,7 @@ import static com.jy2b.zxxfd.contants.RedisConstants.*;
 import static com.jy2b.zxxfd.contants.SystemConstants.*;
 
 /**
+ * @author 林武泰
  * 认证过滤器（是否登录）
  */
 @Component

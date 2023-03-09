@@ -28,6 +28,9 @@ import java.util.concurrent.TimeUnit;
 
 import static com.jy2b.zxxfd.contants.RedisConstants.ROLE_LABEL_KEY;
 
+/**
+ * @author 林武泰
+ */
 @Service
 public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IRoleService {
     @Resource

@@ -6,6 +6,10 @@ import com.jy2b.zxxfd.domain.dto.RoleAuthDTO;
 import com.jy2b.zxxfd.domain.vo.ResultVO;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * @author 林武泰
+ * 角色权限业务接口
+ */
 @Transactional
 public interface IRoleAuthService extends IService<RoleAuth> {
     /**

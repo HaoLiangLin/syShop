@@ -7,8 +7,14 @@ import lombok.Data;
  * @author 林武泰
  */
 @Data
-public class CoerceLogoutDTO {
+public class GoodsCategoryDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private Long userId; // 用户ID
-    private String token; // 登录令牌
+    private Long id;
+
+    private String name;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private Long fid;
+
+    private String remark;
 }

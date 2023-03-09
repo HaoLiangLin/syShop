@@ -8,6 +8,10 @@ import com.jy2b.zxxfd.domain.dto.AuthUpdateDTO;
 import com.jy2b.zxxfd.domain.vo.ResultVO;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * @author 林武泰
+ * 权限业务接口
+ */
 @Transactional
 public interface IAuthService extends IService<Auth> {
     /**

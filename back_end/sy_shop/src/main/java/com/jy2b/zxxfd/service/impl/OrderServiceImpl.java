@@ -30,6 +30,9 @@ import java.util.stream.Collectors;
 import static com.jy2b.zxxfd.contants.RedisConstants.ORDER_KEY;
 import static com.jy2b.zxxfd.contants.SystemConstants.APPLICATION_NAME;
 
+/**
+ * @author 林武泰
+ */
 @Service
 public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements IOrderService {
     @Resource
@@ -329,13 +332,24 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // 退货
         returnGoods(id, "取消订单失败");
 
+        QueryWrapper<OrderItem> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("order_id", id);
+
+        List<OrderItem> orderItemList = orderItemMapper.selectList(queryWrapper);
+        // 删除订单属性
+        orderItemMapper.delete(new QueryWrapper<OrderItem>().eq("order_id", id));
+
         // 取消订单
         boolean result = removeById(id);
         if (!result) {
             throw new RuntimeException("取消订单失败");
         }
+
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("order", order);
+        resultMap.put("orderItem", orderItemList);
         // 取消订单登记
-        cancelOrder(ORDER_KEY, order, reason);
+        cancelOrder(ORDER_KEY, resultMap, reason);
         return ResultVO.ok(null,"取消订单成功");
     }
 
@@ -343,7 +357,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private IBillService billService;
 
     @Override
-    public ResultVO paymentOrder(Long id) {
+    public ResultVO paymentOrder(Long id, Long points) {
         // 查询订单
         Order order = getById(id);
         // 判断订单是否存在
@@ -363,10 +377,27 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // 获取用户钱包
         UserWaller userWaller = userWallerMapper.selectById(userId);
 
+        // 使用积分抵扣减少的金额
+        double reducePrice = 0d;
+        // 判断是否积分抵扣
+        if (points != null) {
+            if (points < 1) {
+                return ResultVO.fail("抵扣积分不能低于1");
+            }
+            // 获取用户积分
+            Long userPoints = userWaller.getPoints();
+            if (userPoints < points) {
+                return ResultVO.fail("对不起，你的积分不足");
+            }
+            reducePrice = points / 100.00;
+            BigDecimal bigDecimal = new BigDecimal(reducePrice);
+            reducePrice = bigDecimal.setScale(2, RoundingMode.UP).doubleValue();
+        }
+
         // 获取钱包余额
         Double balance = userWaller.getBalance();
         // 判断用户钱包是否足够
-        if (balance < price) {
+        if (balance + reducePrice < price) {
             return ResultVO.fail("钱包余额不足");
         }
 
@@ -374,8 +405,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         Double spending = userWaller.getSpending();
 
         // 支付订单
-        userWaller.setBalance(balance - price);
-        userWaller.setSpending(spending + price);
+        userWaller.setBalance(balance - price + reducePrice);
+        userWaller.setSpending(spending + price - reducePrice);
         int update = userWallerMapper.updateById(userWaller);
         if (update < 1) {
             return ResultVO.fail("支付失败");
@@ -384,7 +415,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // 支付成功
         order.setIsPay(1);
         order.setPaymentMethods(0);
-        order.setPaymentTime(new Date());
+        Date payDate = new Date();
+        order.setPaymentTime(payDate);
 
         boolean result = updateById(order);
         if (!result) {
@@ -392,11 +424,23 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         }
 
         // 保存用户账单
-        UserBill userBill = userBillUtils.saveUserBill(userId, price, null, "购物消费", APPLICATION_NAME, BillType.disburse, "钱包", BillStatusCode.rechargeSuccess, "订单号：" + id);
+        UserBill userBill = userBillUtils.saveUserBill(userId, price - reducePrice, null, "购物消费", APPLICATION_NAME, BillType.disburse, "钱包", BillStatusCode.rechargeSuccess, "订单号：" + id);
+        if (points != null) {
+            userBillUtils.saveUserBill(userId, Double.valueOf(points.toString()), "积分", "购物消费抵扣", APPLICATION_NAME, BillType.disburse, "钱包", BillStatusCode.rechargeSuccess, "订单号：" + id);
+        }
         // 保存系统账单
         billService.saveBill(userId, userBill, BillType.income);
 
-        return ResultVO.ok(null,"支付成功");
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("price", price); // 实际金额
+        resultMap.put("paymentPrice", price - reducePrice); // 支付金额
+        resultMap.put("points", points); // 抵扣积分
+        resultMap.put("orderId", order.getId()); // 订单号
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String format = simpleDateFormat.format(payDate);
+        resultMap.put("payTime", format); // 支付时间
+
+        return ResultVO.ok(resultMap,"支付成功");
     }
 
     @Override
@@ -826,16 +870,18 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     /**
      * 取消订单
      * @param keyPrefix key前缀
-     * @param order 订单信息
+     * @param resultMap 订单信息
      * @param reason 取消原因
      */
-    public void cancelOrder(String keyPrefix, Order order, String reason) {
+    public void cancelOrder(String keyPrefix, Map<String, Object> resultMap, String reason) {
+        Order order = (Order) resultMap.get("order");
+
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy:MM:dd");
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GTM+8"));
         String date = simpleDateFormat.format(order.getTime());
         Map<String, Object> hashMap = new HashMap<>();
 
-        hashMap.put("orderInfo", JSONUtil.toJsonStr(order)); // 订单信息
+        hashMap.put("orderInfo", JSONUtil.toJsonStr(resultMap)); // 订单信息
         hashMap.put("reason", reason); // 取消原因
         hashMap.put("time", TimeUtils.nowLocalDateTime()); // 取消时间
 
