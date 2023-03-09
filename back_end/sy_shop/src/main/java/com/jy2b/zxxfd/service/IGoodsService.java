@@ -48,10 +48,10 @@ public interface IGoodsService extends IService<Goods> {
 
     /**
      * 管理员：分页查询所有商品
-     * @param page
-     * @param size
-     * @param goods
-     * @return
+     * @param page 页码
+     * @param size 数量
+     * @param goods 商品信息
+     * @return ResultVO
      */
     ResultVO findGoodsList(Integer page, Integer size, Goods goods);
 

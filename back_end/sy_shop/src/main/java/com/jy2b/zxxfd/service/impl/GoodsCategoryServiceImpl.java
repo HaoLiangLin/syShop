@@ -224,6 +224,7 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
         CategoryDTO categoryDTO = new CategoryDTO();
         categoryDTO.setId(goodsCategory.getId());
         categoryDTO.setName(goodsCategory.getName());
+        categoryDTO.setIcon(goodsCategory.getIcon());
         // 判断分类是否存在子分类
         List<GoodsCategory> sGoodsCategories = query().eq("fid", goodsCategory.getId()).list();
         if (!sGoodsCategories.isEmpty()) {

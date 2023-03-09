@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jy2b.zxxfd.domain.Province;
 import com.jy2b.zxxfd.domain.dto.*;
 import com.jy2b.zxxfd.domain.Goods;
 import com.jy2b.zxxfd.domain.GoodsCategory;
@@ -14,6 +15,7 @@ import com.jy2b.zxxfd.mapper.GoodsCategoryMapper;
 import com.jy2b.zxxfd.mapper.GoodsItemMapper;
 import com.jy2b.zxxfd.mapper.GoodsMapper;
 import com.jy2b.zxxfd.service.IGoodsService;
+import com.jy2b.zxxfd.service.IProvinceService;
 import com.jy2b.zxxfd.utils.TimeUtils;
 import com.jy2b.zxxfd.utils.UploadUtils;
 import com.jy2b.zxxfd.contants.SystemConstants;
@@ -22,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements IGoodsService {
@@ -33,6 +36,9 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
 
     @Resource
     private GoodsItemMapper itemMapper;
+
+    @Resource
+    private IProvinceService provinceService;
 
     @Override
     public ResultVO uploadImage(MultipartFile[] files) {
@@ -58,9 +64,57 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
             return ResultVO.fail("商品分类不能为空");
         }
 
-        // 3. 判断发货地址是否为空
-        if (StrUtil.isBlank(goodsSaveFromDTO.getProvince()) && StrUtil.isBlank(goodsSaveFromDTO.getCity()) && StrUtil.isBlank(goodsSaveFromDTO.getDistrict()) && StrUtil.isBlank(goodsSaveFromDTO.getAddress())) {
-            return ResultVO.fail("发货地址不能未空");
+        // 3 判断发货地址是否正确
+        // 获取发货省份
+        String province = goodsSaveFromDTO.getProvince();
+        // 省份代码
+        String provinceCode = null;
+        // 判断省份是否存在
+        if (StrUtil.isNotBlank(province)) {
+            List<Province> provinceList = provinceService.selectAllProvince();
+            // 过滤每一个省份，并收集到正确的
+            List<Province> filterResult = provinceList.stream().filter(p -> p.getName().equals(province)).collect(Collectors.toList());
+            if (filterResult.isEmpty()) {
+                return ResultVO.fail("省份不存在");
+            }
+            provinceCode = filterResult.get(0).getProvince();
+        } else {
+            return ResultVO.fail("发货省份不能为空");
+        }
+        // 获取发货城市
+        String city = goodsSaveFromDTO.getCity();
+        // 城市代码
+        String cityCode = null;
+        // 判断城市是否存在
+        if (StrUtil.isNotBlank(city)) {
+            List<Province> cityList = provinceService.selectAllCityByProvince(provinceCode);
+            // 判断是否不为直辖市
+            if (!cityList.isEmpty()) {
+                String finalCity = city;
+                // 过滤每一个城市，并收集到正确的
+                List<Province> filterResult = cityList.stream().filter(c -> c.getName().equals(finalCity)).collect(Collectors.toList());
+                if (filterResult.isEmpty()) {
+                    return ResultVO.fail("城市不存在");
+                }
+                cityCode = filterResult.get(0).getCity();
+            } else {
+                city = province;
+            }
+        } else {
+            return ResultVO.fail("发货城市不能为空");
+        }
+        // 获取发货区县
+        String area = goodsSaveFromDTO.getDistrict();
+        // 判断城区是否存在
+        if (StrUtil.isNotBlank(area)) {
+            List<Province> areaList = provinceService.selectAllAreaByProvinceAndCity(provinceCode, cityCode);
+            // 过滤出正确城区
+            List<Province> filterResult = areaList.stream().filter(a -> a.getName().equals(area)).collect(Collectors.toList());
+            if (filterResult.isEmpty()) {
+                return ResultVO.fail("城区不存在");
+            }
+        } else {
+            return ResultVO.fail("发货城区不能为空");
         }
 
         // 4. 判断商品分类是否存在
@@ -73,6 +127,9 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
 
         // 5. 类型转换
         Goods goods = BeanUtil.copyProperties(goodsSaveFromDTO, Goods.class);
+        goods.setProvince(province);
+        goods.setCity(city);
+        goods.setDistrict(area);
 
         // 6. 新增商品
         boolean result = save(goods);
@@ -135,21 +192,65 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
                 return ResultVO.fail("商品名称不能为空");
             }
         }
-        if (updateFromDTO.getProvince() != null) {
-            if (StrUtil.isBlank(updateFromDTO.getProvince())) {
-                return ResultVO.fail("发货省份不能为空");
+
+        // 获取发货省份
+        String province = updateFromDTO.getProvince();
+        if (province == null) {
+            province = beforeGoods.getProvince();
+        }
+        // 获取发货城市
+        String city = updateFromDTO.getCity();
+        if (city == null) {
+            city = beforeGoods.getCity();
+        }
+        // 获取发货区县
+        String area = updateFromDTO.getDistrict();
+        if (area == null) {
+            area = beforeGoods.getDistrict();
+        }
+
+        // 省份代码
+        String provinceCode = null;
+        // 判断省份是否存在
+        if (StrUtil.isNotBlank(province)) {
+            List<Province> provinceList = provinceService.selectAllProvince();
+            // 过滤每一个省份，并收集到正确的
+            String finalProvince = province;
+            List<Province> filterResult = provinceList.stream().filter(p -> p.getName().equals(finalProvince)).collect(Collectors.toList());
+            if (filterResult.isEmpty()) {
+                return ResultVO.fail("省份不存在");
+            }
+            provinceCode = filterResult.get(0).getProvince();
+        }
+        // 城市代码
+        String cityCode = null;
+        // 判断城市是否存在
+        if (StrUtil.isNotBlank(city)) {
+            List<Province> cityList = provinceService.selectAllCityByProvince(provinceCode);
+            // 判断是否不为直辖市
+            if (!cityList.isEmpty()) {
+                String finalCity = city;
+                // 过滤每一个城市，并收集到正确的
+                List<Province> filterResult = cityList.stream().filter(c -> c.getName().equals(finalCity)).collect(Collectors.toList());
+                if (filterResult.isEmpty()) {
+                    return ResultVO.fail("城市不存在");
+                }
+                cityCode = filterResult.get(0).getCity();
+            } else {
+                updateFromDTO.setCity(province);
             }
         }
-        if (updateFromDTO.getCity() != null) {
-            if (StrUtil.isBlank(updateFromDTO.getCity())) {
-                return ResultVO.fail("发货城市不能为空");
+        // 判断城区是否存在
+        if (StrUtil.isNotBlank(area)) {
+            List<Province> areaList = provinceService.selectAllAreaByProvinceAndCity(provinceCode, cityCode);
+            // 过滤出正确城区
+            String finalArea = area;
+            List<Province> filterResult = areaList.stream().filter(a -> a.getName().equals(finalArea)).collect(Collectors.toList());
+            if (filterResult.isEmpty()) {
+                return ResultVO.fail("城区不存在");
             }
         }
-        if (updateFromDTO.getDistrict() != null) {
-            if (StrUtil.isBlank(updateFromDTO.getDistrict())) {
-                return ResultVO.fail("发货区县不能为空");
-            }
-        }
+
         if (updateFromDTO.getAddress() != null) {
             if (StrUtil.isBlank(updateFromDTO.getAddress())) {
                 return ResultVO.fail("发货详细地址不能为空");

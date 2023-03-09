@@ -36,4 +36,6 @@ public interface IProvinceService extends IService<Province> {
      */
     List<Province> selectAllAreaByProvinceAndCity(String province, String city);
 
+
+
 }

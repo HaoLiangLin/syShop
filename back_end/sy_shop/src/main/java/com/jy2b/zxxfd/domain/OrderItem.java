@@ -24,6 +24,9 @@ public class OrderItem {
     @TableField("quantity")
     private Integer quantity;
 
+    @TableField("unit")
+    private Integer unit; // 货币单位 0：货币，1：积分
+
     @TableField("unit_price")
     private Double unitPrice;
 

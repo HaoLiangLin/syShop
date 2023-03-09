@@ -12,5 +12,7 @@ public class CategoryDTO {
 
     private String name;
 
+    private String icon;
+
     private List<CategoryDTO> children;
 }
