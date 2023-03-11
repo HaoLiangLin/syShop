@@ -11,6 +11,9 @@ import com.jy2b.zxxfd.utils.TimeUtils;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -67,8 +70,9 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
             String nowDate = simpleDate.format(date);
             // 获取当日全部账单
             List<Bill> bills = billList.stream().filter(bill -> {
-                simpleDate.setTimeZone(TimeZone.getTimeZone("GTM+8"));
-                String time = simpleDate.format(bill.getTime());
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                String time = bill.getTime().atOffset(ZoneOffset.of("+8")).format(formatter);
+
                 return nowDate.equals(time);
             }).collect(Collectors.toList());
 
@@ -89,13 +93,13 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
             List<Bill> disburseBill = bills.stream().filter(bill -> bill.getType().equals(BillType.disburse.getName())).collect(Collectors.toList());
             // 获取支出总额
             double disburse = 0;
-            for (Bill bill : incomeBill) {
+            for (Bill bill : disburseBill) {
                 disburse += bill.getAmount();
             }
             disburseAll += disburse;
             Map<String, Object> map2 = new HashMap<>();
-            map1.put("disburse", disburse);
-            map1.put("data", disburseBill);
+            map2.put("disburse", disburse);
+            map2.put("data", disburseBill);
             childMap.put("disburseBill", map2);
 
             listMap.put("time", nowDate);
@@ -104,10 +108,10 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
             resultMap.add(listMap);
         }
         Map<String, Object> map = new HashMap<>();
+        map.put("data", resultMap);
         map.put("incomeAll", incomeAll);
         map.put("disburseAll", disburseAll);
 
-        resultMap.add(map);
-        return ResultVO.ok(resultMap, "查询成功");
+        return ResultVO.ok(map, "查询成功");
     }
 }

@@ -43,7 +43,8 @@ import {
   Tag,
   Descriptions,
   DescriptionsItem,
-  Cascader
+  Cascader,
+  Statistic
 } from 'element-ui'
 
 Vue.use(Container)
@@ -87,6 +88,7 @@ Vue.use(Tag)
 Vue.use(Descriptions)
 Vue.use(DescriptionsItem)
 Vue.use(Cascader)
+Vue.use(Statistic)
 Vue.prototype.$message = Message
 Vue.prototype.$notify = Notification
 Vue.prototype.$confirm = MessageBox
