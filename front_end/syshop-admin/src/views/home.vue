@@ -7,7 +7,7 @@
             style="width: 32px; height: 32px"
             :src="require('@/assets/syLogo.png')"
             fit="fit"></el-image>
-          <span>水院商城后台</span>
+          <span>水院商城后台系统</span>
         </div>
         <div class="image" v-if="isCollapse">
           <el-image
@@ -31,11 +31,11 @@
             <el-submenu index="2">
               <template #title>
                 <i class="el-icon-user-solid"></i>
-                <span slot="title">会员管理</span>
+                <span slot="title">用户管理</span>
               </template>
               <el-menu-item-group>
-                <el-menu-item index="/home/user">查询用户</el-menu-item>
-                <el-menu-item index="/home/userList">用户列表</el-menu-item>
+                <el-menu-item index="/home/user">用户列表</el-menu-item>
+                <el-menu-item index="/home/userList">新增用户</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
             <el-submenu index="3">
@@ -44,10 +44,9 @@
                 <span slot="title">商品管理</span>
               </template>
               <el-menu-item-group>
-                <el-menu-item index="/home/goodsCategory">商品分类</el-menu-item>
-                <el-menu-item index="/home/goods">查询商品</el-menu-item>
-                <el-menu-item index="/home/goodsList">商品列表</el-menu-item>
-                <el-menu-item index="/home/saveGoods">新增商品</el-menu-item>
+                <el-menu-item index="/home/goodsCategory">商品分类列表</el-menu-item>
+                <el-menu-item index="/home/goods">商品列表</el-menu-item>
+                <el-menu-item index="/home/goodsList">新增商品</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
             <el-submenu index="4">
@@ -56,24 +55,80 @@
                 <span slot="title">订单管理</span>
               </template>
               <el-menu-item-group>
-                <el-menu-item index="/home/3-1">查询订单</el-menu-item>
-                <el-menu-item index="/home/orderList">订单列表</el-menu-item>
-                <el-menu-item index="/home/3-2">订单设置</el-menu-item>
-                <el-menu-item index="/home/3-3">退货申请处理</el-menu-item>
-                <el-menu-item index="/home/3-4">退货原因设置</el-menu-item>
+                <el-menu-item index="/home/3-1">订单列表</el-menu-item>
+                <el-menu-item index="/home/orderList">订单修改</el-menu-item>
+                <el-menu-item index="/home/3-2">订单统计</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
             <el-submenu index="5">
+              <template #title>
+                <i class="el-icon-data-board"></i>
+                <span slot="title">公告管理</span>
+              </template>
+              <el-menu-item-group>
+                <el-menu-item index="/home/5-1">公告分类列表</el-menu-item>
+                <el-menu-item index="/home/5-2">公告列表</el-menu-item>
+                <el-menu-item index="/home/5-3">新增公告</el-menu-item>
+              </el-menu-item-group>
+            </el-submenu>
+            <el-submenu index="6">
+              <template #title>
+                <i class="el-icon-date"></i>
+                <span slot="title">活动管理</span>
+              </template>
+              <el-menu-item-group>
+                <el-menu-item index="/home/6-1">活动列表</el-menu-item>
+                <el-menu-item index="/home/6-3">新增活动</el-menu-item>
+              </el-menu-item-group>
+            </el-submenu>
+            <el-submenu index="8">
               <template #title>
                 <i class="el-icon-s-tools"></i>
                 <span slot="title">系统管理</span>
               </template>
               <el-menu-item-group>
-                <el-menu-item index="/home/5-1">公告类型</el-menu-item>
-                <el-menu-item index="/home/5-2">公告列表</el-menu-item>
-                <el-menu-item index="/home/5-3">活动列表</el-menu-item>
-                <el-menu-item index="/home/5-4">公告商品</el-menu-item>
-                <el-menu-item index="/home/5-5">充值套餐</el-menu-item>
+                <el-submenu index="8-1">
+                  <template #title>
+                    <i class="el-icon-lock"></i>
+                    <span slot="title">权限管理</span>
+                  </template>
+                  <el-menu-item index="8-1-1">权限列表</el-menu-item>
+                  <el-menu-item index="8-1-2">新增权限</el-menu-item>
+                  <el-menu-item index="8-1-3">回收站</el-menu-item>
+                </el-submenu>
+                <el-submenu index="8-2">
+                  <template #title>
+                    <i class="el-icon-user"></i>
+                    <span slot="title">角色管理</span>
+                  </template>
+                  <el-menu-item index="8-2-1">角色列表</el-menu-item>
+                  <el-menu-item index="8-2-2">新增角色</el-menu-item>
+                  <el-menu-item index="8-2-3">回收站</el-menu-item>
+                </el-submenu>
+                <el-submenu index="8-3">
+                  <template #title>
+                    <i class="el-icon-user-solid"></i>
+                    <span slot="title">角色权限管理</span>
+                  </template>
+                  <el-menu-item index="8-3-1">新增角色权限</el-menu-item>
+                </el-submenu>
+                <el-submenu index="8-4">
+                  <template #title>
+                    <i class="el-icon-s-custom"></i>
+                    <span slot="title">用户角色管理</span>
+                  </template>
+                  <el-menu-item index="8-4-1">新增用户角色</el-menu-item>
+                </el-submenu>
+                <el-submenu index="8-5">
+                  <template #title>
+                    <i class="el-icon-s-shop"></i>
+                    <span slot="title">充值套餐管理</span>
+                  </template>
+                  <el-menu-item index="8-5-1">充值套餐列表</el-menu-item>
+                  <el-menu-item index="8-5-1">新增充值套餐</el-menu-item>
+                  <el-menu-item index="8-5-1">回收站</el-menu-item>
+                </el-submenu>
+                <el-menu-item index="/home/8-6">账单统计</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
           </el-menu>
@@ -84,10 +139,10 @@
           <div class="func">
             <i class="el-icon-s-fold" v-if="!isCollapse" @click="onCollapse"></i>
             <i class="el-icon-s-unfold" v-if="isCollapse" @click="onCollapse"></i>
-            <i class="el-icon-refresh-right" @click="onInit"></i>
+            <i class="el-icon-refresh-right" @click="onInit" title="刷新"></i>
           </div>
           <div class="user">
-            <el-button icon="el-icon-switch-button" circle @click="dialogVisible = true"></el-button>
+            <el-button icon="el-icon-switch-button" circle @click="dialogVisible = true" title="退出登录"></el-button>
             <span>{{username}}</span>
           </div>
         </div>
@@ -168,7 +223,7 @@ export default {
   created() {
     me().then(res => {
       const data = res.data
-      if (data.success) {
+      if (data.code === 20011) {
         this.username = data.data.username
         this.$notify({
           title: '欢迎',

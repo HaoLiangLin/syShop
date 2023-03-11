@@ -46,11 +46,10 @@ public interface IUserService extends IService<User> {
 
     /**
      * 获取登录令牌
-     * @param username 用户名
-     * @param password 密码
+     * @param loginKeyDTO 获取条件信息
      * @return ResultVO
      */
-    ResultVO loginToken(String username, String password);
+    ResultVO loginToken(LoginKeyDTO loginKeyDTO);
 
 
     /**

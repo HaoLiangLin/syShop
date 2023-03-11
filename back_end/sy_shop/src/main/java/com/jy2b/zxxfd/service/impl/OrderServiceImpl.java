@@ -615,13 +615,21 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             // 获取物流状态
             Integer logisticsStatus = orderQueryDTO.getLogisticsStatus();
             if (logisticsStatus != null) {
-                queryWrapper.eq("logistics_status", logisticsStatus);
+                // 发货状态，0未发货，1：待收货，2：已收货，3：待换货，4：已换货，5：待退货，6：已退货，
+                switch (logisticsStatus) {
+                    case 0: case 1: case 2: case 3: case 4: case 5: case 6: queryWrapper.eq("logistics_status", logisticsStatus);break;
+                }
             }
             // 获取订单状态
             Integer status = orderQueryDTO.getStatus();
             if (status != null) {
                 switch (status) {
-                    case 0: case 1: queryWrapper.eq("status", status);break;
+                    case 0:
+                    case 1:
+                    case 2:
+                    case 3:
+                        queryWrapper.eq("status", status);
+                        break;
                 }
             }
             // 获取排序时间

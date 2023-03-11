@@ -43,8 +43,8 @@ public class UserController {
     }
 
     @PostMapping("/loginToken")
-    public ResultVO loginToken(@RequestParam("username") String username, @RequestParam("password") String password) {
-        return userService.loginToken(username, password);
+    public ResultVO loginToken(@RequestBody LoginKeyDTO loginKeyDTO) {
+        return userService.loginToken(loginKeyDTO);
     }
 
     @PostMapping("/adminLogin/{adminKey}")

@@ -179,7 +179,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public ResultVO loginToken(String username, String password) {
+    public ResultVO loginToken(LoginKeyDTO loginKeyDTO) {
+        String username = loginKeyDTO.getUsername();
+        String password = loginKeyDTO.getPassword();
         // 判断用户名是否为空
         if (StrUtil.isBlank(username)) {
             return ResultVO.fail("用户名不能为空");
@@ -822,8 +824,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         List<Map<String, Object>> resultMap = new ArrayList<>();
         for (Date date : dumDateList) {
             SimpleDateFormat simpleDate = new SimpleDateFormat("yyyy-MM-dd");
-            Map<String, Object> listMap = new HashMap<>();
 
+            Map<String, Object> listMap = new HashMap<>();
             String nowDate = simpleDate.format(date);
             List<User> filterResult = userList.stream().filter(user -> {
                 simpleDate.setTimeZone(TimeZone.getTimeZone("GTM+8"));
@@ -837,10 +839,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             resultMap.add(listMap);
         }
         Map<String, Object> listMap = new HashMap<>();
+        listMap.put("data", resultMap);
         listMap.put("total", userList.size());
-        resultMap.add(listMap);
 
-        return ResultVO.ok(resultMap, "查询成功");
+        return ResultVO.ok(listMap, "查询成功");
     }
 
     @Override
@@ -875,10 +877,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             resultMap.add(listMap);
         }
         Map<String, Object> listMap = new HashMap<>();
+        listMap.put("data", resultMap);
         listMap.put("total", count);
-        resultMap.add(listMap);
 
-        return ResultVO.ok(resultMap, "查询成功");
+        return ResultVO.ok(listMap, "查询成功");
     }
 
     /**

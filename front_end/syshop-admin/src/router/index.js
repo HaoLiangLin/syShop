@@ -12,13 +12,13 @@ const routes = [
     component: () => import('@/views/home.vue'),
     redirect: '/home/home',
     children: [
-      { path: 'home', component: () => import('@/components/home/home.vue') },
-      { path: 'user', component: () => import('@/components/user/user.vue') },
-      { path: 'userList', component: () => import('@/components/user/userList.vue') },
-      { path: 'goodsCategory', component: () => import('@/components/goods/goodsCategoryList.vue') },
-      { path: 'goods', component: () => import('@/components/goods/goods.vue') },
-      { path: 'goodsList', component: () => import('@/components/goods/goodsList.vue') },
-      { path: 'goodsItemList/:id', component: () => import('@/components/goods/goodsItemList.vue') }
+      { path: 'home', component: () => import('@/components/home/home.vue') }
+      // { path: 'user', component: () => import('@/components/user/user.vue') },
+      // { path: 'userList', component: () => import('@/components/user/userList.vue') },
+      // { path: 'goodsCategory', component: () => import('@/components/goods/goodsCategoryList.vue') },
+      // { path: 'goods', component: () => import('@/components/goods/goods.vue') },
+      // { path: 'goodsList', component: () => import('@/components/goods/goodsList.vue') },
+      // { path: 'goodsItemList/:id', component: () => import('@/components/goods/goodsItemList.vue') }
     ]
   },
   // 登录

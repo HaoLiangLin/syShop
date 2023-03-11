@@ -2,7 +2,7 @@ import request from '@/utils/request.js'
 
 // 获取登录令牌
 export function getLoginKey(username, password) {
-  return request.pots('/users/loginToken',
+  return request.post('/users/loginToken',
     {
       username,
       password
