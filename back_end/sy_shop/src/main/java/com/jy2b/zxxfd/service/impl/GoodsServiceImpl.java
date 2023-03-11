@@ -494,7 +494,13 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
             for (Goods goods : records) {
                 // 获取商品id
                 Long id = goods.getId();
-                GoodsItem goodsItem = itemMapper.selectList(new QueryWrapper<GoodsItem>().eq("gid", id).eq("status", 1)).get(0);
+                QueryWrapper<GoodsItem> itemQueryWrapper = new QueryWrapper<>();
+                itemQueryWrapper.eq("gid", id).eq("status", 1);
+                List<GoodsItem> goodsItems = itemMapper.selectList(itemQueryWrapper);
+                if (goodsItems.isEmpty()) {
+                    continue;
+                }
+                GoodsItem goodsItem = goodsItems.get(0);
                 GoodsDTO goodsDTO = new GoodsDTO(goods, goodsItem.getPrice(), goodsItem.getDiscount());
                 goodsDTOS.add(goodsDTO);
             }

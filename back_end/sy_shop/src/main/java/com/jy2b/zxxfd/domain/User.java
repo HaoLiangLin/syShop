@@ -30,10 +30,6 @@ public class User {
     private String icon;
     @TableField("user_type")
     private Integer userType;
-    @TableField("isUpdate")
-    private Integer isUpdate;
-    @TableField("isPassword")
-    private Integer isPassword;
     @TableField("status")
     private Integer status;
     @TableField("create_time")

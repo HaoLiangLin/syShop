@@ -186,4 +186,10 @@ public class UserController {
         return userService.userPVCount(startDate, endDate);
     }
 
+    @GetMapping("/userLoginCount")
+    @PreAuthorize("hasAnyAuthority('end:query')")
+    public ResultVO loginUserCount() {
+        return userService.loginUserCount();
+    }
+
 }

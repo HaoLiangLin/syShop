@@ -217,4 +217,10 @@ public interface IUserService extends IService<User> {
      * @return ResultVO
      */
     ResultVO userPVCount(Long startDate, Long endDate);
+
+    /**
+     * 在线用户统计
+     * @return ResultVO
+     */
+    ResultVO loginUserCount();
 }

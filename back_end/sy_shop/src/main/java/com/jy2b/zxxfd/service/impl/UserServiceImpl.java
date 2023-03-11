@@ -883,6 +883,30 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         return ResultVO.ok(listMap, "查询成功");
     }
 
+    @Override
+    public ResultVO loginUserCount() {
+        Set<String> keys = stringRedisTemplate.keys(LOGIN_REGISTER_KEY + "*");
+        // 定义在线人数
+        int onlineNumber = 0;
+        // 定义在线人数名单
+        List<User> onlineUserList = new ArrayList<>();
+        if (keys != null && !keys.isEmpty()) {
+            // 获取登录人数
+            onlineNumber = keys.size();
+            // 循环遍历登录人数
+            for (String key : keys) {
+                String[] split = key.split(":");
+                String userId = split[1];
+                User user = getById(Long.valueOf(userId));
+                onlineUserList.add(user);
+            }
+        }
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("onlineNumber", onlineNumber);
+        resultMap.put("onlineUsers", onlineUserList);
+        return ResultVO.ok(resultMap, "查询成功");
+    }
+
     /**
      * 获取用户当日是否签到
      * @param userId 用户id

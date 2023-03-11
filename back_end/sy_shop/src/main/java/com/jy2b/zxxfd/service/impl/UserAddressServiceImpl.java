@@ -52,7 +52,7 @@ public class UserAddressServiceImpl extends ServiceImpl<UserAddressMapper, UserA
         }
 
         // 根据用户id查询收货地址
-        List<UserAddress> addressList = query().eq("user_id", userId).orderByDesc("isDefault").list();
+        List<UserAddress> addressList = query().eq("uid", userId).orderByDesc("isDefault").list();
         // 判断收货地址是否为空
         if (addressList.isEmpty()) {
             return ResultVO.ok(addressList, "查询成功");
@@ -202,7 +202,7 @@ public class UserAddressServiceImpl extends ServiceImpl<UserAddressMapper, UserA
                 addressUpdateWrapper.set("isDefault", isDefault);
                 if (isDefault == 1) {
                     // 修改该用户全部地址为非默认地址
-                    update(new UpdateWrapper<UserAddress>().eq("user_id", userId).eq("isDefault", 1).set("isDefault", 0));
+                    update(new UpdateWrapper<UserAddress>().eq("uid", userId).eq("isDefault", 1).set("isDefault", 0));
                     Map<Object, Object> entries = stringRedisTemplate.opsForHash().entries(cacheKey);
                     if (!entries.isEmpty()) {
                         List<UserAddress> collect = entries.values().stream().filter(val -> {
@@ -329,7 +329,7 @@ public class UserAddressServiceImpl extends ServiceImpl<UserAddressMapper, UserA
             }
             if (isDefault == 1) {
                 // 修改该用户全部地址为非默认地址
-                boolean update = update(new UpdateWrapper<UserAddress>().eq("user_id", userID).set("isDefault", 0));
+                boolean update = update(new UpdateWrapper<UserAddress>().eq("uid", userID).set("isDefault", 0));
                 if (!update) {
                     return ResultVO.fail("新增失败");
                 }

@@ -94,6 +94,11 @@ export function userPvCount(startDate, endDate) {
   return request.get(`/users/pvCount/${startDate}/${endDate}`)
 }
 
+// 用户登录统计
+export function userLoginCount() {
+  return request.get('/users/userLoginCount')
+}
+
 // 查询用户信息
 export function queryUserInfo(userId) {
   return request.get(`/userInfo/query/${userId}`)
@@ -117,6 +122,7 @@ export default {
   cancelBlockUpUser,
   registerCount,
   userPvCount,
+  userLoginCount,
   queryUserInfo,
   updateUserInfo
 }
