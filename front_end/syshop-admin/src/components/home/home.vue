@@ -36,7 +36,7 @@
       </div>
       <div class="rigthBox">
         <div class="rCountBox">
-          <div class="onlineCount">
+          <div class="onlineCount" @click="loginUserVisible = true">
             <div class="content">
               {{loginUserCount.onlineNumber}}
             </div>
@@ -67,11 +67,57 @@
     <div>
       <OrderCount/>
     </div>
+    <el-dialog
+      :title="`在线用户 (${loginUserCount.onlineNumber})`"
+      :visible.sync="loginUserVisible"
+      width="70%">
+      <el-table
+        :data="loginUserCount.onlineUsers"
+        style="width: 100%"
+        height="50vh">
+        <el-table-column
+          prop="id"
+          label="用户ID"
+          width="180">
+        </el-table-column>
+        <el-table-column
+          prop="username"
+          label="用户名"
+          width="180">
+        </el-table-column>
+        <el-table-column
+          prop="phone"
+          label="联系电话">
+        </el-table-column>
+        <el-table-column
+          label="昵称"
+          prop="nickname">
+        </el-table-column>
+        <el-table-column
+          prop="lastLogin"
+          label="登录时间"
+          width="100">
+        </el-table-column>
+        <el-table-column
+          fixed="right"
+          label="操作">
+          <template slot-scope="scope">
+            <el-button
+              @click="onCoerceLogout(scope.row.id)"
+              type="text"
+              size="small"
+              style="color:#F56C6C;">
+              强制下线
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { me, userPvCount, userLoginCount } from '@/api/user.js'
+import { me, userPvCount, userLoginCount, queryUserById, coerceLogout } from '@/api/user.js'
 import { billCount } from '@/api/system.js'
 export default {
   name: 'Home-Home',
@@ -81,6 +127,7 @@ export default {
       todayPv: 0,
       yesterdayPv: 0,
       loginUserCount: {},
+      loginUserVisible: false,
       billCount: {}
     }
   },
@@ -158,6 +205,7 @@ export default {
         const data = res.data
         if (data.code === 20011) {
           this.loginUserCount = data.data
+          console.log('在线用户统计', this.loginUserCount)
         } else {
           this.$message({
             message: data.message,
@@ -175,6 +223,53 @@ export default {
         const data = res.data
         if (data.code === 20011) {
           this.billCount = data.data
+        } else {
+          this.$message({
+            message: data.message,
+            type: 'warning'
+          })
+        }
+      }).catch(err => {
+        this.$notify.error({
+          title: '错误',
+          message: err.message
+        })
+      })
+    },
+    // 强制下线
+    onCoerceLogout(userId) {
+      queryUserById(userId).then(res => {
+        const data = res.data
+        if (data.code === 20011) {
+          const resultData = data.data
+          if (resultData.loginInfo != null) {
+            const loginInfo = resultData.loginInfo
+            coerceLogout(userId, loginInfo.token).then(res => {
+              const data = res.data
+              if (data.code === 20011) {
+                this.$message({
+                  message: data.message,
+                  type: 'success'
+                })
+                this.loginUserCount.onlineNumber--
+                this.loginUserCount.onlineUsers.forEach((user, index) => {
+                  if (user.id === userId) {
+                    this.loginUserCount.onlineUsers.splice(index, 1)
+                  }
+                })
+              } else {
+                this.$message({
+                  message: data.message,
+                  type: 'warning'
+                })
+              }
+            }).catch(err => {
+              this.$notify.error({
+                title: '错误',
+                message: err.message
+              })
+            })
+          }
         } else {
           this.$message({
             message: data.message,
@@ -283,6 +378,7 @@ export default {
       .rCountBox{
         flex: 1;
         .onlineCount{
+          cursor: pointer;
           text-align: center;
           .content{
             color: #91CC75;

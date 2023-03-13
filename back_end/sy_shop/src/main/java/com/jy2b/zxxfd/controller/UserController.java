@@ -103,7 +103,7 @@ public class UserController {
     }
 
     @PutMapping("/update/icon")
-    @PreAuthorize("hasAnyAuthority('user:info:update')")
+    @PreAuthorize("hasAnyAuthority('userinfo:update')")
     public ResultVO updateUserIcon(@RequestHeader("authorization") String token, @RequestPart("file") MultipartFile file) {
         return userService.updateUserIcon(token, file);
     }

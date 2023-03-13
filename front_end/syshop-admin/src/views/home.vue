@@ -45,8 +45,8 @@
               </template>
               <el-menu-item-group>
                 <el-menu-item index="/home/goodsCategory">商品分类</el-menu-item>
-                <el-menu-item index="/home/goods">商品列表</el-menu-item>
-                <el-menu-item index="/home/goodsList">新增商品</el-menu-item>
+                <el-menu-item index="/home/goodsList">商品列表</el-menu-item>
+                <el-menu-item index="/home/saveGoods">新增商品</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
             <el-submenu index="4">

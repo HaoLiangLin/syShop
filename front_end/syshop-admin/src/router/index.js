@@ -15,9 +15,9 @@ const routes = [
       { path: 'home', component: () => import('@/components/home/home.vue') },
       { path: 'userList', component: () => import('@/components/user/userList.vue') },
       { path: 'saveUser', component: () => import('@/components/user/saveUser.vue') },
-      { path: 'goodsCategory', component: () => import('@/components/goods/goodsCategory.vue') }
+      { path: 'goodsCategory', component: () => import('@/components/goods/goodsCategory.vue') },
+      { path: 'goodsList', component: () => import('@/components/goods/goodsList.vue') }
       // { path: 'goods', component: () => import('@/components/goods/goods.vue') },
-      // { path: 'goodsList', component: () => import('@/components/goods/goodsList.vue') },
       // { path: 'goodsItemList/:id', component: () => import('@/components/goods/goodsItemList.vue') }
     ]
   },

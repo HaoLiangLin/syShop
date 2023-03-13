@@ -5,12 +5,17 @@ export function getImage(name) {
   return `${baseURL}/resources/image?name=${name}`
 }
 
-// 上传商品分类图标
-export function uploadGoodsCategoryIcon() {
-  return `${baseURL}/goodsCategory/uploadIcon`
+// 上传或修改用户头像
+export function uploadOrUpdateUserIcon(userId) {
+  return `${baseURL}/users/uploadOrUpdate/icon/${userId}`
 }
 
-// 上传商品分类图标
+// 上传或修改商品分类图标
+export function uploadOrUpdateGoodsCategoryIcon(id) {
+  return `${baseURL}/goodsCategory/uploadOrUpdateIcon/${id}`
+}
+
+// 上传商品图标
 export function uploadGoodIcon() {
   return `${baseURL}/goods/uploadImages`
 }
@@ -22,7 +27,8 @@ export function uploadGoodsItemIcon() {
 
 export default {
   getImage,
-  uploadGoodsCategoryIcon,
+  uploadOrUpdateUserIcon,
+  uploadOrUpdateGoodsCategoryIcon,
   uploadGoodIcon,
   uploadGoodsItemIcon
 }
