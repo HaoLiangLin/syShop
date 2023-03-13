@@ -41,28 +41,42 @@ export function findUserListForPage(page, size, id, username, phone, status, cre
 }
 
 // 分页查询系统用户(可包含条件)
-export function findSystemUserListForPage(page, size, id, username, phone, status, createTimeSort, lastLoginSort) {
+export function findSystemUserListForPage(page, size, id, username, phone, userType, status, createTimeSort, lastLoginSort) {
   return request.post(`/users/findSystem/${page}/${size}`, {
-    id, username, phone, status, createTimeSort, lastLoginSort
+    id, username, phone, userType, status, createTimeSort, lastLoginSort
   })
 }
 
 // 根据用户ID查询用户信息
 export function queryUserById(userId) {
-  return request.get(`/userInfos/query/${userId}`)
+  return request.get(`/userInfo/query/${userId}`)
 }
 
 // 修改用户
-export function updateUser(id, phone, nickname, status) {
+export function updateUser(id, username, phone, status) {
   return request.put('/users/update', {
-    id, phone, nickname, status
+    id, username, phone, status
   })
 }
 
 // 修改系统用户
-export function updateSystemUser(id, phone, nickname, status) {
+export function updateSytsemUser(id, username, phone, nickname, userType, status) {
   return request.put('/users/updateSystem', {
-    id, phone, nickname, status
+    id, username, phone, nickname, userType, status
+  })
+}
+
+// 新增用户
+export function saveUser(username, phone, password, userType, status) {
+  return request.post('/users/save', {
+    username, phone, password, userType, status
+  })
+}
+
+// 上传或修改用户头像
+export function uploadOrUpdateUserIcon(userId, file) {
+  return request.post(`/users/uploadOrUpdate/icon/${userId}`, {
+    file
   })
 }
 
@@ -76,7 +90,7 @@ export function coerceLogout(userId, token) {
 
 // 禁用用户
 export function blockUpUser(userId, blockUpTime) {
-  return request.Post(`/users/blockUp/${userId}/${blockUpTime}`)
+  return request.post(`/users/blockUp/${userId}/${blockUpTime}`)
 }
 
 // 取消禁用
@@ -116,7 +130,9 @@ export default {
   findSystemUserListForPage,
   queryUserById,
   updateUser,
-  updateSystemUser,
+  saveUser,
+  updateSytsemUser,
+  uploadOrUpdateUserIcon,
   coerceLogout,
   blockUpUser,
   cancelBlockUpUser,

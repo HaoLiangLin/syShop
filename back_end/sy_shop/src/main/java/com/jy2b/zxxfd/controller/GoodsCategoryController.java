@@ -43,7 +43,7 @@ public class GoodsCategoryController {
 
     @PostMapping("/uploadOrUpdateIcon/{id}")
     @ApiOperation(value = "上传或修改分类图标", notes = "上传成功，返回存放路径")
-    @PreAuthorize("hasAnyAuthority('goods:category:upadte')")
+    @PreAuthorize("hasAnyAuthority('goods:category:update')")
     public ResultVO uploadIcon(@PathVariable("id") Long id, @RequestPart("file") MultipartFile file) {
         return goodsCategoryService.uploadOrUpdateCategoryIcon(id, file);
     }

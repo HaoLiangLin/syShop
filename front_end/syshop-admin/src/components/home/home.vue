@@ -157,7 +157,6 @@ export default {
       userLoginCount().then(res => {
         const data = res.data
         if (data.code === 20011) {
-          console.log('在线用户统计', data.data)
           this.loginUserCount = data.data
         } else {
           this.$message({
@@ -193,6 +192,21 @@ export default {
   created() {
     // 初始化数据
     this.initData()
+  },
+  mounted() {
+    this.$bus.$on('init', (val) => {
+      if (val) {
+        this.userInfo = {}
+        this.todayPv = 0
+        this.yesterdayPv = 0
+        this.loginUserCount = {}
+        this.billCount = {}
+        this.initData()
+      }
+    })
+  },
+  beforeDestroy() {
+    this.$bus.$off('init')
   }
 }
 </script>

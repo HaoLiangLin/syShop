@@ -34,8 +34,8 @@
                 <span slot="title">用户管理</span>
               </template>
               <el-menu-item-group>
-                <el-menu-item index="/home/user">用户列表</el-menu-item>
-                <el-menu-item index="/home/userList">新增用户</el-menu-item>
+                <el-menu-item index="/home/userList">用户列表</el-menu-item>
+                <el-menu-item index="/home/saveUser">新增用户</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
             <el-submenu index="3">
@@ -44,7 +44,7 @@
                 <span slot="title">商品管理</span>
               </template>
               <el-menu-item-group>
-                <el-menu-item index="/home/goodsCategory">商品分类列表</el-menu-item>
+                <el-menu-item index="/home/goodsCategory">商品分类</el-menu-item>
                 <el-menu-item index="/home/goods">商品列表</el-menu-item>
                 <el-menu-item index="/home/goodsList">新增商品</el-menu-item>
               </el-menu-item-group>
@@ -207,7 +207,7 @@ export default {
     onLogOut() {
       logout().then(res => {
         const data = res.data
-        if (data.success) {
+        if (data.code === 20011) {
           this.dialogVisible = false
           sessionStorage.removeItem('authorization')
           this.$notify({

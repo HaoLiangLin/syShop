@@ -44,7 +44,9 @@ import {
   Descriptions,
   DescriptionsItem,
   Cascader,
-  Statistic
+  Statistic,
+  Alert,
+  Empty
 } from 'element-ui'
 
 Vue.use(Container)
@@ -89,6 +91,8 @@ Vue.use(Descriptions)
 Vue.use(DescriptionsItem)
 Vue.use(Cascader)
 Vue.use(Statistic)
+Vue.use(Alert)
+Vue.use(Empty)
 Vue.prototype.$message = Message
 Vue.prototype.$notify = Notification
 Vue.prototype.$confirm = MessageBox

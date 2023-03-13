@@ -310,7 +310,7 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         if (resultVO.getCode().equals(StatusCode.FAIL)) {
             return resultVO;
         }
-        String fileNames = resultVO.getData().toString();
+        String fileNames = resultVO.getMessage();
 
         boolean updateResult = update().set("images", fileNames).eq("id", id).update();
 

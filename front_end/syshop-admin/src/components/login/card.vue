@@ -65,6 +65,7 @@ export default {
   },
   methods: {
     onLogin() {
+      sessionStorage.removeItem('authorization')
       login(this.username, this.password, this.loginKey).then(res => {
         const data = res.data
         if (data.code === 20011) {

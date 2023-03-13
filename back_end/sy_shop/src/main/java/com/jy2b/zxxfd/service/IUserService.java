@@ -180,6 +180,20 @@ public interface IUserService extends IService<User> {
     ResultVO updateUser(UpdateUserDTO updateUserDTO, String level);
 
     /**
+     * 新增用户
+     * @param saveUserDTO 新增用户信息
+     * @return ResultVO
+     */
+    ResultVO saveUser(SaveUserDTO saveUserDTO);
+
+    /**
+     * 上传或修改用户头像
+     * @param file 图片文件
+     * @return ResultVO
+     */
+    ResultVO uploadOrUpdateUserIcon(Long userId, MultipartFile file);
+
+    /**
      * 强制下线
      * @param mainToken 主人登录令牌
      * @param coerceLogoutDTO 强制下线条件

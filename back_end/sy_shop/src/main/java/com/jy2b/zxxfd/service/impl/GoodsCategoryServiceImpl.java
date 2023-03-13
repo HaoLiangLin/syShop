@@ -208,13 +208,15 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
         if (resultVO.getCode().equals(StatusCode.FAIL)) {
             return resultVO;
         }
-        String fileName = resultVO.getData().toString();
+        String fileName = resultVO.getMessage();
 
         // 修改商品分类图标
         boolean updateResult = update().set("icon", fileName).eq("id", id).update();
         if (updateResult) {
             // 删除旧图标
-            UploadUtils.deleteFile(icon);
+            if (StrUtil.isNotBlank(icon)) {
+                UploadUtils.deleteFile(icon);
+            }
         } else {
             // 删除新图标
             UploadUtils.deleteFile(fileName);

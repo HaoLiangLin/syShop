@@ -236,7 +236,7 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
         if (resultVO.getCode().equals(StatusCode.FAIL)) {
             return resultVO;
         }
-        String fileName = resultVO.getData().toString();
+        String fileName = resultVO.getMessage();
 
         // 修改图标
         boolean updateResult = update().set("icon", fileName).eq("id", id).update();

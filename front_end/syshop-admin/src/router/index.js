@@ -12,10 +12,10 @@ const routes = [
     component: () => import('@/views/home.vue'),
     redirect: '/home/home',
     children: [
-      { path: 'home', component: () => import('@/components/home/home.vue') }
-      // { path: 'user', component: () => import('@/components/user/user.vue') },
-      // { path: 'userList', component: () => import('@/components/user/userList.vue') },
-      // { path: 'goodsCategory', component: () => import('@/components/goods/goodsCategoryList.vue') },
+      { path: 'home', component: () => import('@/components/home/home.vue') },
+      { path: 'userList', component: () => import('@/components/user/userList.vue') },
+      { path: 'saveUser', component: () => import('@/components/user/saveUser.vue') },
+      { path: 'goodsCategory', component: () => import('@/components/goods/goodsCategory.vue') }
       // { path: 'goods', component: () => import('@/components/goods/goods.vue') },
       // { path: 'goodsList', component: () => import('@/components/goods/goodsList.vue') },
       // { path: 'goodsItemList/:id', component: () => import('@/components/goods/goodsItemList.vue') }
@@ -42,6 +42,7 @@ router.beforeEach((to, from, next) => {
         }
       })
     } else {
+      sessionStorage.removeItem('authorization')
       next('/login')
     }
   }

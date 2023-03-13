@@ -141,7 +141,7 @@ public class EventsServiceImpl extends ServiceImpl<EventsMapper, Events> impleme
             return resultVO;
         }
 
-        String fileName = resultVO.getData().toString();
+        String fileName = resultVO.getMessage();
         // 修改活动图片
         boolean updateResult = update().set("icon", fileName).eq("id", id).update();
 

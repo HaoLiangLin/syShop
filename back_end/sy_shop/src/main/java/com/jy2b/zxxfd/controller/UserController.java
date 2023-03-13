@@ -150,6 +150,18 @@ public class UserController {
         return userService.updateUser(updateUserDTO, "user");
     }
 
+    @PostMapping("/save")
+    @PreAuthorize("hasAnyAuthority('admin:all')")
+    public ResultVO saveUser(@RequestBody SaveUserDTO saveUserDTO) {
+        return userService.saveUser(saveUserDTO);
+    }
+
+    @PostMapping("/uploadOrUpdate/icon/{userId}")
+    @PreAuthorize("hasAnyAuthority('admin:all')")
+    public ResultVO uploadOrUpdateUserIcon(@PathVariable("userId") Long userId, @RequestPart(value = "file", required = false) MultipartFile file) {
+        return userService.uploadOrUpdateUserIcon(userId, file);
+    }
+
     @PutMapping("/updateSystem")
     @PreAuthorize("hasAnyAuthority('admin:all')")
     public ResultVO updateSystemUser( @RequestBody UpdateUserDTO updateUserDTO) {

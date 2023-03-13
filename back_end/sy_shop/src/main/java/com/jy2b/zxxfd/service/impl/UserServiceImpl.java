@@ -22,6 +22,7 @@ import com.jy2b.zxxfd.contants.RedisConstants;
 import com.jy2b.zxxfd.contants.SystemConstants;
 import com.jy2b.zxxfd.domain.dto.*;
 import eu.bitwalker.useragentutils.*;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.BitFieldSubCommands;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -83,6 +84,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Resource
     private RedisUtils redisUtils;
 
+    private final String savePath =  "/user/icon";
+
     @Override
     public ResultVO sendCodeByRegister(String phone) {
         // 发送验证码
@@ -136,7 +139,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         }
 
         // 注册用户
-        userRegister(username, phone, password);
+        userRegister(username, phone, password, null);
 
         return ResultVO.ok("用户注册成功");
     }
@@ -488,7 +491,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public ResultVO updateUserIcon(String token, MultipartFile file) {
         // 保存头像
-        ResultVO resultVO = UploadUtils.saveFile(file, "/user/icon");
+        ResultVO resultVO = UploadUtils.saveFile(file, savePath);
         // 判断是否保存成功
         if (resultVO.getCode().equals(StatusCode.FAIL)) {
             return resultVO;
@@ -705,6 +708,28 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             userUpdateWrapper.set("phone", phone);
         }
 
+        // 获取用户昵称
+        String nickname = updateUserDTO.getNickname();
+        // 判断是否不为空
+        if (StrUtil.isNotBlank(nickname)) {
+            if ("admin".equals(level)) {
+                // 添加用户状态条件
+                userUpdateWrapper.set("nickname", nickname);
+            }
+        }
+
+        // 获取用户类型
+        Integer userType = updateUserDTO.getUserType();
+        // 判断是否不为空
+        if (userType != null) {
+            if ("admin".equals(level)) {
+                // 添加用户类型条件
+                if (userType == 0 || userType == 1) {
+                    userUpdateWrapper.set("user_type", userType);
+                }
+            }
+        }
+
         // 获取用户状态
         Integer status = updateUserDTO.getStatus();
         // 判断用户状态是否不为空
@@ -729,6 +754,129 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         // 修改用户
         boolean updateResult = update(userUpdateWrapper);
         return updateResult ? ResultVO.ok("修改用户成功") : ResultVO.fail("修改用户失败");
+    }
+
+    @Override
+    public ResultVO saveUser(SaveUserDTO saveUserDTO) {
+        // 获取用户名
+        String username = saveUserDTO.getUsername();
+        // 判断用户名是否为空
+        if (StrUtil.isBlank(username)) {
+            return ResultVO.fail("用户名不能为空");
+        }
+        // 获取手机号
+        String phone = saveUserDTO.getPhone();
+        // 判断手机号是否为空
+        if (StrUtil.isBlank(phone)) {
+            return ResultVO.fail("手机号不能为空");
+        }
+        // 判断手机号格式是否正确
+        if (RegexUtils.isPhoneInvalid(phone)) {
+            return ResultVO.fail("手机号格式错误");
+        }
+        // 获取密码
+        String password = saveUserDTO.getPassword();
+        // 判断密码是否为空
+        if (StrUtil.isBlank(password)) {
+            return ResultVO.fail("密码不能为空");
+        }
+        // 获取用户类型
+        Integer userType = saveUserDTO.getUserType();
+        // 判断是否为空
+        if (userType == null) {
+            userType = 1; // 默认为用户
+        }
+        // 判断是否有效值
+        if (userType < 0 || userType > 1) {
+            userType = 1; // 默认为用户
+        }
+        // 获取用户状态
+        Integer status = saveUserDTO.getStatus();
+        // 判断状态是否为空
+        if (status == null) {
+            status = 1; // 默认停用
+        }
+        // 判断状态是否有效值
+        if (status < 0 || status > 1) {
+            status = 1; // 默认停用
+        }
+        // 判断用户名是否存在
+        Integer usernameCount = query().eq("username", username).count();
+        if (usernameCount > 0) {
+            return ResultVO.fail("用户名已存在");
+        }
+        // 判断手机号是否存在
+        Integer phoneCount = query().eq("phone", phone).count();
+        if (phoneCount > 0) {
+            return ResultVO.fail("手机号已存在");
+        }
+
+        // 判断用户类型是否为用户
+        if (userType == 1) {
+            User user = userRegister(username, phone, password, status);
+            return ResultVO.ok(user, "新增用户成功");
+        }
+
+        // 保存新用户
+        User user = new User();
+        user.setUsername(username);
+        user.setPhone(phone);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setNickname(username);
+        user.setUserType(userType);
+        user.setStatus(status);
+
+        boolean saveResult = save(user);
+
+        return saveResult ? ResultVO.ok(user, "新增管理员成功，暂未设置角色") : ResultVO.fail("新增用户失败");
+    }
+
+    @Override
+    public ResultVO uploadOrUpdateUserIcon(Long userId, MultipartFile file) {
+        // 查询用户
+        User user = getById(userId);
+        // 判断用户是否存在
+        if (user == null) {
+            return ResultVO.fail("用户不存在");
+        }
+        // 获取用户头像
+        String icon = user.getIcon();
+        // 判断是否删除头像
+        if (file == null || file.isEmpty()) {
+            // 判断是否设置头像
+            if (StrUtil.isBlank(icon)) {
+                return ResultVO.fail("头像不存在");
+            }
+            // 删除用户头像
+            boolean updateResult = update().set("icon", null).eq("id", userId).update();
+            if (updateResult) {
+                UploadUtils.deleteFile(icon);
+                return ResultVO.ok("删除头像成功");
+            }
+            return ResultVO.fail("删除头像失败");
+        }
+
+        // 保存新头像
+        ResultVO resultVO = UploadUtils.saveFile(file, savePath);
+        // 判断是否保存成功
+        if (resultVO.getCode().equals(StatusCode.FAIL)) {
+            return resultVO;
+        }
+        // 获取头像路径
+        String fileNames = resultVO.getMessage();
+        // 修改用户头像
+        boolean updateResult = update().set("icon", fileNames).eq("id", userId).update();
+        // 判断是否修改成功
+        if (updateResult) {
+            // 删除旧头像
+            if (StrUtil.isNotBlank(icon)) {
+                UploadUtils.deleteFile(icon);
+            }
+        } else {
+            // 删除新头像
+            UploadUtils.deleteFile(fileNames);
+        }
+        return updateResult ? ResultVO.ok(fileNames, "修改成功") : ResultVO.fail("修改失败");
     }
 
     @Override
@@ -979,7 +1127,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         // 判断用户名是否不为空
         if (StrUtil.isNotBlank(username)) {
             // 添加用户名条件
-            userQueryWrapper.eq("username", username);
+            userQueryWrapper.like("username", username);
         }
 
         // 获取手机号
@@ -1333,7 +1481,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
      * @param phone 手机号
      * @param password 密码
      */
-    private void userRegister(String username, String phone, String password) {
+    private User userRegister(String username, String phone, String password, Integer status) {
         // 密码加密
         String encodePassword = passwordEncoder.encode(password);
         // 新增用户
@@ -1341,7 +1489,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         user.setUsername(username);
         user.setPhone(phone);
         user.setPassword(encodePassword);
-        user.setNickname(USER_NICK_NAME_PREFIX + username);
+        if (status != null) {
+            user.setStatus(status);
+        }
+        user.setNickname(USER_NICK_NAME_PREFIX + phone);
         boolean registerResult = save(user);
         // 判断是否新增成功
         if (!registerResult) {
@@ -1378,6 +1529,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         if (userWallerResult < 1) {
             throw new RuntimeException("用户注册失败");
         }
+
+        return user;
     }
 
     /**

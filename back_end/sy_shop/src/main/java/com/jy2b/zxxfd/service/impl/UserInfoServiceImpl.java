@@ -92,10 +92,10 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         String blockUpMsg = stringRedisTemplate.opsForValue().get(BLOCK_UP_USER_KEY + userId);
 
         Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("userInfo", userInfo);
         if (!map.isEmpty()) {
-            resultMap.put("userInfo", userInfo);
+            resultMap.put("loginInfo", map);
         }
-        resultMap.put("loginInfo", map);
         if (StrUtil.isNotBlank(blockUpMsg)) {
             Long expire = stringRedisTemplate.getExpire(BLOCK_UP_USER_KEY + userId, TimeUnit.MINUTES);
 
