@@ -35,7 +35,7 @@ public class UploadUtils {
             // 保存文件
             file.transferTo(new File(SystemConstants.UPLOAD_IMAGE_PATH, fileName));
             // 返回文件保存路径
-            return ResultVO.ok(fileName);
+            return ResultVO.ok(fileName, "文件上传成功");
         } catch (IOException e) {
             e.printStackTrace();
             // 失败，返回错误信息

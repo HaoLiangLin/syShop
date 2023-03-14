@@ -208,7 +208,7 @@ public class GoodsCategoryServiceImpl extends ServiceImpl<GoodsCategoryMapper, G
         if (resultVO.getCode().equals(StatusCode.FAIL)) {
             return resultVO;
         }
-        String fileName = resultVO.getMessage();
+        String fileName = resultVO.getData().toString();
 
         // 修改商品分类图标
         boolean updateResult = update().set("icon", fileName).eq("id", id).update();

@@ -16,8 +16,8 @@ export function uploadOrUpdateGoodsCategoryIcon(id) {
 }
 
 // 上传商品图标
-export function uploadGoodIcon() {
-  return `${baseURL}/goods/uploadImages`
+export function uploadGoodImages(id) {
+  return `${baseURL}/goods/uploadOrUpdate/images/${id}`
 }
 
 // 上传商品属性图标
@@ -29,6 +29,6 @@ export default {
   getImage,
   uploadOrUpdateUserIcon,
   uploadOrUpdateGoodsCategoryIcon,
-  uploadGoodIcon,
+  uploadGoodImages,
   uploadGoodsItemIcon
 }

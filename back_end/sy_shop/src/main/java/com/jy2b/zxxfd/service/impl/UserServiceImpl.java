@@ -497,7 +497,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             return resultVO;
         }
         // 获取头像路径
-        String fileNames = resultVO.getMessage();
+        String fileNames = resultVO.getData().toString();
         // 获取用户ID
         Long userId = UserHolder.getUser().getId();
 
