@@ -327,6 +327,31 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
     }
 
     @Override
+    public ResultVO removeGoodsImages(Long id) {
+        // 获取商品
+        Goods goods = getById(id);
+        // 判断商品是否存在
+        if (goods == null) {
+            return ResultVO.fail("商品不存在");
+        }
+        // 获取商品图片
+        String images = goods.getImages();
+        // 判断是否为空
+        if (StrUtil.isBlank(images)) {
+            return ResultVO.fail("商品暂无封面参数");
+        }
+
+        // 删除商品图片
+        boolean updateResult = update().set("images", "").eq("id", id).update();
+        if (updateResult) {
+            // 删除图片
+            UploadUtils.deleteFiles(images);
+            return ResultVO.ok(null, "删除成功");
+        }
+        return ResultVO.fail("删除失败");
+    }
+
+    @Override
     public ResultVO findGoodsById(Long id) {
         Goods goods = getById(id);
         if (goods != null) {

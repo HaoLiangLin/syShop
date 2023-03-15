@@ -49,8 +49,14 @@ public class GoodsController {
 
     @PostMapping("/uploadOrUpdate/images/{id}")
     @PreAuthorize("hasAnyAuthority('goods:update')")
-    public ResultVO updateGoodsImages(@PathVariable("id") Long id,@RequestPart("files") MultipartFile[] files) {
+    public ResultVO updateGoodsImages(@PathVariable("id") Long id, @RequestParam("files[]") MultipartFile[] files) {
         return goodsService.uploadOrUpdateGoodsImages(id, files);
+    }
+
+    @DeleteMapping("/remove/images/{id}")
+    @PreAuthorize("hasAnyAuthority('goods:update')")
+    public ResultVO removeGoodsImages(@PathVariable("id") Long id) {
+        return goodsService.removeGoodsImages(id);
     }
 
     @GetMapping("/find/{id}")

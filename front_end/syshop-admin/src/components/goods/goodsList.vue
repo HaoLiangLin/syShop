@@ -82,18 +82,6 @@
           label="操作"
           width="120">
           <template slot-scope="scope">
-            <el-upload
-              :action="setUploadAction(scope.row.id)"
-              :multiple="true"
-              :limit="10"
-              :show-file-list="false"
-              name="files"
-              accept="image/*"
-              :headers="{authorization}"
-              :on-success="onUploadSuccess"
-              :on-error="onUploadError">
-              <el-button size="small" type="text">上传或修改商品封面</el-button>
-            </el-upload>
             <el-button
               v-if="scope.row.status === 1"
               @click="onSoldoOut(scope.row.id)"
@@ -163,6 +151,21 @@
         </el-descriptions-item>
         <el-descriptions-item label="最后修改">{{goods.updateTime}}</el-descriptions-item>
       </el-descriptions>
+       <el-upload
+        action="www"
+        :multiple="true"
+        :limit="10"
+        ref="upload"
+        :auto-upload="false"
+        :file-list="fileList"
+        name="files"
+        type="file"
+        list-type="picture"
+        :on-change="handleChange"
+        :on-remove="handleRemove">
+        <el-button slot="trigger" size="small" type="primary">上传或修改商品封面</el-button>
+        <el-button size="small" type="success" style="margin-left: 10px;" @click="submitUpload(goods.id)">上传到服务器</el-button>
+      </el-upload>
       <div class="funBtn">
         <el-button type="danger" @click="onRemoveGoods(goods.id)">删除商品</el-button>
       </div>
@@ -171,14 +174,15 @@
 </template>
 
 <script>
-import { queryGoodsPage, updateGoods, deleteGoods } from '@/api/goods.js'
-import { getImage, uploadGoodImages } from '@/utils/resources.js'
+import { queryGoodsPage, updateGoods, deleteGoods, uploadOrUpdateGoodsImages } from '@/api/goods.js'
+import { getImage } from '@/utils/resources.js'
 export default {
   name: 'Goods-List',
   data() {
     return {
       authorization: window.sessionStorage.getItem('authorization'),
       goodsData: [],
+      fileList: [],
       size: 6,
       isHidePage: true,
       total: 0,
@@ -247,32 +251,48 @@ export default {
       })
       return srcs
     },
-    // ############上传图片（起始）###############
-    setUploadAction(userId) {
-      return uploadGoodImages(userId)
+    // 文件状态改变时
+    handleChange(file, fileList) {
+      this.fileList = fileList
     },
-    onUploadSuccess(res) {
-      if (res.code === 20011) {
-        this.$notify({
-          title: '成功',
-          message: res.message,
-          type: 'success'
-        })
-      } else {
-        this.$notify({
-          title: '失败',
-          message: res.message,
-          type: 'warning'
-        })
+    // 删除文件之前时
+    handleRemove(file, fileList) {
+      this.fileList = fileList
+    },
+    // 上传或修改商品封面
+    submitUpload(id) {
+      // 判断是否存在文件
+      if (this.fileList.length === 0) {
+        return this.$message.warning('请选取文件后再上传')
       }
-    },
-    onUploadError(err) {
-      this.$notify.error({
-        title: '错误',
-        message: err.message
+      uploadOrUpdateGoodsImages(id, this.fileList).then(res => {
+        const data = res.data
+        if (data.code === 20011) {
+          this.$message({
+            message: data.message,
+            type: 'success'
+          })
+          this.goodsData.forEach(goods => {
+            if (goods.id === id) {
+              goods.images = data.data
+            }
+          })
+        } else {
+          this.$notify({
+            title: '失败',
+            message: data.message,
+            type: 'warning'
+          })
+        }
+        // 清空文件列表
+        this.fileList = []
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消'
+        })
       })
     },
-    // ############上传图片（截止）###############
     onGoodsItemStock(row) {},
     // 下架
     onSoldoOut(id) {

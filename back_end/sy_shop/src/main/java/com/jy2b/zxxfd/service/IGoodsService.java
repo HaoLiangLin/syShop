@@ -45,6 +45,13 @@ public interface IGoodsService extends IService<Goods> {
     ResultVO uploadOrUpdateGoodsImages(Long id, MultipartFile[] files);
 
     /**
+     * 删除商品封面
+     * @param id
+     * @return
+     */
+    ResultVO removeGoodsImages(Long id);
+
+    /**
      * 管理员：根据id查询商品
      * @param id 商品id
      * @return ResultVo

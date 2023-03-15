@@ -29,8 +29,6 @@ spring:
       max-file-size: 10MB # 单文件最大上传大小
       max-request-size: 100MB # 多文件最大上传大小
 mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 开启日志，输出SQL语句
   type-aliases-package: com.jy2b.zxxfd.domain # 指定实体类别名路径
   mapper-locations: classpath:/mapper/*.xml
 server:
@@ -48,6 +46,9 @@ spring:
       on-profile: test
   redis:
     host: 192.168.110.100
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 开启日志，输出SQL语句
 
 ---
 spring:

@@ -60,9 +60,20 @@ export function updateGoods(id, name, cid, province, city, district, address, po
 
 // 上传或修改商品封面
 export function uploadOrUpdateGoodsImages(id, files) {
+  // 创建一个空的FormData对象
+  const formData = new FormData()
+  files.forEach(file => {
+    formData.append('files', file.raw)
+  })
   return request.post(
     `/goods/uploadOrUpdate/images/${id}`,
-    { files }
+    {
+      files: formData.getAll('files')
+    },
+    {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      processData: false
+    }
   )
 }
 
