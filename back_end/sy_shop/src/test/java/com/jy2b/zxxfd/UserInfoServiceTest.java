@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @SpringBootTest
 public class UserInfoServiceTest {
@@ -14,6 +16,8 @@ public class UserInfoServiceTest {
 
     @Test
     void pageTest() {
-
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
+        String date = simpleDateFormat.format(new Date());
+        System.out.println("date = " + date);
     }
 }

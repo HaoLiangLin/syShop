@@ -1,5 +1,6 @@
 package com.jy2b.zxxfd.service.impl;
 
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -24,6 +25,9 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -349,7 +353,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         resultMap.put("order", order);
         resultMap.put("orderItem", orderItemList);
         // 取消订单登记
-        cancelOrder(ORDER_KEY, resultMap, reason);
+        cancelOrder(ORDER_KEY, order, orderItemList, reason);
         return ResultVO.ok(null,"取消订单成功");
     }
 
@@ -839,10 +843,22 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             childMap.put("completedOrder", map4);
 
             // 获取当日取消订单
-            Map<Object, Object> cancelOrder = stringRedisTemplate.opsForHash().entries("cancel:" + ORDER_KEY + simpleDate1.format(date));
+            Set<String> keys = stringRedisTemplate.keys("cancel:" + ORDER_KEY + simpleDate1.format(date) + ":*");
             Map<String, Object> map5 = new HashMap<>();
-            map5.put("quantity", cancelOrder.size());
-            map5.put("data", cancelOrder);
+            map5.put("quantity", 0);
+            if (keys != null && !keys.isEmpty()) {
+                map5.put("quantity", keys.size());
+                List<Map<Object, Object>> dataList = new ArrayList<>();
+                for (String key : keys) {
+                    Map<Object, Object> entries = stringRedisTemplate.opsForHash().entries(key);
+                    Object order = entries.get("order");
+                    Object orderItems = entries.get("orderItems");
+                    entries.put("order", JSONUtil.toBean(order.toString(), Order.class));
+                    entries.put("orderItems", JSONUtil.toList(orderItems.toString(), OrderItem.class));
+                    dataList.add(entries);
+                }
+                map5.put("data", dataList);
+            }
             childMap.put("cancelOrder", map5);
 
             // 获得当日成交额
@@ -878,23 +894,23 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     /**
      * 取消订单
      * @param keyPrefix key前缀
-     * @param resultMap 订单信息
      * @param reason 取消原因
      */
-    public void cancelOrder(String keyPrefix, Map<String, Object> resultMap, String reason) {
-        Order order = (Order) resultMap.get("order");
+    public void cancelOrder(String keyPrefix, Order order, List<OrderItem> orderItems, String reason) {
+        Date now = new Date();
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy:MM:dd");
-        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GTM+8"));
-        String date = simpleDateFormat.format(order.getTime());
+        String date = simpleDateFormat.format(now);
         Map<String, Object> hashMap = new HashMap<>();
 
-        hashMap.put("orderInfo", JSONUtil.toJsonStr(resultMap)); // 订单信息
+        SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        hashMap.put("order", JSONUtil.toJsonStr(order)); // 订单信息
+        hashMap.put("orderItems", JSONUtil.toJsonStr(orderItems));
         hashMap.put("reason", reason); // 取消原因
-        hashMap.put("time", TimeUtils.nowLocalDateTime()); // 取消时间
+        hashMap.put("time", simpleDateFormat1.format(now)); // 取消时间
 
         // 2.2. 订单量自减少
-        stringRedisTemplate.opsForHash().put("cancel:" + keyPrefix + date, order.getId().toString(), hashMap);
+        stringRedisTemplate.opsForHash().putAll("cancel:" + keyPrefix + date + ":" + order.getId(), hashMap);
     }
 
     private ArrayList<OrderDTO> setQueryDTOS(List<Order> orderList) {

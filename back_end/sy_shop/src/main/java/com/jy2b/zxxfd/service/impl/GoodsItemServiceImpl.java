@@ -168,9 +168,6 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
 
         // 判断属性颜色是否不为空
         String color = itemFromDTO.getColor();
-        if (StrUtil.isBlank(color)) {
-            return ResultVO.fail("商品属性颜色不能为空");
-        }
         queryWrapper.eq("color", color);
 
         // 判断属性大小是否不为空
@@ -199,8 +196,8 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
         }
         // 判断属性库存是否不为空，且大于零
         if (itemFromDTO.getStock() != null) {
-            if (itemFromDTO.getStock() <= 0) {
-                return ResultVO.fail("修改商品属性库存不能为空或小于等于零");
+            if (itemFromDTO.getStock() < 0) {
+                return ResultVO.fail("修改商品属性库存不能为空或小于零");
             }
         }
         // 判断属性状态是否不为空
@@ -213,13 +210,18 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
                 if (StrUtil.isBlank(icon)) {
                     return ResultVO.fail("商品属性图标未上传");
                 }
+                if (StrUtil.isBlank(color)) {
+                    return ResultVO.fail("商品属性颜色不能为空");
+                }
             }
         }
 
-        // 查询是否有重复项
-        int colorCount = count(queryWrapper);
-        if (colorCount > 0) {
-            return ResultVO.fail("商品属性已存在");
+        if (StrUtil.isNotBlank(color) || StrUtil.isNotBlank(size) || StrUtil.isNotBlank(combo) || StrUtil.isNotBlank(edition)) {
+            // 查询是否有重复项
+            int colorCount = count(queryWrapper);
+            if (colorCount > 1) {
+                return ResultVO.fail("商品属性已存在");
+            }
         }
 
         // 修改商品属性
@@ -251,7 +253,7 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
         String fileName = resultVO.getData().toString();
 
         // 修改图标
-        boolean updateResult = update().set("icon", fileName).eq("id", id).update();
+        boolean updateResult = update().set("icon", fileName).eq("id", id).eq("color", goodsItem.getColor()).update();
 
         if (updateResult) {
             // 删除旧图标
@@ -797,6 +799,7 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
         // 获取颜色可选项
         List<GoodsItem> itemList = query().select("DISTINCT color,icon").eq("gid", gid)
                 .eq("status", 1).list();
+
         ArrayList<HashMap<String, String>> colorAndIcon = new ArrayList<>();
         for (GoodsItem item : itemList) {
             if (item != null) {

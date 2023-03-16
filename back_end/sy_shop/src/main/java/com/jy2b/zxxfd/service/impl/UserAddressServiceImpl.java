@@ -131,7 +131,7 @@ public class UserAddressServiceImpl extends ServiceImpl<UserAddressMapper, UserA
         if (StrUtil.isNotBlank(tel)) {
             // 判断电话格式
             if (!RegexUtils.isPhoneInvalid(tel)) {
-                addressUpdateWrapper.set("tel", tel);
+                addressUpdateWrapper.set("phone", tel);
             }
         }
         // 获取省份

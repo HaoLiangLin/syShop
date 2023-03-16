@@ -107,7 +107,7 @@ public class UserWallerServiceImpl extends ServiceImpl<UserWallerMapper, UserWal
     @Override
     public ResultVO selectUserBill(int year, int month) {
         // 判断年份是否正确
-        if (year < 2022) {
+        if (year <= 2022) {
             return ResultVO.fail("错误年份");
         }
         // 判断月份是否正确
