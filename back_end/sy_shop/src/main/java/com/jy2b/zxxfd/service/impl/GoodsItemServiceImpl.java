@@ -168,35 +168,22 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
 
         // 判断属性颜色是否不为空
         String color = itemFromDTO.getColor();
-        if (color != null) {
-            if (StrUtil.isNotBlank(color)) {
-                queryWrapper.eq("color", color);
-            }
+        if (StrUtil.isBlank(color)) {
+            return ResultVO.fail("商品属性颜色不能为空");
         }
+        queryWrapper.eq("color", color);
 
         // 判断属性大小是否不为空
         String size = itemFromDTO.getSize();
-        if (size != null) {
-            if (StrUtil.isNotBlank(size)) {
-                queryWrapper.eq("size", size);
-            }
-        }
+        queryWrapper.eq("size", size);
 
         // 判断属性套餐是否不为空
         String combo = itemFromDTO.getCombo();
-        if (combo != null) {
-            if (StrUtil.isNotBlank(combo)) {
-                queryWrapper.eq("combo", combo);
-            }
-        }
+        queryWrapper.eq("combo", combo);
 
         // 判断属性版本是否不为空
         String edition = itemFromDTO.getEdition();
-        if (edition != null) {
-            if (StrUtil.isNotBlank(edition)) {
-                queryWrapper.eq("edition", edition);
-            }
-        }
+        queryWrapper.eq("edition", edition);
 
         // 判断属性价格是否不为空，且大于零
         if (itemFromDTO.getPrice() != null) {
