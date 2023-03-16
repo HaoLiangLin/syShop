@@ -281,9 +281,10 @@ public class UserAddressServiceImpl extends ServiceImpl<UserAddressMapper, UserA
         if (provinceFilter.isEmpty()) {
             return ResultVO.fail("省份不存在");
         }
+        // 获取省份代码
         String provinceCode = provinceFilter.get(0).getProvince();
 
-        // 获取该省份城市
+        // 根据省份代码获取该省份城市
         List<Province> cityList = provinceService.selectAllCityByProvince(provinceCode);
         String cityCode = null;
         // 判断是否不为直辖市

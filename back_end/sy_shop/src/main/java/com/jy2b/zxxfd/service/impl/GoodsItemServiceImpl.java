@@ -164,20 +164,38 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
             itemFromDTO.setGid(gid);
         }
 
+        QueryWrapper<GoodsItem> queryWrapper = new QueryWrapper<>();
+
         // 判断属性颜色是否不为空
         String color = itemFromDTO.getColor();
         if (color != null) {
-            if (StrUtil.isBlank(color)) {
-                return ResultVO.fail("修改商品属性失败，颜色不能为空");
-            } else {
-                List<GoodsItem> list = query().eq("color", color).eq("gid", gid).list();
-                // 判断属性图片是否不为空
-                if (list.isEmpty()) {
-                    return ResultVO.fail("颜色不存在");
-                }
+            if (StrUtil.isNotBlank(color)) {
+                queryWrapper.eq("color", color);
             }
-        } else {
-            itemFromDTO.setColor(item.getColor());
+        }
+
+        // 判断属性大小是否不为空
+        String size = itemFromDTO.getSize();
+        if (size != null) {
+            if (StrUtil.isNotBlank(size)) {
+                queryWrapper.eq("size", size);
+            }
+        }
+
+        // 判断属性套餐是否不为空
+        String combo = itemFromDTO.getCombo();
+        if (combo != null) {
+            if (StrUtil.isNotBlank(combo)) {
+                queryWrapper.eq("combo", combo);
+            }
+        }
+
+        // 判断属性版本是否不为空
+        String edition = itemFromDTO.getEdition();
+        if (edition != null) {
+            if (StrUtil.isNotBlank(edition)) {
+                queryWrapper.eq("edition", edition);
+            }
         }
 
         // 判断属性价格是否不为空，且大于零
@@ -203,13 +221,20 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
             if (itemFromDTO.getStatus() < 0 || itemFromDTO.getStatus() > 1) {
                 return ResultVO.fail("修改商品属性状态不存在");
             }
-            if (itemFromDTO.getStatus() == 0) {
+            if (itemFromDTO.getStatus() == 1) {
                 String icon = item.getIcon();
                 if (StrUtil.isBlank(icon)) {
                     return ResultVO.fail("商品属性图标未上传");
                 }
             }
         }
+
+        // 查询是否有重复项
+        int colorCount = count(queryWrapper);
+        if (colorCount > 0) {
+            return ResultVO.fail("商品属性已存在");
+        }
+
         // 修改商品属性
         GoodsItem goodsItem = BeanUtil.toBean(itemFromDTO, GoodsItem.class);
         goodsItem.setId(id);

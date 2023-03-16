@@ -863,7 +863,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             return resultVO;
         }
         // 获取头像路径
-        String fileNames = resultVO.getMessage();
+        String fileNames = resultVO.getData().toString();
         // 修改用户头像
         boolean updateResult = update().set("icon", fileNames).eq("id", userId).update();
         // 判断是否修改成功

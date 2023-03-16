@@ -35,8 +35,8 @@ export function deleteGoodsCategory(id) {
 // #######################商品分类结束线#####################################
 
 // 分页查询商品
-export function queryGoodsPage(page, size, id, cid, province, city, district, recommend, warrantyTime, refundTime, changerTime, status) {
-  return request.post(`/goods/list/${page}/${size}`, { id, cid, province, city, district, recommend, warrantyTime, refundTime, changerTime, status })
+export function queryGoodsPage(page, size, id, name, cid, province, city, district, recommend, warrantyTime, refundTime, changerTime, status) {
+  return request.post(`/goods/list/${page}/${size}`, { id, name, cid, province, city, district, recommend, warrantyTime, refundTime, changerTime, status })
 }
 
 // 根据id查询商品
@@ -75,6 +75,11 @@ export function uploadOrUpdateGoodsImages(id, files) {
       processData: false
     }
   )
+}
+
+// 删除商品封面
+export function removeImages(id) {
+  return request.delete(`/goods/remove/images/${id}`)
 }
 
 // 删除商品
@@ -136,6 +141,7 @@ export default {
   saveGoods,
   updateGoods,
   uploadOrUpdateGoodsImages,
+  removeImages,
   deleteGoods,
   uploadOrUpdateGoodsItemIcon,
   saveGoodsItem,

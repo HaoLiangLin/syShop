@@ -16,9 +16,9 @@ const routes = [
       { path: 'userList', component: () => import('@/components/user/userList.vue') },
       { path: 'saveUser', component: () => import('@/components/user/saveUser.vue') },
       { path: 'goodsCategory', component: () => import('@/components/goods/goodsCategory.vue') },
-      { path: 'goodsList', component: () => import('@/components/goods/goodsList.vue') }
-      // { path: 'goods', component: () => import('@/components/goods/goods.vue') },
-      // { path: 'goodsItemList/:id', component: () => import('@/components/goods/goodsItemList.vue') }
+      { path: 'goodsList', component: () => import('@/components/goods/goodsList.vue') },
+      { path: 'saveGoods', component: () => import('@/components/goods/saveGoods.vue') },
+      { path: 'goodsItem/:id', component: () => import('@/components/goods/goodsItem.vue') }
     ]
   },
   // 登录

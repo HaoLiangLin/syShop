@@ -82,15 +82,11 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
             List<Province> cityList = provinceService.selectAllCityByProvince(provinceCode);
             // 判断是否不为直辖市
             if (!cityList.isEmpty()) {
-                String finalCity = city;
                 // 过滤每一个城市，并收集到正确的
-                List<Province> filterResult = cityList.stream().filter(c -> c.getName().equals(finalCity)).collect(Collectors.toList());
-                if (filterResult.isEmpty()) {
-                    return ResultVO.fail("城市不存在");
+                List<Province> filterResult = cityList.stream().filter(c -> c.getName().equals(city)).collect(Collectors.toList());
+                if (!filterResult.isEmpty()) {
+                    cityCode = filterResult.get(0).getCity();
                 }
-                cityCode = filterResult.get(0).getCity();
-            } else {
-                city = province;
             }
         } else {
             return ResultVO.fail("发货城市不能为空");
@@ -227,10 +223,9 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
                 String finalCity = city;
                 // 过滤每一个城市，并收集到正确的
                 List<Province> filterResult = cityList.stream().filter(c -> c.getName().equals(finalCity)).collect(Collectors.toList());
-                if (filterResult.isEmpty()) {
-                    return ResultVO.fail("城市不存在");
+                if (!filterResult.isEmpty()) {
+                    cityCode = filterResult.get(0).getCity();
                 }
-                cityCode = filterResult.get(0).getCity();
             } else {
                 updateFromDTO.setCity(province);
             }
@@ -375,6 +370,11 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
             if (goods.getId() != null) {
                 queryWrapper.eq("id", goods.getId());
             }
+            // 判断商品名称是否不为空
+            String goodsName = goods.getName();
+            if (StrUtil.isNotBlank(goodsName)) {
+                queryWrapper.like("name", goodsName);
+            }
             // 判断商品分类是否不为空
             if (goods.getCid() != null) {
                 List<Long> cidList = getSunCid(goods.getCid());
@@ -397,18 +397,18 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
                 queryWrapper.eq("district", goods.getDistrict());
             }
             // 判断是否推荐
-            if (goods.getRecommend() != null && goods.getRecommend() == 0 && goods.getRecommend() == 1) {
+            if (goods.getRecommend() != null && (goods.getRecommend() == 0 || goods.getRecommend() == 1)) {
                 queryWrapper.eq("recommend", goods.getRecommend());
             }
 
             if (goods.getWarrantyTime() != null) {
-                queryWrapper.eq("warranty_time", goods.getWarrantyTime());
+                queryWrapper.ge("warranty_time", goods.getWarrantyTime());
             }
             if (goods.getRefundTime() != null) {
-                queryWrapper.eq("refund_time", goods.getRefundTime());
+                queryWrapper.ge("refund_time", goods.getRefundTime());
             }
             if (goods.getChangerTime() != null) {
-                queryWrapper.eq("changer_time", goods.getChangerTime());
+                queryWrapper.ge("changer_time", goods.getChangerTime());
             }
             if (goods.getStatus() != null) {
                 queryWrapper.eq("status", goods.getStatus());
