@@ -289,15 +289,10 @@ public class UserAddressServiceImpl extends ServiceImpl<UserAddressMapper, UserA
         String cityCode = null;
         // 判断是否不为直辖市
         if (cityList != null) {
-            // 判断城市是否存在
-            if (cityList.isEmpty()) {
-                return ResultVO.fail("城市不存在");
-            }
             List<Province> cityFilter = cityList.stream().filter(c -> c.getName().equals(city)).collect(Collectors.toList());
-            if (cityFilter.isEmpty()) {
-                return ResultVO.fail("城市不存在");
+            if (!cityFilter.isEmpty()) {
+                cityCode = cityFilter.get(0).getCity();
             }
-           cityCode = cityFilter.get(0).getCity();
         }
 
         // 获取该城市城区

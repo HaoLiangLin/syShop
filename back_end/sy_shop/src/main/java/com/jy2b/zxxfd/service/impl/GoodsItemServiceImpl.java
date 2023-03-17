@@ -253,7 +253,7 @@ public class GoodsItemServiceImpl extends ServiceImpl<GoodsItemMapper, GoodsItem
         String fileName = resultVO.getData().toString();
 
         // 修改图标
-        boolean updateResult = update().set("icon", fileName).eq("id", id).eq("color", goodsItem.getColor()).update();
+        boolean updateResult = update().set("icon", fileName).eq("gid", goodsItem.getGid()).eq("color", goodsItem.getColor()).update();
 
         if (updateResult) {
             // 删除旧图标

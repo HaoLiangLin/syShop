@@ -15,20 +15,14 @@ export function uploadOrUpdateGoodsCategoryIcon(id) {
   return `${baseURL}/goodsCategory/uploadOrUpdateIcon/${id}`
 }
 
-// 上传商品图标
-export function uploadGoodImages(id) {
-  return `${baseURL}/goods/uploadOrUpdate/images/${id}`
-}
-
 // 上传商品属性图标
-export function uploadGoodsItemIcon() {
-  return `${baseURL}/goodsItem/uploadIcon`
+export function uploadOrUpdateGoodsItemIcon(id) {
+  return `${baseURL}/goodsItem/uploadOrUpdate/icon/${id}`
 }
 
 export default {
   getImage,
   uploadOrUpdateUserIcon,
   uploadOrUpdateGoodsCategoryIcon,
-  uploadGoodImages,
-  uploadGoodsItemIcon
+  uploadOrUpdateGoodsItemIcon
 }

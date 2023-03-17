@@ -46,7 +46,8 @@ import {
   Cascader,
   Statistic,
   Alert,
-  Empty
+  Empty,
+  Autocomplete
 } from 'element-ui'
 
 Vue.use(Container)
@@ -93,6 +94,7 @@ Vue.use(Cascader)
 Vue.use(Statistic)
 Vue.use(Alert)
 Vue.use(Empty)
+Vue.use(Autocomplete)
 Vue.prototype.$message = Message
 Vue.prototype.$notify = Notification
 Vue.prototype.$confirm = MessageBox

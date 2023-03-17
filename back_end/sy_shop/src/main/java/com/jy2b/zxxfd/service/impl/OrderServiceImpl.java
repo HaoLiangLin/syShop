@@ -32,6 +32,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.jy2b.zxxfd.contants.RedisConstants.ORDER_KEY;
+import static com.jy2b.zxxfd.contants.RedisConstants.USER_WALLER_KEY;
 import static com.jy2b.zxxfd.contants.SystemConstants.APPLICATION_NAME;
 
 /**
@@ -405,12 +406,18 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             return ResultVO.fail("钱包余额不足");
         }
 
+        // 获取钱包积分
+        Long userPoints = userWaller.getPoints();
+
         // 获取钱包累计消费
         Double spending = userWaller.getSpending();
 
         // 支付订单
         userWaller.setBalance(balance - price + reducePrice);
         userWaller.setSpending(spending + price - reducePrice);
+        if (points != null) {
+            userWaller.setPoints(userPoints - points);
+        }
         int update = userWallerMapper.updateById(userWaller);
         if (update < 1) {
             return ResultVO.fail("支付失败");
@@ -434,6 +441,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         }
         // 保存系统账单
         billService.saveBill(userId, userBill, BillType.income);
+
+        // 更新缓存
+        stringRedisTemplate.opsForValue().set(USER_WALLER_KEY + ":" + userId, JSONUtil.toJsonStr(userWaller));
 
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("price", price); // 实际金额
@@ -608,6 +618,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             Long userId = orderQueryDTO.getUid();
             if (orderId != null) {
                 queryWrapper.eq("uid", userId);
+            }
+            // 获取联系电话
+            String phone = orderQueryDTO.getPhone();
+            if (StrUtil.isNotBlank(phone)) {
+                queryWrapper.like("phone", phone);
             }
             // 获取支付状态
             Integer isPay = orderQueryDTO.getIsPay();

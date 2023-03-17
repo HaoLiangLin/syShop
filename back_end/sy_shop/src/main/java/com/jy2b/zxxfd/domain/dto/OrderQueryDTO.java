@@ -14,6 +14,8 @@ public class OrderQueryDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long uid; // 下单用户id
 
+    private String phone; // 手机号
+
     private Integer isPay; // 是否付款
 
     private Integer logisticsStatus; // 发货状态
