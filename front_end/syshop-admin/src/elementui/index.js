@@ -47,7 +47,8 @@ import {
   Statistic,
   Alert,
   Empty,
-  Autocomplete
+  Autocomplete,
+  Card
 } from 'element-ui'
 
 Vue.use(Container)
@@ -95,6 +96,7 @@ Vue.use(Statistic)
 Vue.use(Alert)
 Vue.use(Empty)
 Vue.use(Autocomplete)
+Vue.use(Card)
 Vue.prototype.$message = Message
 Vue.prototype.$notify = Notification
 Vue.prototype.$confirm = MessageBox

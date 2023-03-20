@@ -18,7 +18,8 @@ const routes = [
       { path: 'goodsCategory', component: () => import('@/components/goods/goodsCategory.vue') },
       { path: 'goodsList', component: () => import('@/components/goods/goodsList.vue') },
       { path: 'saveGoods', component: () => import('@/components/goods/saveGoods.vue') },
-      { path: 'goodsItem/:id', component: () => import('@/components/goods/goodsItem.vue') }
+      { path: 'goodsItem/:id', component: () => import('@/components/goods/goodsItem.vue') },
+      { path: 'orderList', component: () => import('@/components/order/orderList.vue') }
     ]
   },
   // 登录

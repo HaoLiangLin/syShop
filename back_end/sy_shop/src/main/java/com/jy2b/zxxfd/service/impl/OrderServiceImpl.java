@@ -1,19 +1,21 @@
 package com.jy2b.zxxfd.service.impl;
 
-import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jy2b.zxxfd.domain.dto.*;
 import com.jy2b.zxxfd.domain.*;
 import com.jy2b.zxxfd.domain.vo.BillStatusCode;
 import com.jy2b.zxxfd.domain.vo.BillType;
+import com.jy2b.zxxfd.domain.vo.LogisticsStatus;
 import com.jy2b.zxxfd.domain.vo.ResultVO;
 import com.jy2b.zxxfd.mapper.*;
 import com.jy2b.zxxfd.service.IBillService;
 import com.jy2b.zxxfd.service.IOrderService;
+import com.jy2b.zxxfd.service.IProvinceService;
 import com.jy2b.zxxfd.utils.RedisIdWorker;
 import com.jy2b.zxxfd.utils.TimeUtils;
 import com.jy2b.zxxfd.utils.UserBillUtils;
@@ -25,9 +27,6 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -62,10 +61,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private UserWallerMapper userWallerMapper;
 
     @Resource
-    private GoodsEvaluationMapper goodsEvaluationMapper;
+    private UserBillUtils userBillUtils;
 
     @Resource
-    private UserBillUtils userBillUtils;
+    private UserMapper userMapper;
 
     @Override
     public ResultVO submitOrder(OrderSaveFromDTO orderSaveFromDTO) {
@@ -177,13 +176,24 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             // 设置订单号
             orderItem.setOrderId(orderId);
             // 设置商品属性id
-            orderItem.setGid(gid);
+            orderItem.setGoodsItemId(gid);
             // 设置单价
             orderItem.setUnitPrice(unitPrice);
             // 设置数量
             orderItem.setQuantity(quantity);
             // 设置总价
             orderItem.setPrice(price);
+            // 设置商品名称
+            orderItem.setGoodsName(goods.getName());
+            // 设置商品属性参数
+            String color = item.getColor();
+            orderItem.setGoodsItemColor(color);
+            String size = item.getSize();
+            orderItem.setGoodsItemSize(size);
+            String combo = item.getCombo();
+            orderItem.setGoodsItemCombo(combo);
+            String edition = item.getEdition();
+            orderItem.setGoodsItemEdition(edition);
 
             // 保存订单属性
             orderItemMapper.insert(orderItem);
@@ -395,6 +405,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 return ResultVO.fail("对不起，你的积分不足");
             }
             reducePrice = points / 100.00;
+
             BigDecimal bigDecimal = new BigDecimal(reducePrice);
             reducePrice = bigDecimal.setScale(2, RoundingMode.UP).doubleValue();
         }
@@ -658,6 +669,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                     case "Asc": queryWrapper.orderByAsc("time");break;
                     case "Des": queryWrapper.orderByDesc("time");break;
                 }
+            } else {
+                queryWrapper.orderByDesc("time");
             }
 
             // 获取排序价格
@@ -674,8 +687,45 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
         orderMapper.selectPage(orderPage, queryWrapper);
 
-        return ResultVO.ok(orderPage, "查询成功");
+        List<Order> records = orderPage.getRecords();
+        List<OrderManagerDTO> orderManagerDTOList = new ArrayList<>();
+        for (Order order : records) {
+            // 获取用户ID
+            Long userId = order.getUid();
+            // 查询用户
+            User user = userMapper.selectById(userId);
+
+            // 获取订单号
+            Long orderId = order.getId();
+            // 查询订单属性
+            QueryWrapper<OrderItem> itemQueryWrapper = new QueryWrapper<>();
+            itemQueryWrapper.eq("order_id", orderId);
+            List<OrderItem> orderItems = orderItemMapper.selectList(itemQueryWrapper);
+
+            OrderManagerDTO orderManagerDTO = new OrderManagerDTO();
+            orderManagerDTO.setOrder(order);
+            orderManagerDTO.setUser(user);
+            orderManagerDTO.setOrderItemList(orderItems);
+
+            orderManagerDTOList.add(orderManagerDTO);
+        }
+
+        Page<OrderManagerDTO> orderManagerDTOPage = new Page<>();
+        orderManagerDTOPage.setRecords(orderManagerDTOList);
+        orderManagerDTOPage.setSize(orderPage.getSize());
+        orderManagerDTOPage.setCountId(orderPage.getCountId());
+        orderManagerDTOPage.setCurrent(orderPage.getCurrent());
+        orderManagerDTOPage.setHitCount(orderPage.isHitCount());
+        orderManagerDTOPage.setMaxLimit(orderPage.getMaxLimit());
+        orderManagerDTOPage.setTotal(orderPage.getTotal());
+        orderManagerDTOPage.setSearchCount(orderPage.isSearchCount());
+        orderManagerDTOPage.setOrders(orderPage.getOrders());
+
+        return ResultVO.ok(orderManagerDTOPage, "查询成功");
     }
+
+    @Resource
+    private IProvinceService provinceService;
 
     @Override
     public ResultVO updateOrder(OrderUpdateFromDTO updateFromDTO) {
@@ -686,6 +736,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // 判断订单是否存在
         if (order == null) {
             return ResultVO.fail("订单不存在！");
+        }
+
+        if (order.getLogisticsStatus() > 1) {
+            return ResultVO.fail("订单无法修改");
+        }
+
+        if (order.getStatus() > 0) {
+            return ResultVO.fail("订单无法修改");
         }
 
         // 获取修改收货人
@@ -700,22 +758,68 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             // 修改联系电话
             order.setPhone(phone);
         }
-        // 获取修改收货省份
+
+        // 获取发货省份
         String province = updateFromDTO.getProvince();
-        // 获取修改收货城市
+        if (province == null) {
+            province = order.getProvince();
+        }
+        // 获取发货城市
         String city = updateFromDTO.getCity();
-        if (StrUtil.isNotBlank(province) && StrUtil.isNotBlank(city)) {
-            // 修改省份
+        if (city == null) {
+            city = order.getCity();
+        }
+        // 获取发货区县
+        String area = updateFromDTO.getDistrict();
+        if (area == null) {
+            area = order.getDistrict();
+        }
+
+        // 省份代码
+        String provinceCode = null;
+        // 判断省份是否存在
+        if (StrUtil.isNotBlank(province)) {
+            List<Province> provinceList = provinceService.selectAllProvince();
+            // 过滤每一个省份，并收集到正确的
+            String finalProvince = province;
+            List<Province> filterResult = provinceList.stream().filter(p -> p.getName().equals(finalProvince)).collect(Collectors.toList());
+            if (filterResult.isEmpty()) {
+                return ResultVO.fail("省份不存在");
+            }
+            provinceCode = filterResult.get(0).getProvince();
             order.setProvince(province);
-            // 修改城市
-            order.setCity(city);
         }
-        // 获取修改区/县
-        String district = updateFromDTO.getDistrict();
-        if (StrUtil.isNotBlank(district)) {
-            // 修改区/县
-            order.setDistrict(district);
+        // 城市代码
+        String cityCode = null;
+        // 判断城市是否存在
+        if (StrUtil.isNotBlank(city)) {
+            List<Province> cityList = provinceService.selectAllCityByProvince(provinceCode);
+            // 判断是否不为直辖市
+            if (!cityList.isEmpty()) {
+                String finalCity = city;
+                // 过滤每一个城市，并收集到正确的
+                List<Province> filterResult = cityList.stream().filter(c -> c.getName().equals(finalCity)).collect(Collectors.toList());
+                if (!filterResult.isEmpty()) {
+                    cityCode = filterResult.get(0).getCity();
+                    order.setCity(city);
+                }
+            } else {
+                updateFromDTO.setCity(province);
+                order.setCity(province);
+            }
         }
+        // 判断城区是否存在
+        if (StrUtil.isNotBlank(area)) {
+            List<Province> areaList = provinceService.selectAllAreaByProvinceAndCity(provinceCode, cityCode);
+            // 过滤出正确城区
+            String finalArea = area;
+            List<Province> filterResult = areaList.stream().filter(a -> a.getName().equals(finalArea)).collect(Collectors.toList());
+            if (filterResult.isEmpty()) {
+                return ResultVO.fail("城区不存在");
+            }
+            order.setDistrict(area);
+        }
+
         // 获取修改收货地址
         String address = updateFromDTO.getAddress();
         if (StrUtil.isNotBlank(address)) {
@@ -730,28 +834,44 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             order.setRemarks(remarks);
         }
 
-        // 修改物流状态
-        Integer logisticsStatus = updateFromDTO.getLogisticsStatus();
+        // 修改订单
+        boolean result = updateById(order);
+
+        return result ? ResultVO.ok(null,"订单修改成功！") : ResultVO.fail("订单修改失败！");
+    }
+
+    @Override
+    public ResultVO updateOrderStatus(Long orderId, OrderStatusUpdateDTO orderStatusUpdateDTO) {
+        // 查询订单
+        Order order = getById(orderId);
+        // 判断订单是否存在
+        if (order == null) {
+            return ResultVO.fail("订单不存在");
+        }
+
+        // 获取物流状态
+        Integer logisticsStatus = orderStatusUpdateDTO.getLogisticsStatus();
         if (logisticsStatus != null) {
             // 修改物流状态
-            order.setLogisticsStatus(logisticsStatus);
-
-            if (logisticsStatus == 1) {
+            if (logisticsStatus == LogisticsStatus.shipped.getCode()) {
                 Date date = new Date();
                 // 设置发货时间
                 order.setShippingTime(date);
             }
 
-            if (logisticsStatus == 6) {
+            if (logisticsStatus == LogisticsStatus.haveRefund.getCode()) {
                 Date date = new Date();
                 // 设置退货时间
                 order.setReturnTime(date);
                 // 退货
                 returnGoods(order.getId(), "订单退货失败");
+
+                order.setLogisticsStatus(logisticsStatus);
             }
         }
-        // 修改订单状态
-        Integer status = updateFromDTO.getStatus();
+
+        // 获取订单状态
+        Integer status = orderStatusUpdateDTO.getStatus();
         if (status != null) {
             // 修改订单状态
             order.setStatus(status);
@@ -760,7 +880,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 // 获取订单物流状态
                 Integer orderLogisticsStatus = order.getLogisticsStatus();
                 if (orderLogisticsStatus != null) {
-                    if (orderLogisticsStatus == 0 || orderLogisticsStatus == 6) {
+                    if (orderLogisticsStatus == LogisticsStatus.unshipped.getCode() || orderLogisticsStatus == LogisticsStatus.haveRefund.getCode()) {
                         // 退款
                         returnMoney(order, "订单退款失败");
                     } else {
@@ -770,10 +890,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             }
         }
 
-        // 修改订单
-        boolean result = updateById(order);
+        boolean updateResult = updateById(order);
 
-        return result ? ResultVO.ok(null,"订单修改成功！") : ResultVO.fail("订单修改失败！");
+        if (!updateResult) {
+            throw new RuntimeException("修改失败");
+        }
+
+        return ResultVO.ok("修改成功");
     }
 
     @Override
@@ -985,7 +1108,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             }
         }
 
-
         // 设置物流状态
         Integer logisticsStatus = order.getLogisticsStatus();
         switch (logisticsStatus) {
@@ -1040,36 +1162,28 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 orderItemDTO.setOrderItemId(id);
 
                 // 获取商品属性id
-                Long itemId = orderItem.getGid();
+                Long itemId = orderItem.getGoodsItemId();
                 // 获取商品属性信息
                 GoodsItem item = goodsItemMapper.selectById(itemId);
 
-                // 获取商品id
-                Long gid = item.getGid();
-                // 获取商品信息
-                Goods goods = goodsMapper.selectById(gid);
-
                 // 设置商品名称
-                orderItemDTO.setGoodsName(goods.getName());
+                orderItemDTO.setGoodsName(orderItem.getGoodsName());
 
                 // 设置商品属性id
                 orderItemDTO.setGid(itemId);
                 // 设置商品属性颜色
-                orderItemDTO.setColor(item.getColor());
+                orderItemDTO.setColor(orderItem.getGoodsItemColor());
                 // 设置商品属性图片
-                orderItemDTO.setImage(item.getIcon());
+                orderItemDTO.setImage(orderItem.getGoodsItemIcon());
+
                 // 设置商品属性套餐
-                if (item.getCombo() != null) {
-                    orderItemDTO.setCombo(item.getCombo());
-                }
+                orderItemDTO.setCombo(orderItem.getGoodsItemCombo());
+
                 // 设置商品属性尺寸
-                if (item.getSize() != null) {
-                    orderItemDTO.setSize(item.getSize());
-                }
+                orderItemDTO.setSize(orderItem.getGoodsItemSize());
+
                 // 设置商品属性版本
-                if (item.getEdition() != null) {
-                    orderItemDTO.setEdition(item.getEdition());
-                }
+                orderItemDTO.setEdition(orderItem.getGoodsItemEdition());
 
                 // 设置商品属性单价
                 orderItemDTO.setUnitPrice(orderItem.getUnitPrice());
@@ -1079,14 +1193,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 orderItemDTO.setQuantity(orderItem.getQuantity());
 
                 if (order.getStatus() == 1) {
-                    // 查询是否进行评价
-                    QueryWrapper<GoodsEvaluation> commentQueryWrapper = new QueryWrapper<>();
-                    commentQueryWrapper.eq("order_id", order.getId()).eq("goodsItem_id", itemId);
-                    Integer integer = goodsEvaluationMapper.selectCount(commentQueryWrapper);
-
-                    if (integer > 0) {
+                    if (orderItem.getIsComment() >= 0) {
                         // 设置是否评论
-                        orderItemDTO.setIsComment(integer);
+                        orderItemDTO.setIsComment(orderItem.getIsComment());
                     } else {
                         orderItemDTO.setIsComment(0);
                     }
@@ -1133,7 +1242,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         List<OrderItem> orderItems = orderItemMapper.selectList(queryWrapper);
         for (OrderItem orderItem : orderItems) {
             if (orderItem != null) {
-                Long itemId = orderItem.getGid();
+                Long itemId = orderItem.getGoodsItemId();
                 // 获取商品属性
                 GoodsItem item = goodsItemMapper.selectById(itemId);
                 // 获取购买数量

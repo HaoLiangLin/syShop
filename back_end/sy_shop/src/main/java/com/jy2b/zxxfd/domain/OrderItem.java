@@ -21,8 +21,8 @@ public class OrderItem {
     private Long orderId;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    @TableField("gid")
-    private Long gid;
+    @TableField("goodsItem_id")
+    private Long goodsItemId;
 
     @TableField("quantity")
     private Integer quantity;
@@ -35,4 +35,25 @@ public class OrderItem {
 
     @TableField("price")
     private Double price;
+
+    @TableField("goods_name")
+    private String goodsName;
+
+    @TableField("goodsItem_icon")
+    private String goodsItemIcon;
+
+    @TableField("goodsItem_color")
+    private String goodsItemColor;
+
+    @TableField("goodsItem_size")
+    private String goodsItemSize;
+
+    @TableField("goodsItem_combo")
+    private String goodsItemCombo;
+
+    @TableField("goodsItem_edition")
+    private String goodsItemEdition;
+
+    @TableField("isComment")
+    private Integer isComment;
 }

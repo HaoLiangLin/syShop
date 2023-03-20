@@ -17,4 +17,12 @@ public interface IOrderItemService extends IService<OrderItem> {
      * @return ResultVo
      */
     ResultVO queryById(Long id);
+
+    /**
+     * 修改订单属性
+     * @param id 订单属性ID
+     * @param goodsItemId 商品属性Id
+     * @return ResultVO
+     */
+    ResultVO updateOrderItem(Long id, Long goodsItemId);
 }

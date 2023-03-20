@@ -2,6 +2,7 @@ package com.jy2b.zxxfd.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jy2b.zxxfd.domain.dto.GoodsEvaluationDTO;
 import com.jy2b.zxxfd.domain.dto.GoodsEvaluationSaveDTO;
@@ -120,6 +121,10 @@ public class GoodsEvaluationServiceImpl extends ServiceImpl<GoodsEvaluationMappe
         if (orderItem == null) {
             return ResultVO.fail("订单不存在");
         }
+        // 判断是否已评价
+        if (orderItem.getIsComment() != null && orderItem.getIsComment() == 1) {
+            return ResultVO.fail("该订单商品已完成评价");
+        }
 
         // 获取订单号
         Long orderId = orderItem.getOrderId();
@@ -136,16 +141,8 @@ public class GoodsEvaluationServiceImpl extends ServiceImpl<GoodsEvaluationMappe
             return ResultVO.fail("订单未完成");
         }
 
-        // 获取商品属性id
-        Long gid = orderItem.getGid();
-        // 查询是否评论
-        Integer count = query().eq("order_id", orderId).eq("goodsItem_id", gid).count();
-        if (count > 0) {
-            return ResultVO.fail("该订单已完成评价");
-        }
-
         // 查询商品属性
-        GoodsItem goodsItem = goodsItemMapper.selectById(gid);
+        GoodsItem goodsItem = goodsItemMapper.selectById(orderItem.getGoodsItemId());
 
         GoodsEvaluation goodsEvaluation = new GoodsEvaluation();
 
@@ -180,12 +177,16 @@ public class GoodsEvaluationServiceImpl extends ServiceImpl<GoodsEvaluationMappe
         goodsEvaluation.setGoodsId(goodsItem.getGid());
 
         // 设置商品属性id
-        goodsEvaluation.setGoodsItemId(orderItem.getGid());
+        goodsEvaluation.setGoodsItemId(orderItem.getGoodsItemId());
 
         // 新增评论
         boolean result = save(goodsEvaluation);
         if (!result) {
             UploadUtils.deleteFiles(images);
+        } else {
+            UpdateWrapper<OrderItem> itemUpdateWrapper = new UpdateWrapper<>();
+            itemUpdateWrapper.eq("id", orderItemId).set("isComment", 1);
+            orderItemMapper.update(null, itemUpdateWrapper);
         }
         return result ? ResultVO.ok(goodsEvaluation,"评价成功") : ResultVO.fail("评价失败");
     }
@@ -232,6 +233,21 @@ public class GoodsEvaluationServiceImpl extends ServiceImpl<GoodsEvaluationMappe
         boolean result = removeById(id);
 
         if (result) {
+            // 获取订单号
+            Long orderId = comment.getOrderId();
+            // 获取商品属性ID
+            Long goodsItemId = comment.getGoodsItemId();
+
+            QueryWrapper<OrderItem> itemQueryWrapper = new QueryWrapper<>();
+            itemQueryWrapper.eq("order_id", orderId).eq("goodsItem_id", goodsItemId);
+
+            OrderItem orderItem = orderItemMapper.selectOne(itemQueryWrapper);
+            Long orderItemId = orderItem.getId();
+            UpdateWrapper<OrderItem> itemUpdateWrapper = new UpdateWrapper<>();
+            itemUpdateWrapper.eq("id", orderItemId).set("isComment", 2);
+            orderItemMapper.update(null, itemUpdateWrapper);
+
+
             // 删除点赞记录
             stringRedisTemplate.delete(EVALUATION_LIKED_KEY + id);
 

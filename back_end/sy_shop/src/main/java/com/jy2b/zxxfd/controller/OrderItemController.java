@@ -25,4 +25,10 @@ public class OrderItemController {
     public ResultVO queryById(@PathVariable("id") Long id) {
         return orderItemService.queryById(id);
     }
+
+    @PutMapping("/update/{id}/{goodsItemId}")
+    @PreAuthorize("hasAnyAuthority('order:update')")
+    public ResultVO updateOrderItem(@PathVariable("id") Long id, @PathVariable("goodsItemId") Long goodsItemId) {
+        return orderItemService.updateOrderItem(id, goodsItemId);
+    }
 }

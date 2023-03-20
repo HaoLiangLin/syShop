@@ -183,7 +183,7 @@ public class UserAddressServiceImpl extends ServiceImpl<UserAddressMapper, UserA
             if (filterResult.isEmpty()) {
                 return ResultVO.fail("城区不存在");
             }
-            addressUpdateWrapper.set("area", area);
+            addressUpdateWrapper.set("district", area);
         }
 
         // 获取具体地址

@@ -110,6 +110,14 @@ public interface IOrderService extends IService<Order> {
     ResultVO updateOrder(OrderUpdateFromDTO updateFromDTO);
 
     /**
+     * 修改订单状态
+     * @param orderId 订单号
+     * @param orderStatusUpdateDTO 订单状态信息
+     * @return ResultVO
+     */
+    ResultVO updateOrderStatus(Long orderId, OrderStatusUpdateDTO orderStatusUpdateDTO);
+
+    /**
      * 订单统计
      * @param startDate 起始时间
      * @param endDate 返回时间

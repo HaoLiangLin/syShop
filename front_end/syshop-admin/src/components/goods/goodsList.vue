@@ -271,7 +271,7 @@
     <el-dialog
       title="修改商品"
       :visible.sync="isUpdate"
-      width="45%">
+      width="47%">
       <el-form :model="updateGoods" :inline="true">
         <el-form-item label="商品编号" :label-width="formLabelWidth">
           <el-input v-model="updateGoods.id" :disabled="true"></el-input>

@@ -13,6 +13,8 @@ import com.jy2b.zxxfd.service.IOrderItemService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * @author 林武泰
@@ -39,7 +41,7 @@ public class OrderItemServiceImpl extends ServiceImpl<OrderItemMapper, OrderItem
         orderItemDTO.setOrderItemId(orderItem.getId());
 
         // 获取商品属性id
-        Long goodsItemId = orderItem.getGid();
+        Long goodsItemId = orderItem.getGoodsItemId();
         // 根据商品属性id查询商品属性
         GoodsItem goodsItem = goodsItemMapper.selectById(goodsItemId);
 
@@ -78,5 +80,54 @@ public class OrderItemServiceImpl extends ServiceImpl<OrderItemMapper, OrderItem
         orderItemDTO.setQuantity(orderItem.getQuantity());
 
         return ResultVO.ok(orderItemDTO, "查询成功");
+    }
+
+    @Override
+    public ResultVO updateOrderItem(Long id, Long goodsItemId) {
+        // 获取订单属性
+        OrderItem orderItem = getById(id);
+        // 判断是否存在
+        if (orderItem == null) {
+            return ResultVO.fail("订单属性不存在");
+        }
+
+        // 获取价格
+        Double unitPrice = orderItem.getUnitPrice();
+        // 获取数量
+        Integer quantity = orderItem.getQuantity();
+
+        // 获取商品属性
+        GoodsItem goodsItem = goodsItemMapper.selectById(goodsItemId);
+        // 判断是否存在
+        if (goodsItem == null) {
+            return ResultVO.fail("商品属性不存在");
+        }
+
+        // 获取价格
+        Double price = goodsItem.getPrice();
+        Double discount = goodsItem.getDiscount();
+
+        price = price * discount;
+        double allPrice = price * quantity;
+
+        BigDecimal bigDecimal = new BigDecimal(unitPrice);
+        double p1 = bigDecimal.setScale(2, RoundingMode.UP).doubleValue();
+        BigDecimal bigDecimal1 = new BigDecimal(allPrice);
+        double p2 = bigDecimal1.setScale(2, RoundingMode.UP).doubleValue();
+
+        if ((p1 - p2 < -0.1 || p1 - p2 > 0.1)) {
+            return ResultVO.fail("价格不相等，无法修改");
+        }
+
+        orderItem.setGoodsItemId(goodsItemId);
+        orderItem.setGoodsItemColor(goodsItem.getColor());
+        orderItem.setGoodsItemIcon(goodsItem.getIcon());
+        orderItem.setGoodsItemSize(goodsItem.getSize());
+        orderItem.setGoodsItemCombo(goodsItem.getCombo());
+        orderItem.setGoodsItemEdition(goodsItem.getEdition());
+
+        boolean updateResult = updateById(orderItem);
+
+        return updateResult ? ResultVO.ok(null, "修改成功") : ResultVO.fail("修改失败");
     }
 }

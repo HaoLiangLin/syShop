@@ -55,8 +55,8 @@
                 <span slot="title">订单管理</span>
               </template>
               <el-menu-item-group>
-                <el-menu-item index="/home/3-1">订单列表</el-menu-item>
-                <el-menu-item index="/home/orderList">订单修改</el-menu-item>
+                <el-menu-item index="/home/orderList">订单列表</el-menu-item>
+                <el-menu-item index="/home/3-1">订单修改</el-menu-item>
                 <el-menu-item index="/home/3-2">订单统计</el-menu-item>
               </el-menu-item-group>
             </el-submenu>

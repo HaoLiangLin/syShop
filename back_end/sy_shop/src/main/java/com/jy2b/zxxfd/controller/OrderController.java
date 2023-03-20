@@ -2,6 +2,7 @@ package com.jy2b.zxxfd.controller;
 
 import com.jy2b.zxxfd.domain.dto.OrderQueryDTO;
 import com.jy2b.zxxfd.domain.dto.OrderSaveFromDTO;
+import com.jy2b.zxxfd.domain.dto.OrderStatusUpdateDTO;
 import com.jy2b.zxxfd.domain.dto.OrderUpdateFromDTO;
 import com.jy2b.zxxfd.domain.vo.ResultVO;
 import com.jy2b.zxxfd.service.IOrderService;
@@ -108,6 +109,11 @@ public class OrderController {
     @PreAuthorize("hasAnyAuthority('order:update')")
     public ResultVO updateOrder(@RequestBody OrderUpdateFromDTO updateFromDTO) {
         return orderService.updateOrder(updateFromDTO);
+    }
+
+    @PutMapping("/update/{orderId}")
+    public ResultVO updateOrderStatus(@PathVariable("orderId") Long orderId, OrderStatusUpdateDTO orderStatusUpdateDTO) {
+        return orderService.updateOrderStatus(orderId, orderStatusUpdateDTO);
     }
 
     @GetMapping("/count/{startDate}/{endDate}")

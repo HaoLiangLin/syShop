@@ -17,8 +17,4 @@ public class OrderUpdateFromDTO {
     private String district; // 区/县
     private String address; // 详细收货地址
     private String remarks; // 订单备注
-
-    private Integer logisticsStatus; // 物流状态
-
-    private Integer status; // 订单状态
 }
