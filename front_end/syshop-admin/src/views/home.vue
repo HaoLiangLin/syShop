@@ -250,6 +250,10 @@ export default {
     height: 100%;
     .el-aside{
       background-color: #fff;
+      .footer{
+        position: absolute;
+        bottom: 0;
+      }
       .title{
         padding: 15px 0;
         padding-left: 20px;

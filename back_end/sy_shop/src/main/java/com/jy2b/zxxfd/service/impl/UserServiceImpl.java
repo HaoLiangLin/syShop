@@ -1578,8 +1578,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         if (StrUtil.isBlank(code)) {
             return ResultVO.fail("手机号格式错误");
         }
+
+        CommunicationUtils.sendCode(phone, code, Long.toString(time));
         // 返回验证码
-        return ResultVO.ok(code, "验证码已发送");
+        return ResultVO.ok(null, "验证码已发送");
     }
     /**
      * 生成验证码

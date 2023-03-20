@@ -20,5 +20,9 @@ export default {
   background-repeat: no-repeat;
   display: flex;
   align-items: center;
+  .footer{
+    position: absolute;
+    bottom: 0;
+  }
 }
 </style>
