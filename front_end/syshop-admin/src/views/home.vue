@@ -56,8 +56,7 @@
               </template>
               <el-menu-item-group>
                 <el-menu-item index="/home/orderList">订单列表</el-menu-item>
-                <el-menu-item index="/home/3-1">订单修改</el-menu-item>
-                <el-menu-item index="/home/3-2">订单统计</el-menu-item>
+                <el-menu-item index="/home/orderCount">订单统计</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
             <el-submenu index="5">
@@ -66,8 +65,8 @@
                 <span slot="title">公告管理</span>
               </template>
               <el-menu-item-group>
-                <el-menu-item index="/home/5-1">公告分类列表</el-menu-item>
-                <el-menu-item index="/home/5-2">公告列表</el-menu-item>
+                <el-menu-item index="/home/noticeCategory">公告分类</el-menu-item>
+                <el-menu-item index="/home/noticeList">公告列表</el-menu-item>
                 <el-menu-item index="/home/5-3">新增公告</el-menu-item>
               </el-menu-item-group>
             </el-submenu>

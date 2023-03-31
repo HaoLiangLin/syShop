@@ -11,6 +11,11 @@ export function queryNoticeCategoryChild(id) {
   return request.get(`/noticeCategory/query/child/${id}`)
 }
 
+// 查询全部公告类型
+export function queryNoticeCategoryAll() {
+  return request.get('/noticeCategory/select')
+}
+
 // 新增公告类型
 export function saveNoticeCategory(name, fid, remark) {
   return request.post('/noticeCategory/save', {
@@ -54,6 +59,16 @@ export function updateNotice(id, title, cid, content) {
   return request.put(`/notices/update/${id}`, {
     title, cid, content
   })
+}
+
+// 首要公告
+export function indexNotice() {
+  return request.get('/notices/index')
+}
+
+// 首要公告推送
+export function indexNoticePush(niticeId) {
+  return request.put(`/notices/index/${niticeId}`)
 }
 
 // 查询活动
@@ -120,6 +135,7 @@ export function billCount(startDate, endDate) {
 export default {
   queryNoticeCategoryFirstPage,
   queryNoticeCategoryChild,
+  queryNoticeCategoryAll,
   saveNoticeCategory,
   deleteNoticeCategory,
   updateNoticeCategory,

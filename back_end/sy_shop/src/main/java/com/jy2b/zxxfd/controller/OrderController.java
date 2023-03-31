@@ -111,8 +111,8 @@ public class OrderController {
         return orderService.updateOrder(updateFromDTO);
     }
 
-    @PutMapping("/update/{orderId}")
-    public ResultVO updateOrderStatus(@PathVariable("orderId") Long orderId, OrderStatusUpdateDTO orderStatusUpdateDTO) {
+    @PutMapping("/update/status/{orderId}")
+    public ResultVO updateOrderStatus(@PathVariable("orderId") Long orderId, @RequestBody OrderStatusUpdateDTO orderStatusUpdateDTO) {
         return orderService.updateOrderStatus(orderId, orderStatusUpdateDTO);
     }
 

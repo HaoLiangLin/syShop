@@ -19,7 +19,10 @@ const routes = [
       { path: 'goodsList', component: () => import('@/components/goods/goodsList.vue') },
       { path: 'saveGoods', component: () => import('@/components/goods/saveGoods.vue') },
       { path: 'goodsItem/:id', component: () => import('@/components/goods/goodsItem.vue') },
-      { path: 'orderList', component: () => import('@/components/order/orderList.vue') }
+      { path: 'orderList', component: () => import('@/components/order/orderList.vue') },
+      { path: 'orderCount', component: () => import('@/components/order/orderCount.vue') },
+      { path: 'noticeCategory', component: () => import('@/components/notice/noticeCategory.vue') },
+      { path: 'noticeList', component: () => import('@/components/notice/noticeList.vue') }
     ]
   },
   // 登录

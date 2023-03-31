@@ -17,7 +17,7 @@ html{
   background-color: #EFF0F4;
   .footer{
     position: absolute;
-    bottom: 10px;
+    bottom: 3px;
     padding: 0 10px;
     a{
       font-size: 12px;

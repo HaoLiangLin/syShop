@@ -19,6 +19,7 @@ public class Notice {
     private Long id;
     @TableField("title")
     private String title;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     @TableField("cid")
     private Long cid;
     @TableField("content")

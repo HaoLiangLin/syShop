@@ -27,7 +27,7 @@ public class IUserServiceTest {
 
     @Test
     void timeTest() {
-        Date date = new Date();
+        Date date = new Date(1680081944000l);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String format = simpleDateFormat.format(date);
         System.out.println("format = " + format);

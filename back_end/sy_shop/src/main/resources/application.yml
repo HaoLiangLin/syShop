@@ -28,6 +28,16 @@ spring:
     multipart:
       max-file-size: 10MB # 单文件最大上传大小
       max-request-size: 100MB # 多文件最大上传大小
+  mail:
+    host: smtp.qq.com
+    username: 2130933887@qq.com
+    password: wcwoluyjkuvefcib
+    properties:
+      mail:
+        smtp: true
+      starttls:
+        enable: true
+        required: true
 mybatis-plus:
   type-aliases-package: com.jy2b.zxxfd.domain # 指定实体类别名路径
   mapper-locations: classpath:/mapper/*.xml

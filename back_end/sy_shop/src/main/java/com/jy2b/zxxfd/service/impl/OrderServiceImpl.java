@@ -627,13 +627,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             }
             // 获取下单用户id
             Long userId = orderQueryDTO.getUid();
-            if (orderId != null) {
+            if (userId != null) {
                 queryWrapper.eq("uid", userId);
             }
             // 获取联系电话
             String phone = orderQueryDTO.getPhone();
             if (StrUtil.isNotBlank(phone)) {
-                queryWrapper.like("phone", phone);
+                queryWrapper.eq("phone", phone);
             }
             // 获取支付状态
             Integer isPay = orderQueryDTO.getIsPay();
@@ -669,8 +669,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                     case "Asc": queryWrapper.orderByAsc("time");break;
                     case "Des": queryWrapper.orderByDesc("time");break;
                 }
-            } else {
-                queryWrapper.orderByDesc("time");
             }
 
             // 获取排序价格
@@ -852,6 +850,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // 获取物流状态
         Integer logisticsStatus = orderStatusUpdateDTO.getLogisticsStatus();
         if (logisticsStatus != null) {
+            if (logisticsStatus < 0 || logisticsStatus > 6) {
+                return ResultVO.fail("错误物流状态");
+            }
             // 修改物流状态
             if (logisticsStatus == LogisticsStatus.shipped.getCode()) {
                 Date date = new Date();
@@ -865,14 +866,17 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 order.setReturnTime(date);
                 // 退货
                 returnGoods(order.getId(), "订单退货失败");
-
-                order.setLogisticsStatus(logisticsStatus);
             }
+
+            order.setLogisticsStatus(logisticsStatus);
         }
 
         // 获取订单状态
         Integer status = orderStatusUpdateDTO.getStatus();
         if (status != null) {
+            if (status < 0 || status > 3) {
+                return ResultVO.fail("错误订单状态");
+            }
             // 修改订单状态
             order.setStatus(status);
             // 判断是否已退款

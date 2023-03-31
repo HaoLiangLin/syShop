@@ -131,6 +131,18 @@
             <artifactId>tencentcloud-sdk-java</artifactId>
             <version>3.1.718</version>
         </dependency>
+
+        <!--邮件服务-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId>
+            <version>3.3</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>

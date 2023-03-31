@@ -48,7 +48,9 @@ import {
   Alert,
   Empty,
   Autocomplete,
-  Card
+  Card,
+  Divider,
+  Badge
 } from 'element-ui'
 
 Vue.use(Container)
@@ -97,6 +99,8 @@ Vue.use(Alert)
 Vue.use(Empty)
 Vue.use(Autocomplete)
 Vue.use(Card)
+Vue.use(Divider)
+Vue.use(Badge)
 Vue.prototype.$message = Message
 Vue.prototype.$notify = Notification
 Vue.prototype.$confirm = MessageBox

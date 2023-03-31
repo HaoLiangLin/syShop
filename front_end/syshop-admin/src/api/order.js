@@ -14,9 +14,15 @@ export function updateOrder(id, remarks, name, phone, province, city, district, 
   })
 }
 
-// 修改订单状态
+/**
+ * 修改订单状态
+ * @param {*} orderId 订单号
+ * @param {*} logisticsStatus 0：未发货，1：待收货，2：已收货，3：待换货，4：已换货，5：待退货，6：已退货
+ * @param {*} status 0：未完成，1：已完成，2：待退款，3：已退款
+ * @returns function
+ */
 export function updateOrderStatus(orderId, logisticsStatus, status) {
-  return request.put(`/orders/update/${orderId}`, {
+  return request.put(`/orders/update/status/${orderId}`, {
     logisticsStatus, status
   })
 }
@@ -29,5 +35,6 @@ export function orderCount(startDate, endDate) {
 export default {
   queryOrder,
   updateOrder,
+  updateOrderStatus,
   orderCount
 }

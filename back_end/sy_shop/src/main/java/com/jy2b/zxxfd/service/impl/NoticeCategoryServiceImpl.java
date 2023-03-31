@@ -204,10 +204,10 @@ public class NoticeCategoryServiceImpl extends ServiceImpl<NoticeCategoryMapper,
         categoryDTO.setId(noticeCategory.getId());
         categoryDTO.setName(noticeCategory.getName());
         // 判断分类是否存在子分类
-        List<NoticeCategory> sGoodsCategories = query().eq("fid", noticeCategory.getId()).list();
-        if (!sGoodsCategories.isEmpty()) {
+        List<NoticeCategory> sNoticeCategories = query().eq("fid", noticeCategory.getId()).list();
+        if (!sNoticeCategories.isEmpty()) {
             // 存在子类
-            List<CategoryDTO> children = setSelectCategory(sGoodsCategories);
+            List<CategoryDTO> children = setSelectCategory(sNoticeCategories);
             categoryDTO.setChildren(children);
         }
 
